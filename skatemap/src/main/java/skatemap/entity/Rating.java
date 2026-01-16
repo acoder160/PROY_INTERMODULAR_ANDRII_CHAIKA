@@ -1,27 +1,28 @@
 package skatemap.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "comments")
-public class Comment {
+@Table(name = "ratings", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "spot_id"}) // Regla: 1 voto por usuario y spot
+})
+public class Rating {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String text; // El contenido del comentario
+    @Min(1) @Max(5) // Validación: Solo de 1 a 5 estrellas
+    @Column(name = "surface_rating", nullable = false)
+    private Integer value;
 
-    // Relación: Muchos comentarios pertenecen a UN Spot
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spot_id", nullable = false)
     private Spot spot;
 
-    // Relación: Muchos comentarios pertenecen a UN Usuario
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -29,7 +30,7 @@ public class Comment {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    public Comment() {}
+    public Rating() {}
 
     @PrePersist
     protected void onCreate() {
@@ -39,11 +40,10 @@ public class Comment {
     // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public String getText() { return text; }
-    public void setText(String text) { this.text = text; }
+    public Integer getValue() { return value; }
+    public void setValue(Integer value) { this.value = value; }
     public Spot getSpot() { return spot; }
     public void setSpot(Spot spot) { this.spot = spot; }
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
 }
