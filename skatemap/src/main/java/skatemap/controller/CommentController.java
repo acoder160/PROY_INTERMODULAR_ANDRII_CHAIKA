@@ -5,42 +5,35 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import skatemap.dto.CommentDto;
-import skatemap.service.CommentService;
+import skatemap.service.SpotService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/api/comments") // <--- ESTO ES LO QUE BUSCA REACT
 @CrossOrigin(origins = "*")
 public class CommentController {
 
-    private final CommentService commentService;
+    private final SpotService spotService;
 
-    public CommentController(CommentService commentService) {
-        this.commentService = commentService;
+    public CommentController(SpotService spotService) {
+        this.spotService = spotService;
     }
 
-    // AÑADIR COMENTARIO
-    // POST /api/comments/{spotId}
+    // 1. GUARDAR COMENTARIO (POST /api/comments/{spotId})
     @PostMapping("/{spotId}")
-    public ResponseEntity<CommentDto> addComment(@PathVariable Long spotId, @RequestBody Map<String, String> payload) {
-        // Obtenemos el usuario del Token
+    public ResponseEntity<?> addComment(@PathVariable Long spotId, @RequestBody CommentDto commentDto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
 
-        // Extraemos el texto del JSON {"text": "Hola..."}
-        String text = payload.get("text");
+        // Llamamos al servicio (Asegúrate de que spotService.addComment usa 'content' y no 'text')
+        spotService.addComment(spotId, commentDto.getContent(), auth.getName());
 
-        CommentDto newComment = commentService.addComment(spotId, username, text);
-        return ResponseEntity.ok(newComment);
+        return ResponseEntity.ok().build();
     }
 
-    // LEER COMENTARIOS DE UN SPOT
-    // GET /api/comments/{spotId}
-    @GetMapping("/{spotId}")
+    // 2. LEER COMENTARIOS (GET /api/comments/spot/{spotId})
+    @GetMapping("/spot/{spotId}")
     public ResponseEntity<List<CommentDto>> getComments(@PathVariable Long spotId) {
-        List<CommentDto> comments = commentService.getCommentsBySpot(spotId);
-        return ResponseEntity.ok(comments);
+        return ResponseEntity.ok(spotService.getCommentsBySpot(spotId));
     }
 }

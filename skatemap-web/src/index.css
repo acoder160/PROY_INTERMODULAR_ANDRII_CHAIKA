@@ -46,3 +46,19 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
+/* Estilo para los marcadores personalizados del mapa */
+.custom-marker {
+  background: none !important;
+  border: none !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px; /* Tamaño del icono */
+  filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4)); /* Sombrita para que destaque */
+  transition: transform 0.2s;
+}
+
+.custom-marker:hover {
+  transform: scale(1.2); /* Efecto zoom al pasar el ratón */
+}

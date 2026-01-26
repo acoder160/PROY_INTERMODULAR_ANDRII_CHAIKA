@@ -23,21 +23,31 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    // Función de Login
     const login = async (username, password) => {
         try {
             const response = await api.post('/auth/login', { username, password });
-            const { accessToken } = response.data; // Tu backend devuelve "accessToken"
             
-            // Guardamos en la "Caja Fuerte" del navegador
-            localStorage.setItem('token', accessToken);
+            // 1. MIRAR EN LA CONSOLA QUÉ LLEGA EXACTAMENTE (El Chivato)
+            console.log("📢 RESPUESTA DEL LOGIN:", response.data); 
+
+            // 2. BUSCAR EL TOKEN CON VARIOS NOMBRES POSIBLES
+            // Si no está en 'accessToken', mira en 'token', y si no en 'jwt'
+            const elToken = response.data.accessToken || response.data.token || response.data.jwt;
+
+            if (!elToken) {
+                alert("ERROR CRÍTICO: El backend no ha devuelto ningún token válido.");
+                throw new Error("Token no encontrado en la respuesta");
+            }
+            
+            // 3. GUARDAR EL TOKEN ENCONTRADO
+            localStorage.setItem('token', elToken);
             localStorage.setItem('username', username);
             
             setUser({ username });
-            return true; // Éxito
+            return true; 
         } catch (error) {
             console.error("Error login:", error);
-            throw error; // Lanzamos error para que lo maneje el formulario
+            throw error; 
         }
     };
 

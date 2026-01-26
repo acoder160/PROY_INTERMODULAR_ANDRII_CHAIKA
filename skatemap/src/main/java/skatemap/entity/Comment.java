@@ -13,8 +13,9 @@ public class Comment {
     private Long id;
 
     @NotBlank
+    // CAMBIO IMPORTANTE: Renombramos 'text' a 'content' para coincidir con DTO y Frontend
     @Column(columnDefinition = "TEXT", nullable = false)
-    private String text; // El contenido del comentario
+    private String content;
 
     // Relación: Muchos comentarios pertenecen a UN Spot
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,14 +37,20 @@ public class Comment {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Getters y Setters
+    // --- GETTERS Y SETTERS ACTUALIZADOS ---
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public String getText() { return text; }
-    public void setText(String text) { this.text = text; }
+
+    // Aquí está la clave: getContent y setContent
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+
     public Spot getSpot() { return spot; }
     public void setSpot(Spot spot) { this.spot = spot; }
+
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
 }

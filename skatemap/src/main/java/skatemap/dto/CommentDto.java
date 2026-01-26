@@ -3,18 +3,22 @@ package skatemap.dto;
 import java.time.LocalDateTime;
 
 public class CommentDto {
+
     private Long id;
-    private String text;      // Lo que escribe el usuario
-    private String username;  // Quién lo escribió
+    private String content; // Cambiado de 'text' a 'content' para coincidir con React
+    private String username;
     private LocalDateTime createdAt;
 
-    // Constructor vacío
+    // Opcional: Para mostrar la nota que puso el usuario (si la tienes)
+    private Integer rating;
+
+    // Constructor vacío (Necesario para que Spring lea el JSON)
     public CommentDto() {}
 
-    // Constructor completo
-    public CommentDto(Long id, String text, String username, LocalDateTime createdAt) {
+    // Constructor con todos los argumentos (Usado en tu Service)
+    public CommentDto(Long id, String content, String username, LocalDateTime createdAt) {
         this.id = id;
-        this.text = text;
+        this.content = content;
         this.username = username;
         this.createdAt = createdAt;
     }
@@ -22,10 +26,16 @@ public class CommentDto {
     // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public String getText() { return text; }
-    public void setText(String text) { this.text = text; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public Integer getRating() { return rating; }
+    public void setRating(Integer rating) { this.rating = rating; }
 }
