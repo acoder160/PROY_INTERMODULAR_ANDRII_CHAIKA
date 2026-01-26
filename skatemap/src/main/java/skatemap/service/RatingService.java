@@ -34,13 +34,13 @@ public class RatingService {
         Spot spot = spotRepository.findById(spotId)
                 .orElseThrow(() -> new RuntimeException("Spot no encontrado"));
 
-        // 2. Comprobar si ya existe voto (CORREGIDO: Usamos findBySpotAndUser)
+        // 2. Comprobar si ya existe voto (Usamos findBySpotAndUser)
         // Spring Data JPA espera los objetos entidad, no los IDs sueltos
         Optional<Rating> existingRating = ratingRepository.findBySpotAndUser(spot, user);
 
         Rating rating;
         if (existingRating.isPresent()) {
-            // Si ya votó, actualizamos el existente
+            // Si ya voto, actualizamos el existente
             rating = existingRating.get();
         } else {
             // Si es nuevo

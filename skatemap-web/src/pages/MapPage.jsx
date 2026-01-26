@@ -17,11 +17,18 @@ const getSpotIcon = (type) => {
     }
     return L.divIcon({
         className: 'custom-marker',
-        html: `<div style="font-size: 30px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));">${emoji}</div>`,
+        html: `<div style="font-size: 30px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); display: flex; justify-content: center; align-items: center;">${emoji}</div>`,
         iconSize: [40, 40],
         iconAnchor: [20, 20],
-        popupAnchor: [0, -20]
+        popupAnchor: [0, -25]
     });
+};
+
+// --- DICCIONARIO PARA TRADUCIR DIFICULTAD ---
+const difficultyLabels = {
+    'BEGINNER': 'Fácil',
+    'INTERMEDIATE': 'Medio',
+    'ADVANCED': 'Pro'
 };
 
 // --- COMPONENTE POPUP ---
@@ -82,15 +89,30 @@ function SpotPopup({ spot, onUpdate }) {
     if (loadingData) return <div style={{padding:'10px'}}>Cargando...</div>;
 
     return (
-        <div style={{ minWidth: '240px', maxWidth: '280px', fontFamily: 'Segoe UI, sans-serif' }}>
+        <div style={{ width: '260px', fontFamily: 'Segoe UI, sans-serif' }}>
             
             {/* INFO HEADER */}
             <div style={{ textAlign: 'center', marginBottom: '10px' }}>
                 <h3 style={{ margin: '0 0 5px 0', color: '#333', fontSize: '18px' }}>{spot.name}</h3>
                 <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#666' }}>{spot.description}</p>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
-                    <span style={{ background: '#f0f2f5', color: '#555', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #ddd' }}>{spot.spotType}</span>
-                    <span style={{ background: '#fff9c4', color: '#fbc531', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #f9ca24' }}>⭐ {spot.surfaceRating || '-'}</span>
+                
+                {/* ETIQUETAS: TIPO | DIFICULTAD | RATING */}
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                    
+                    {/* 1. Tipo */}
+                    <span style={{ background: '#f0f2f5', color: '#555', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #ddd' }}>
+                        {spot.spotType}
+                    </span>
+
+                    {/* 2. Dificultad (NUEVO) - Azulito */}
+                    <span style={{ background: '#e3f2fd', color: '#0984e3', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #74b9ff' }}>
+                        {difficultyLabels[spot.difficultyLevel] || spot.difficultyLevel}
+                    </span>
+
+                    {/* 3. Rating */}
+                    <span style={{ background: '#fff9c4', color: '#fbc531', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #f9ca24' }}>
+                        ⭐ {spot.surfaceRating || '-'}
+                    </span>
                 </div>
             </div>
 
@@ -115,7 +137,7 @@ function SpotPopup({ spot, onUpdate }) {
                 )}
             </div>
 
-            {/* FORMULARIO (CORREGIDO FONDO BLANCO) */}
+            {/* FORMULARIO */}
             {!hasVoted && currentRating > 0 && (
                 <div style={{ animation: 'fadeIn 0.3s' }}>
                     <textarea
@@ -131,9 +153,10 @@ function SpotPopup({ spot, onUpdate }) {
                             fontSize: '13px', 
                             resize: 'none', 
                             marginBottom: '8px',
-                            background: '#ffffff', // FORZADO BLANCO
-                            color: '#333333',      // TEXTO OSCURO
-                            fontFamily: 'inherit'
+                            background: '#ffffff', 
+                            color: '#333333',      
+                            fontFamily: 'inherit',
+                            boxSizing: 'border-box'
                         }}
                     />
                     <button
@@ -211,12 +234,10 @@ export default function MapPage() {
   return (
     <div style={{ height: '100vh', width: '100vw', position: 'relative', margin: 0, padding: 0, overflow: 'hidden' }}>
       
-      {/* ESTILOS GLOBALES PARA ARREGLAR LEAFLET POPUP */}
+      {/* ESTILOS GLOBALES */}
       <style>{`
-        /* Quitamos márgenes extraños del popup por defecto */
-        .leaflet-popup-content { margin: 12px !important; width: auto !important; }
-        .leaflet-popup-content-wrapper { border-radius: 12px !important; padding: 0 !important; overflow: hidden; }
-        /* Ajustamos el pico para que no se rompa */
+        .leaflet-popup-content-wrapper { padding: 0 !important; overflow: hidden; border-radius: 12px !important; }
+        .leaflet-popup-content { margin: 14px !important; width: 260px !important; }
         .leaflet-popup-tip-container { margin-top: -1px; }
       `}</style>
 

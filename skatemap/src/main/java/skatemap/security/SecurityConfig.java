@@ -55,20 +55,20 @@ public class SecurityConfig {
                 // 2. DESACTIVAR CSRF (Necesario para APIs REST)
                 .csrf(csrf -> csrf.disable())
 
-                // 3. GESTIÓN DE SESIONES (Sin estado / Stateless)
+                // 3. GESTION DE SESIONES (Sin estado / Stateless)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 4. REGLAS DE AUTORIZACIÓN (Rutas públicas vs privadas)
+                // 4. REGLAS DE AUTORIZACION
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/spots/**").permitAll() // <--- OPCIONAL: Si quieres que ver spots sea público (Crear seguirá pidiendo token por código)
+                        .requestMatchers("/api/spots/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
-        // 5. AÑADIR FILTROS
+        // 5.  FILTROS
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 

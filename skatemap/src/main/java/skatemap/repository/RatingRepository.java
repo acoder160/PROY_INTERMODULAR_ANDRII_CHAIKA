@@ -16,7 +16,7 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
     // Buscar si este usuario ya votó este spot
     Optional<Rating> findBySpotAndUser(Spot spot, User user);
 
-    // Calcular la media de estrellas directamente en SQL (muy rápido)
+    // Calcular la media de estrellas directamente en SQL
     @Query("SELECT AVG(r.value) FROM Rating r WHERE r.spot.id = :spotId")
     Double getAverageRating(@Param("spotId") Long spotId);
 }

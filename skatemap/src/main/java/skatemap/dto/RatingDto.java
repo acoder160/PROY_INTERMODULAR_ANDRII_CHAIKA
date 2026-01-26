@@ -8,7 +8,6 @@ public class RatingDto {
     // 1. Constructor Vacío (Obligatorio para JSON)
     public RatingDto() {}
 
-    // 2. Constructor Completo (ESTE ES EL QUE TE FALTA)
     public RatingDto(Integer value, Double newAverage) {
         this.value = value;
         this.newAverage = newAverage;

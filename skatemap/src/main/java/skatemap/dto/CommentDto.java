@@ -5,11 +5,10 @@ import java.time.LocalDateTime;
 public class CommentDto {
 
     private Long id;
-    private String content; // Cambiado de 'text' a 'content' para coincidir con React
+    private String content;
     private String username;
     private LocalDateTime createdAt;
 
-    // Opcional: Para mostrar la nota que puso el usuario (si la tienes)
     private Integer rating;
 
     // Constructor vacío (Necesario para que Spring lea el JSON)

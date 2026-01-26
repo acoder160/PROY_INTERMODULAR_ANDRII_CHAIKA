@@ -10,7 +10,7 @@ import skatemap.service.SpotService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/comments") // <--- ESTO ES LO QUE BUSCA REACT
+@RequestMapping("/api/comments")
 @CrossOrigin(origins = "*")
 public class CommentController {
 
@@ -25,7 +25,7 @@ public class CommentController {
     public ResponseEntity<?> addComment(@PathVariable Long spotId, @RequestBody CommentDto commentDto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        // Llamamos al servicio (Asegúrate de que spotService.addComment usa 'content' y no 'text')
+        // Llamamos al servicio
         spotService.addComment(spotId, commentDto.getContent(), auth.getName());
 
         return ResponseEntity.ok().build();

@@ -1,7 +1,7 @@
 package skatemap.entity;
 
-import skatemap.entity.enums.DifficultyLevel; // Asegúrate de que este paquete sea correcto
-import skatemap.entity.enums.SpotType;       // Asegúrate de que este paquete sea correcto
+import skatemap.entity.enums.DifficultyLevel;
+import skatemap.entity.enums.SpotType;
 import jakarta.persistence.*;
 import org.locationtech.jts.geom.Point;
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ public class Spot {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // Coordenadas geoespaciales (Latitud/Longitud) [cite: 210]
+    // Coordenadas geoespaciales (Latitud/Longitud)
     @Column(columnDefinition = "geometry(Point, 4326)", nullable = false)
     private Point location;
 

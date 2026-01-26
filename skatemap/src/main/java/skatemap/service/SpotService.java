@@ -68,7 +68,7 @@ public class SpotService {
         return spotRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
-    // --- NUEVA LÓGICA: VALORACIONES (RATINGS) ---
+    // VALORACIONES (RATINGS)
 
     @Transactional
     public void addRating(Long spotId, int value, String username) {
@@ -107,14 +107,14 @@ public class SpotService {
                 .orElse(new RatingDto());
     }
 
-    public void addComment(Long spotId, String content, String username) { // <--- content
+    public void addComment(Long spotId, String content, String username) {
         Spot spot = spotRepository.findById(spotId).orElseThrow(() -> new RuntimeException("Spot no encontrado"));
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User no encontrado"));
 
         Comment comment = new Comment();
         comment.setSpot(spot);
         comment.setUser(user);
-        comment.setContent(content); // <--- setContent
+        comment.setContent(content);
         commentRepository.save(comment);
 
     }
@@ -125,7 +125,6 @@ public class SpotService {
                     CommentDto dto = new CommentDto();
                     dto.setId(c.getId());
 
-                    // CORREGIDO: Ahora usamos setContent y getContent
                     dto.setContent(c.getContent());
 
                     dto.setUsername(c.getUser().getUsername());

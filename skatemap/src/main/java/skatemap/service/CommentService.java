@@ -27,7 +27,6 @@ public class CommentService {
     }
 
     @Transactional
-    // OJO: Cambié el nombre del parámetro 'text' a 'content' por claridad
     public CommentDto addComment(Long spotId, String username, String content) {
         // 1. Buscar el Spot
         Spot spot = spotRepository.findById(spotId)
@@ -41,17 +40,14 @@ public class CommentService {
         Comment comment = new Comment();
         comment.setSpot(spot);
         comment.setUser(user);
-
-        // CORRECCIÓN: Usamos setContent en lugar de setText para coincidir con la Entidad
         comment.setContent(content);
 
         Comment savedComment = commentRepository.save(comment);
 
         // 4. Devolver DTO
-        // CORRECCIÓN: He quitado el 5º argumento (savedComment) porque el DTO solo acepta 4
         return new CommentDto(
                 savedComment.getId(),
-                savedComment.getContent(), // getContent en vez de getText
+                savedComment.getContent(),
                 savedComment.getUser().getUsername(),
                 savedComment.getCreatedAt()
         );
@@ -63,7 +59,7 @@ public class CommentService {
         return comments.stream()
                 .map(comment -> new CommentDto(
                         comment.getId(),
-                        comment.getContent(), // getContent en vez de getText
+                        comment.getContent(),
                         comment.getUser().getUsername(),
                         comment.getCreatedAt()))
                 .collect(Collectors.toList());

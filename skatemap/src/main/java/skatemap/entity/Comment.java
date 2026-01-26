@@ -13,7 +13,6 @@ public class Comment {
     private Long id;
 
     @NotBlank
-    // CAMBIO IMPORTANTE: Renombramos 'text' a 'content' para coincidir con DTO y Frontend
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
@@ -37,7 +36,7 @@ public class Comment {
         this.createdAt = LocalDateTime.now();
     }
 
-    // --- GETTERS Y SETTERS ACTUALIZADOS ---
+    // --- GETTERS Y SETTERS ---
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

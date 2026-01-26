@@ -18,7 +18,7 @@ import skatemap.security.JwtUtil;
 import skatemap.security.UserDetailsServiceImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 
-@CrossOrigin(origins = "*", maxAge = 3600) // Permite peticiones desde React/Móvil
+@CrossOrigin(origins = "*", maxAge = 3600) // Permite peticiones desde React/Movil
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

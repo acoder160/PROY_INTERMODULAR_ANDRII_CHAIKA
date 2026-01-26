@@ -36,7 +36,7 @@ public class User {
     // CONSTRUCTOR VACÍO (Obligatorio para JPA)
     public User() {}
 
-    // AUTOMATIZACIÓN: Antes de guardar, pon la fecha actual
+    // AUTOMATIZACIÓN: Antes de guardar, poner la fecha actual
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

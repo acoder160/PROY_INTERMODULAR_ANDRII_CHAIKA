@@ -4,10 +4,10 @@ import api from '../api/axiosConfig';
 // Creamos el contexto
 const AuthContext = createContext();
 
-// Hook personalizado para usar el contexto fácil
+// Hook personalizado para usar el contexto facil
 export const useAuth = () => useContext(AuthContext);
 
-// El proveedor que envolverá la app
+// El proveedor que envolvera la app
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);

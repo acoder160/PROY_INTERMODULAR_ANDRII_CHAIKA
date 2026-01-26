@@ -20,8 +20,8 @@ public class CorsConfig {
         // 1. Permitir que se envíen credenciales (cookies, headers de auth)
         config.setAllowCredentials(true);
 
-        // 2. Dominios permitidos (Tu Frontend)
-        // IMPORTANTE: Pon aquí la URL exacta de tu frontend (sin barra al final)
+        // 2. Dominios permitidos (Frontend)
+        // IMPORTANTE: aqui la URL exacta del frontend
         config.setAllowedOrigins(List.of("http://localhost:5173"));
 
         // 3. Headers permitidos

@@ -1,4 +1,4 @@
-/* src/index.css - BORRA TODO LO ANTERIOR Y PON ESTO */
+
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -16,7 +16,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* IMPORTANTE: Quitamos los márgenes por defecto del navegador */
 body {
   margin: 0;
   padding: 0;
