@@ -1,112 +1,181 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Platform } from 'react-native';
+import * as Location from 'expo-location';
+import * as ImagePicker from 'expo-image-picker';
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+export default function AddSpotScreen() {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [isLoadingLoc, setIsLoadingLoc] = useState(false);
 
-export default function TabTwoScreen() {
+  // Función para obtener Geolocalización
+  const getLocation = async () => {
+    setIsLoadingLoc(true);
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Se denegó el permiso para acceder a la ubicación');
+        setIsLoadingLoc(false);
+        return;
+      }
+
+      let currentLoc = await Location.getCurrentPositionAsync({});
+      setLocation(currentLoc);
+    } catch (error) {
+      alert('Error al obtener la ubicación. Comprueba los permisos de tu navegador.');
+    } finally {
+      setIsLoadingLoc(false);
+    }
+  };
+
+  // Función para abrir la cámara o galería
+  const takePhoto = async () => {
+    // Pedimos permisos
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      alert("Necesitamos permisos para usar la cámara.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
+  const handleSaveSpot = () => {
+    if (!name || !location || !imageUri) {
+      alert('Falta información (Nombre, Ubicación o Foto)');
+      return;
+    }
+
+    const newSpot = {
+      name,
+      description,
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      imageUri,
+    };
+
+    console.log('Spot listo para enviar al backend (Spring Boot):', newSpot);
+    alert('Spot guardado temporalmente (Revisa la consola)');
+    // Aquí integraremos Axios para hacer el POST
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>🛹 Añadir Nuevo Spot</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre del spot (ej. Antoniuti)"
+        value={name}
+        onChangeText={setName}
+      />
+
+      <TextInput
+        style={[styles.input, styles.textArea]}
+        placeholder="Descripción..."
+        value={description}
+        onChangeText={setDescription}
+        multiline
+        numberOfLines={4}
+      />
+
+      {/* Botón Geolocalización */}
+      <TouchableOpacity style={styles.buttonSecondary} onPress={getLocation}>
+        <Text style={styles.buttonText}>
+          {isLoadingLoc ? "Buscando..." : "📍 Obtener mi Ubicación"}
+        </Text>
+      </TouchableOpacity>
+      
+      {location && (
+        <Text style={styles.infoText}>
+          Lat: {location.coords.latitude.toFixed(4)} | Lng: {location.coords.longitude.toFixed(4)}
+        </Text>
+      )}
+
+      {/* Botón Foto */}
+      <TouchableOpacity style={styles.buttonSecondary} onPress={takePhoto}>
+        <Text style={styles.buttonText}>📸 Tomar Foto</Text>
+      </TouchableOpacity>
+
+      {imageUri && (
+        <Image source={{ uri: imageUri }} style={styles.previewImage} />
+      )}
+
+      {/* Botón Guardar */}
+      <TouchableOpacity style={styles.buttonPrimary} onPress={handleSaveSpot}>
+        <Text style={styles.buttonText}>Guardar Spot</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#F8F9FA', 
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1A1A1A',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: 'top',
+  },
+  buttonPrimary: {
+    backgroundColor: '#2EC4B6', 
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonSecondary: {
+    backgroundColor: '#FF9F1C', // Color Acento
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  infoText: {
+    textAlign: 'center',
+    color: '#6C757D',
+    marginBottom: 15,
+  },
+  previewImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginTop: 10,
+    resizeMode: 'cover',
   },
 });

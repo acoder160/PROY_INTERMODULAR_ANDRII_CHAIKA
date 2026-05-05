@@ -1,98 +1,177 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import axios from 'axios';
+import SkateMap from '../../components/skatemap';
+import AddSpotScreen from './explore'; 
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [modalVisible, setModalVisible] = useState(false);
+  const [spots, setSpots] = useState([]);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  // 1. CONEXIÓN AL BACKEND (Spring Boot)
+  const fetchSpots = async () => {
+    try {
+      // endpoint definido en la memoria
+      const response = await axios.get('http://localhost:8080/api/spots');
+      setSpots(response.data);
+      console.log("Spots cargados:", response.data);
+    } catch (error) {
+      console.error("Error cargando spots desde el backend:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSpots();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      
+      {/* MAPA */}
+      <View style={styles.mapContainer}>
+        {/* Aquí en el futuro le pasaremos los 'spots' como props a SkateMap */}
+        <SkateMap />
+      </View>
+
+      {/* BADGE DE USUARIO (Arriba centro) */}
+      <View style={styles.userBadge}>
+        <Text style={styles.userName}>👤 tonyhawk56</Text>
+        <View style={styles.separator} />
+        <TouchableOpacity>
+          <Text style={styles.logoutText}>Salir</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* BOTÓN RECENTRAR (Derecha) */}
+      <TouchableOpacity style={styles.recenterButton}>
+        <Text style={styles.iconText}>🔄</Text>
+      </TouchableOpacity>
+
+      {/* BOTÓN PIN (Abajo derecha) */}
+      <TouchableOpacity style={styles.pinButton}>
+        <Text style={styles.iconText}>📍</Text>
+      </TouchableOpacity>
+
+      {/* BOTÓN FLOTANTE: AÑADIR SPOT (Abajo centro) */}
+      <TouchableOpacity 
+        style={styles.fab} 
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={styles.fabIcon}>➕</Text>
+        <Text style={styles.fabText}>Añadir Spot</Text>
+      </TouchableOpacity>
+
+      {/* MODAL DEL FORMULARIO */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity 
+              style={styles.closeButton} 
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>✕ Cerrar</Text>
+            </TouchableOpacity>
+            <View style={{ flex: 1 }}>
+              <AddSpotScreen />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: { flex: 1, backgroundColor: '#fff' },
+  mapContainer: { flex: 1, backgroundColor: '#e5e5e5' },
+  
+  // Estilo del Badge de Usuario (Arriba)
+  userBadge: {
+    position: 'absolute',
+    top: 20,
+    alignSelf: 'center',
+    backgroundColor: 'white',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  userName: { fontWeight: 'bold', color: '#1A1A1A', marginRight: 10 },
+  separator: { width: 1, height: 15, backgroundColor: '#E0E0E0', marginRight: 10 },
+  logoutText: { color: '#FF6B35', fontWeight: 'bold' },
+
+  // Botón Recentrar (Derecha)
+  recenterButton: {
     position: 'absolute',
+    right: 15,
+    top: '45%',
+    backgroundColor: 'white',
+    width: 45,
+    height: 45,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
   },
+
+  // Botón Pin (Abajo derecha)
+  pinButton: {
+    position: 'absolute',
+    right: 15,
+    bottom: 30,
+    backgroundColor: 'white',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  iconText: { fontSize: 20 },
+
+  // Botón Añadir Spot 
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    alignSelf: 'center',
+    backgroundColor: '#2EC4B6', // Verde/Turquesa
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 30,
+    shadowColor: '#2EC4B6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  fabIcon: { fontSize: 18, marginRight: 8, color: 'white' },
+  fabText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+
+  // Modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#F8F9FA', height: '85%', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 10, overflow: 'hidden' },
+  closeButton: { alignSelf: 'flex-end', padding: 15 },
+  closeButtonText: { fontSize: 16, fontWeight: 'bold', color: '#FF6B35' }
 });
