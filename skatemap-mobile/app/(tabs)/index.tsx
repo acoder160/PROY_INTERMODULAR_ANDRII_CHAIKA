@@ -1,28 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext'; // Importamos nuestro contexto de autenticación
 import SkateMap from '../../components/skatemap';
+import { useRouter, Redirect } from 'expo-router';
 import AddSpotScreen from './explore'; 
 
 export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [spots, setSpots] = useState([]);
+  
+  const { user, token, logout } = useAuth(); 
 
-  // 1. CONEXIÓN AL BACKEND (Spring Boot)
+  // 1. CONEXIÓN AL BACKEND
   const fetchSpots = async () => {
+    if (!token) return; 
+    
     try {
-      // endpoint definido en la memoria
-      const response = await axios.get('http://localhost:8080/api/spots');
+      const response = await axios.get('http://localhost:8080/api/spots', {
+        headers: { Authorization: `Bearer ${token}` } 
+      });
       setSpots(response.data);
-      console.log("Spots cargados:", response.data);
+      console.log("Spots cargados de la base de datos:", response.data);
     } catch (error) {
-      console.error("Error cargando spots desde el backend:", error);
+      console.error("Error cargando spots:", error);
     }
   };
 
   useEffect(() => {
     fetchSpots();
-  }, []);
+  }, [token]);
+
+  // Redirección declarativa y segura de Expo Router
+  if (!user) {
+    return <Redirect href="/login" />;
+  }
 
   return (
     <View style={styles.container}>
@@ -33,11 +45,12 @@ export default function HomeScreen() {
         <SkateMap />
       </View>
 
-      {/* BADGE DE USUARIO (Arriba centro) */}
+      {/* BADGE DE USUARIO DINÁMICO (Arriba centro) */}
       <View style={styles.userBadge}>
-        <Text style={styles.userName}>👤 tonyhawk56</Text>
+        <Text style={styles.userName}>👤 {user}</Text>
         <View style={styles.separator} />
-        <TouchableOpacity>
+        {/* Conectamos el botón de salir a la función del contexto */}
+        <TouchableOpacity onPress={logout}>
           <Text style={styles.logoutText}>Salir</Text>
         </TouchableOpacity>
       </View>
