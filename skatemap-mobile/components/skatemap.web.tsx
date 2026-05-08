@@ -1,91 +1,85 @@
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import * as Location from 'expo-location';
-import { View, Text, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 
-// Solución al icono de Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png'
-});
+export default function SkateMap({ spots = [] }: { spots?: any[] }) {
+  const spotsJSON = JSON.stringify(spots);
 
-// Componente para cambiar el centro dinámicamente
-function MapUpdater({ center }: { center: [number, number] }) {
-  const map = useMap();
-  map.setView(center, map.getZoom());
-  return null;
-}
+  const leafletHTML = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <style>
+          html, body { padding: 0; margin: 0; height: 100%; width: 100%; background-color: #e5e5e5; }
+          #map { height: 100%; width: 100%; }
+          .custom-marker {
+            font-size: 30px; 
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="map"></div>
+        <script>
+          var map = L.map('map', {
+            zoomControl: false 
+          }).setView([42.8125, -1.6458], 14);
 
-export default function SkateMap() {
-  const [location, setLocation] = useState<[number, number] | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+          }).addTo(map);
 
-  const fallbackPosition: [number, number] = [42.8125, -1.6458]; // Pamplona, si ubicacion falla
+          var emojiIcon = L.divIcon({
+            className: 'custom-marker',
+            html: '📍',
+            iconSize: [40, 40],
+            iconAnchor: [20, 20],
+            popupAnchor: [0, -25]
+          });
 
-  useEffect(() => {
-    // ✅ INYECTAMOS EL CSS DE LEAFLET DESDE UN CDN
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-    document.head.appendChild(link);
+          var spotsData = ${spotsJSON};
 
-    // Lógica de geolocalización
-    (async () => {
-      try {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        
-        if (status !== 'granted') {
-          setErrorMsg('Permiso de ubicación denegado. Usando ubicación por defecto.');
-          setLocation(fallbackPosition);
-          return;
-        }
+          spotsData.forEach(function(spot) {
+            if(spot.latitude && spot.longitude) {
+              L.marker([spot.latitude, spot.longitude], { icon: emojiIcon })
+                .addTo(map)
+                .bindPopup('<b style="font-size:16px;">' + (spot.name || 'Spot') + '</b><br>' + (spot.description || ''));
+            }
+          });
 
-        let currentLocation = await Location.getCurrentPositionAsync({});
-        setLocation([currentLocation.coords.latitude, currentLocation.coords.longitude]);
-      } catch (error) {
-        setErrorMsg('No se pudo obtener la ubicación. Usando ubicación por defecto.');
-        setLocation(fallbackPosition);
-      }
-    })();
-  }, []);
-
-  if (!location) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#e5e5e5' }}>
-        <ActivityIndicator size="large" color="#2EC4B6" />
-        <Text style={{ marginTop: 10, color: '#6C757D' }}>Buscando tu ubicación...</Text>
-      </View>
-    );
-  }
+          if (spotsData.length === 0) {
+            L.marker([42.8125, -1.6458], { icon: emojiIcon })
+              .addTo(map)
+              .bindPopup('<b style="font-size:16px;">Pamplona</b><br>¡Añade tu primer spot!');
+          }
+        </script>
+      </body>
+    </html>
+  `;
 
   return (
-    <>
-      {errorMsg && (
-        <View style={{ backgroundColor: '#FF9F1C', padding: 10, zIndex: 10 }}>
-          <Text style={{ color: 'white', textAlign: 'center', fontSize: 12 }}>{errorMsg}</Text>
-        </View>
-      )}
-
-      <MapContainer 
-        center={location} 
-        zoom={14} 
-        style={{ height: '100%', width: '100%', zIndex: 0 }}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <MapUpdater center={location} />
-        
-        <Marker position={location}>
-          <Popup>
-            {errorMsg ? "Ubicación aproximada (Respaldo)" : "¡Estás aquí!"}
-          </Popup>
-        </Marker>
-      </MapContainer>
-    </>
+    <View style={styles.container}>
+      {/* ¡AQUÍ ESTÁ LA MAGIA! 
+        En lugar de WebView (que es para móviles), usamos un iframe estándar de la web.
+      */}
+      <iframe 
+        srcDoc={leafletHTML}
+        style={{ width: '100%', height: '100%', border: 'none' }}
+        title="SkateMap Web"
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#e5e5e5',
+  },
+});

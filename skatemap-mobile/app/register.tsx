@@ -20,7 +20,7 @@ export default function RegisterScreen() {
     setIsLoading(true);
     try {
       // Petición real al backend para registrar[cite: 2]
-      await axios.post('https://great-peas-ring.loca.lt/api/auth/register', {
+      await axios.post('https://small-geese-invite.loca.lt/api/auth/register', {
         username: username,
         email: email,
         password: password

@@ -25,7 +25,7 @@ public class CorsConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",      // Tu React Web original
                 "http://localhost:8081",      // Expo Web (Navegador local)
-                "https://great-peas-ring.loca.lt"     // Expo (App móvil vía Hotspot)
+                "https://small-geese-invite.loca.lt"     // Expo (App móvil vía LocalTunel)
         ));
 
         // 3. Headers permitidos

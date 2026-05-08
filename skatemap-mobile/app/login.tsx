@@ -21,7 +21,7 @@ export default function LoginScreen() {
     setIsLoading(true);
     try {
       // Petición real al backend Spring Boot[cite: 2]
-      const response = await axios.post('https://great-peas-ring.loca.lt/api/auth/login', {
+      const response = await axios.post('https://small-geese-invite.loca.lt/api/auth/login', {
         username: username,
         password: password
       });
