@@ -21,8 +21,12 @@ public class CorsConfig {
         config.setAllowCredentials(true);
 
         // 2. Dominios permitidos (Frontend)
-        // IMPORTANTE: aqui la URL exacta del frontend
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        // IMPORTANTE: Añadimos la IP de tu hotspot y el puerto de Expo (8081)
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",      // Tu React Web original
+                "http://localhost:8081",      // Expo Web (Navegador local)
+                "https://great-peas-ring.loca.lt"     // Expo (App móvil vía Hotspot)
+        ));
 
         // 3. Headers permitidos
         config.setAllowedHeaders(Arrays.asList(
@@ -30,10 +34,12 @@ public class CorsConfig {
                 "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"
         ));
 
-        // 4. Métodos permitidos (GET, POST, PUT, DELETE...)
+        // 4. Métodos permitidos (GET, POST, PUT, DELETE, OPTIONS vital para preflight)
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
+        // Aplica esta configuración a todas las rutas de tu API
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
+
 }

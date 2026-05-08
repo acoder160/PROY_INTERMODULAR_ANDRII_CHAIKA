@@ -44,7 +44,10 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow SkateMap to use your location to show nearby skate spots."
         }
-      ]
+      ],
+      "expo-font",
+      "expo-image",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

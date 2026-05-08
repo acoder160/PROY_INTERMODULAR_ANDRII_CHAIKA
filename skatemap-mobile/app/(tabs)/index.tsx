@@ -17,7 +17,7 @@ export default function HomeScreen() {
     if (!token) return; 
     
     try {
-      const response = await axios.get('http://localhost:8080/api/spots', {
+      const response = await axios.get('https://great-peas-ring.loca.lt/api/spots', {
         headers: { Authorization: `Bearer ${token}` } 
       });
       setSpots(response.data);
@@ -102,12 +102,15 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  mapContainer: { flex: 1, backgroundColor: '#e5e5e5' },
+  mapContainer: { 
+    ...StyleSheet.absoluteFillObject, 
+    zIndex: -1
+  },
   
   // Estilo del Badge de Usuario (Arriba)
   userBadge: {
     position: 'absolute',
-    top: 20,
+    top: 60,
     alignSelf: 'center',
     backgroundColor: 'white',
     flexDirection: 'row',
