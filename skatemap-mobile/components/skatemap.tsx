@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
@@ -18,7 +18,19 @@ export default function SkateMap({
 }: SkateMapProps) {
   const webviewRef = useRef<WebView>(null);
 
-  // 1. Sincronizamos la ubicación del usuario
+  // --- 1. NUEVO: Sincronizamos los spots sin recargar el mapa ---
+  useEffect(() => {
+    if (webviewRef.current) {
+      webviewRef.current.injectJavaScript(`
+        if(typeof window.renderSpots === 'function') {
+          window.renderSpots(${JSON.stringify(spots)});
+        }
+        true;
+      `);
+    }
+  }, [spots]);
+
+  // 2. Sincronizamos la ubicación del usuario
   useEffect(() => {
     if (userLocation && webviewRef.current) {
       webviewRef.current.injectJavaScript(`
@@ -30,7 +42,7 @@ export default function SkateMap({
     }
   }, [userLocation]);
 
-  // 2. Sincronizamos el modo "Añadir Spot" para que el mapa deje hacer clic
+  // 3. Sincronizamos el modo "Añadir Spot" para que el mapa deje hacer clic
   useEffect(() => {
     if (webviewRef.current) {
       webviewRef.current.injectJavaScript(`
@@ -44,9 +56,9 @@ export default function SkateMap({
     }
   }, [isAddingMode]);
 
-  const spotsJSON = JSON.stringify(spots);
-
-  const leafletHTML = `
+  // --- 4. CLAVE: Usamos useState para que el HTML sea estático ---
+  // Así evitamos que la pantalla parpadee o borre el círculo azul al abrir la cámara
+  const [staticHtml] = useState(`
     <!DOCTYPE html>
     <html>
       <head>
@@ -92,7 +104,8 @@ export default function SkateMap({
       <body>
         <div id="map"></div>
         <script>
-          window.isAddingMode = ${isAddingMode};
+          // Inicializamos los estados
+          window.isAddingMode = false;
           window.newSpotMarker = null;
 
           var map = L.map('map', { zoomControl: false }).setView([42.8125, -1.6458], 14);
@@ -102,7 +115,10 @@ export default function SkateMap({
             attribution: '© OpenStreetMap'
           }).addTo(map);
 
-          // 1. LOS IFS PARA LOS ICONOS (Corregidos según tu versión web)
+          // Creamos una capa para los spots para poder borrarlos y redibujarlos dinámicamente
+          var spotsLayer = L.layerGroup().addTo(map);
+
+          // 1. LOS IFS PARA LOS ICONOS
           function getSpotEmoji(type) {
             var t = (type || '').toUpperCase();
             switch (t) {
@@ -116,50 +132,54 @@ export default function SkateMap({
             }
           }
 
-          var spotsData = ${spotsJSON};
+          // FUNCIÓN PARA RENDERIZAR SPOTS DINÁMICAMENTE
+          window.renderSpots = function(spotsData) {
+            spotsLayer.clearLayers(); 
+            
+            spotsData.forEach(function(spot) {
+              if(spot.latitude && spot.longitude) {
+                var emoji = getSpotEmoji(spot.spotType || spot.type);
+                var icon = L.divIcon({
+                  className: 'custom-marker',
+                  html: emoji,
+                  iconSize: [40, 40],
+                  iconAnchor: [20, 20],
+                  popupAnchor: [0, -25]
+                });
 
-          spotsData.forEach(function(spot) {
-            if(spot.latitude && spot.longitude) {
-              
-              var emoji = getSpotEmoji(spot.spotType || spot.type);
-              var icon = L.divIcon({
-                className: 'custom-marker',
-                html: emoji,
-                iconSize: [40, 40],
-                iconAnchor: [20, 20],
-                popupAnchor: [0, -25]
-              });
-
-              var imageUrl = spot.mediaUrl ? spot.mediaUrl : 'https://skateism.com/wp-content/uploads/2019/02/placeholder-skate.jpg';
-              var spotType = (spot.spotType || 'SPOT').toUpperCase();
-              var diff = (spot.difficultyLevel || 'MEDIA').toUpperCase();
-              
-              var popupHTML = \`
-                <div class="popup-card">
-                  <img src="\${imageUrl}" class="popup-image" onerror="this.src='https://via.placeholder.com/220x120?text=Sin+Imagen'" />
-                  <div class="popup-info">
-                    <h3 class="popup-title">\${spot.name || 'Spot Sin Nombre'}</h3>
-                    <div class="popup-badges">
-                      <span class="badge-type">\${spotType}</span>
-                      <span class="badge-diff">\${diff}</span>
+                var imageUrl = spot.mediaUrl ? spot.mediaUrl : 'https://skateism.com/wp-content/uploads/2019/02/placeholder-skate.jpg';
+                var spotType = (spot.spotType || 'SPOT').toUpperCase();
+                var diff = (spot.difficultyLevel || 'MEDIA').toUpperCase();
+                
+                var popupHTML = \`
+                  <div class="popup-card">
+                    <img src="\${imageUrl}" class="popup-image" onerror="this.src='https://via.placeholder.com/220x120?text=Sin+Imagen'" />
+                    <div class="popup-info">
+                      <h3 class="popup-title">\${spot.name || 'Spot Sin Nombre'}</h3>
+                      <div class="popup-badges">
+                        <span class="badge-type">\${spotType}</span>
+                        <span class="badge-diff">\${diff}</span>
+                      </div>
+                      <p class="popup-desc">\${spot.description || 'No hay descripción detallada para este spot.'}</p>
                     </div>
-                    <p class="popup-desc">\${spot.description || 'No hay descripción detallada para este spot.'}</p>
                   </div>
-                </div>
-              \`;
+                \`;
 
-              L.marker([spot.latitude, spot.longitude], { icon: icon })
-                .addTo(map)
-                .bindPopup(popupHTML);
-            }
-          });
+                L.marker([spot.latitude, spot.longitude], { icon: icon })
+                  .addTo(spotsLayer) // Añadimos a la capa nueva
+                  .bindPopup(popupHTML);
+              }
+            });
+          };
 
-          // 2. FUNCIÓN PARA EL BOTÓN DEL PUNTO AZUL
+          // 2. FUNCIÓN PARA EL BOTÓN DEL PUNTO AZUL Y CÍRCULO
           var userMarker = null;
+          var locationCircle = null; 
+
           window.updateUserLocation = function(lat, lng) {
-            if (userMarker) {
-              map.removeLayer(userMarker);
-            }
+            if (userMarker) map.removeLayer(userMarker);
+            if (locationCircle) map.removeLayer(locationCircle);
+
             var blueDotIcon = L.divIcon({
               className: 'blue-dot',
               html: '<div class="blue-dot-inner"></div>',
@@ -168,20 +188,49 @@ export default function SkateMap({
             });
             
             userMarker = L.marker([lat, lng], { icon: blueDotIcon }).addTo(map);
+
+            // DIBUJAMOS EL RADIO DE 200 METROS
+            locationCircle = L.circle([lat, lng], {
+                color: '#3498db',
+                fillColor: '#3498db',
+                fillOpacity: 0.15,
+                radius: 200, // 200 metros
+                weight: 1
+            }).addTo(map);
+
             map.flyTo([lat, lng], 16, { animate: true, duration: 1.5 });
           };
 
-          // 3. EVENTO DE CLIC EN EL MAPA (CRÍTICO PARA PODER AÑADIR SPOTS)
+          // 3. EVENTO DE CLIC EN EL MAPA CON VALIDACIÓN DE 200m
           map.on('click', function(e) {
             if (window.isAddingMode) {
+              
+              if (!userMarker) {
+                 window.ReactNativeWebView.postMessage(JSON.stringify({ 
+                    type: 'error', 
+                    message: 'Por favor, espera a que el GPS detecte tu ubicación.' 
+                 }));
+                 return;
+              }
+
+              var userLatLng = userMarker.getLatLng();
+              var distanceInMeters = userLatLng.distanceTo(e.latlng);
+
+              if (distanceInMeters > 200) {
+                 window.ReactNativeWebView.postMessage(JSON.stringify({ 
+                    type: 'error', 
+                    message: 'Estás a ' + Math.round(distanceInMeters) + 'm. Debes estar a menos de 200m del spot para añadirlo.' 
+                 }));
+                 return;
+              }
+
               if (window.newSpotMarker) {
                 map.removeLayer(window.newSpotMarker);
               }
-              // Ponemos un pin temporal donde el usuario tocó
               window.newSpotMarker = L.marker(e.latlng, { opacity: 0.7 }).addTo(map);
               
-              // Enviamos las coordenadas a la app móvil
               window.ReactNativeWebView.postMessage(JSON.stringify({ 
+                type: 'locationSelected', 
                 lat: e.latlng.lat, 
                 lng: e.latlng.lng 
               }));
@@ -190,7 +239,7 @@ export default function SkateMap({
         </script>
       </body>
     </html>
-  `;
+  `);
 
   return (
     <View style={styles.container}>
@@ -199,16 +248,19 @@ export default function SkateMap({
         originWhitelist={['*']}
         javaScriptEnabled={true}
         domStorageEnabled={true}
-        source={{ html: leafletHTML }} 
+        source={{ html: staticHtml }} // Usamos la constante estática
         style={styles.map} 
         scrollEnabled={false}
         bounces={false}
-        // 4. RECIBIMOS LAS COORDENADAS AQUÍ CUANDO SE TOCA EL MAPA
         onMessage={(event) => {
           try {
             const data = JSON.parse(event.nativeEvent.data);
-            if (data.lat && data.lng && onMapClick) {
-              onMapClick(data.lat, data.lng);
+            
+            if (data.type === 'error') {
+               alert(data.message);
+            } 
+            else if (data.type === 'locationSelected' && data.lat && data.lng && onMapClick) {
+               onMapClick(data.lat, data.lng);
             }
           } catch (e) {
             console.error("Error leyendo mensaje del WebView:", e);
