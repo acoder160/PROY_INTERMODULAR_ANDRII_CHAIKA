@@ -8,17 +8,20 @@ interface SkateMapProps {
   userLocation?: { lat: number, lng: number } | null;
   isAddingMode?: boolean;
   onMapClick?: (lat: number, lng: number) => void;
+  // 🟢 NUEVO: Callback para cuando se hace clic en un spot existente
+  onSpotClick?: (spotId: number) => void; 
 }
 
 export default function SkateMap({ 
   spots = [], 
   userLocation,
   isAddingMode = false,
-  onMapClick 
+  onMapClick,
+  onSpotClick
 }: SkateMapProps) {
   const webviewRef = useRef<WebView>(null);
 
-  // --- 1. NUEVO: Sincronizamos los spots sin recargar el mapa ---
+  // --- 1. Sincronizamos los spots sin recargar el mapa ---
   useEffect(() => {
     if (webviewRef.current) {
       webviewRef.current.injectJavaScript(`
@@ -57,7 +60,6 @@ export default function SkateMap({
   }, [isAddingMode]);
 
   // --- 4. CLAVE: Usamos useState para que el HTML sea estático ---
-  // Así evitamos que la pantalla parpadee o borre el círculo azul al abrir la cámara
   const [staticHtml] = useState(`
     <!DOCTYPE html>
     <html>
@@ -88,7 +90,7 @@ export default function SkateMap({
             box-shadow: 0 0 5px rgba(0,0,0,0.5);
           }
 
-          /* DISEÑO DEL POPUP (Igual a tu versión Web) */
+          /* DISEÑO DEL POPUP */
           .leaflet-popup-content-wrapper { border-radius: 12px; overflow: hidden; padding: 0; }
           .leaflet-popup-content { margin: 0; }
           .popup-card { width: 220px; font-family: sans-serif; }
@@ -98,7 +100,12 @@ export default function SkateMap({
           .popup-badges { margin-bottom: 8px; display: flex; gap: 6px; }
           .badge-type { background: #2EC4B6; color: white; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; }
           .badge-diff { background: #FF9F1C; color: white; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; }
-          .popup-desc { margin: 0; font-size: 12px; color: #666; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+          
+          /* 🟢 NUEVOS ESTILOS: Descripción más corta, estrellas y botón */
+          .popup-desc { margin: 0 0 10px 0; font-size: 12px; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+          .popup-rating { display: flex; align-items: center; margin-bottom: 8px; }
+          .star-icon { color: #FFD700; font-size: 14px; letter-spacing: 2px; }
+          .details-btn { background: #007AFF; color: white; border: none; padding: 8px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px; }
         </style>
       </head>
       <body>
@@ -151,16 +158,32 @@ export default function SkateMap({
                 var spotType = (spot.spotType || 'SPOT').toUpperCase();
                 var diff = (spot.difficultyLevel || 'MEDIA').toUpperCase();
                 
+                // LÓGICA DE ESTRELLAS
+                var rating = spot.surfaceRating || 0;
+                var fullStars = '★'.repeat(Math.round(rating));
+                var emptyStars = '☆'.repeat(5 - Math.round(rating));
+                
                 var popupHTML = \`
                   <div class="popup-card">
                     <img src="\${imageUrl}" class="popup-image" onerror="this.src='https://via.placeholder.com/220x120?text=Sin+Imagen'" />
                     <div class="popup-info">
                       <h3 class="popup-title">\${spot.name || 'Spot Sin Nombre'}</h3>
+                      
+                      <div class="popup-rating">
+                        <span class="star-icon">\${fullStars}\${emptyStars}</span>
+                        <span style="font-size: 11px; color: #666; margin-left: 4px;">(\${rating.toFixed(1)})</span>
+                      </div>
+
                       <div class="popup-badges">
                         <span class="badge-type">\${spotType}</span>
                         <span class="badge-diff">\${diff}</span>
                       </div>
+                      
                       <p class="popup-desc">\${spot.description || 'No hay descripción detallada para este spot.'}</p>
+                      
+                      <button class="details-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDetails', spotId: \${spot.id} }))">
+                        Ver y Valorar 💬
+                      </button>
                     </div>
                   </div>
                 \`;
@@ -261,6 +284,10 @@ export default function SkateMap({
             } 
             else if (data.type === 'locationSelected' && data.lat && data.lng && onMapClick) {
                onMapClick(data.lat, data.lng);
+            }
+            // Escuchamos el clic del botón de detalles
+            else if (data.type === 'openDetails' && onSpotClick) {
+               onSpotClick(data.spotId);
             }
           } catch (e) {
             console.error("Error leyendo mensaje del WebView:", e);

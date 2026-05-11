@@ -51,6 +51,7 @@ public class SpotService {
         spot.setDescription(spotDto.getDescription());
         spot.setSpotType(spotDto.getSpotType());
         spot.setDifficultyLevel(spotDto.getDifficultyLevel());
+        spot.setMediaUrl(spotDto.getMediaUrl());
         spot.setCreatedBy(user);
 
         Point point = geometryFactory.createPoint(new Coordinate(spotDto.getLongitude(), spotDto.getLatitude()));
@@ -145,6 +146,7 @@ public class SpotService {
         dto.setDescription(spot.getDescription());
         dto.setSpotType(spot.getSpotType());
         dto.setDifficultyLevel(spot.getDifficultyLevel());
+        dto.setMediaUrl(spot.getMediaUrl());
 
         double rating = spot.getSurfaceRating() != null ? spot.getSurfaceRating() : 0.0;
         dto.setSurfaceRating(Math.round(rating * 10.0) / 10.0);

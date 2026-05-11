@@ -42,6 +42,9 @@ public class Spot {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "media_url", length = 500) // 500 por si la URL de Cloudinary es larga
+    private String mediaUrl;
+
     public Spot() {}
 
     @PrePersist
@@ -66,4 +69,6 @@ public class Spot {
     public void setSurfaceRating(Double surfaceRating) { this.surfaceRating = surfaceRating; }
     public User getCreatedBy() { return createdBy; }
     public void setCreatedBy(User createdBy) { this.createdBy = createdBy; }
+    public String getMediaUrl() { return mediaUrl; }
+    public void setMediaUrl(String mediaUrl) { this.mediaUrl = mediaUrl; }
 }

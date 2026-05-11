@@ -18,6 +18,8 @@ public class SpotDto {
     private String createdBy; // Devolvemos el nombre del usuario, no el objeto entero
     private Double surfaceRating;
 
+    private String mediaUrl;
+
     // Constructores, Getters y Setters
     public SpotDto() {}
 
@@ -40,4 +42,6 @@ public class SpotDto {
     public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
     public Double getSurfaceRating() { return surfaceRating; }
     public void setSurfaceRating(Double surfaceRating) { this.surfaceRating = surfaceRating; }
+    public String getMediaUrl() { return mediaUrl; }
+    public void setMediaUrl(String mediaUrl) { this.mediaUrl = mediaUrl; }
 }
