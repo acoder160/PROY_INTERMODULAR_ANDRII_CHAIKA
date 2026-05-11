@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import { API_BASE_URL } from '../constants/api';
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState('');
@@ -20,11 +21,16 @@ export default function RegisterScreen() {
     setIsLoading(true);
     try {
       // Petición real al backend para registrar[cite: 2]
-      await axios.post('https://small-geese-invite.loca.lt/api/auth/register', {
-        username: username,
-        email: email,
-        password: password
-      });
+      await axios.post(`${API_BASE_URL}/api/auth/register`, 
+        {
+          username: username,
+          email: email,
+          password: password
+        },
+        {
+          headers: { "ngrok-skip-browser-warning": "true" }
+        }
+      );
 
       alert("Cuenta creada con éxito. Ahora puedes iniciar sesión.");
       router.replace('/login');

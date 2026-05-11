@@ -5,6 +5,7 @@ import { Redirect } from 'expo-router';
 import * as Location from 'expo-location';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { API_BASE_URL } from '../../constants/api';
 
 export default function HomeScreen() {
   const [spots, setSpots] = useState([]);
@@ -21,8 +22,8 @@ export default function HomeScreen() {
   const fetchSpots = async () => {
     if (!token) return; 
     try {
-      const response = await axios.get('https://small-geese-invite.loca.lt/api/spots', {
-        headers: { Authorization: `Bearer ${token}`, "Bypass-Tunnel-Reminder": "true" } 
+      const response = await axios.get(`${API_BASE_URL}/api/spots`, {
+        headers: { Authorization: `Bearer ${token}`, "ngrok-skip-browser-warning": "true" } 
       });
       setSpots(response.data);
     } catch (error) { console.error("Error cargando spots:", error); }
@@ -57,12 +58,12 @@ export default function HomeScreen() {
   const handleSaveSpot = async () => {
     if (!newSpotLocation || !formData.name) return;
     try {
-      await axios.post('https://small-geese-invite.loca.lt/api/spots', { 
+      await axios.post(`${API_BASE_URL}/api/spots`, { 
         ...formData, 
         latitude: newSpotLocation.lat, 
         longitude: newSpotLocation.lng 
       }, {
-        headers: { Authorization: `Bearer ${token}`, "Bypass-Tunnel-Reminder": "true" }
+        headers: { Authorization: `Bearer ${token}`, "ngrok-skip-browser-warning": "true" }
       });
       alert('¡Spot creado!');
       setModalVisible(false);

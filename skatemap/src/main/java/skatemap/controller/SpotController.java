@@ -62,7 +62,6 @@ public class SpotController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
 
-        // CORREGIDO: El método en el servicio se llama 'getUserRating'
         return ResponseEntity.ok(spotService.getUserRating(spotId, username));
     }
 }

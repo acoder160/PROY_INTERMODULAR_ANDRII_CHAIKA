@@ -1,9 +1,9 @@
-// app/login.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../constants/api';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
@@ -20,16 +20,17 @@ export default function LoginScreen() {
 
     setIsLoading(true);
     try {
-      // Petición real al backend Spring Boot[cite: 2]
-      const response = await axios.post('https://small-geese-invite.loca.lt/api/auth/login', {
-        username: username,
-        password: password
-      });
+      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, 
+        {
+          username: username,
+          password: password
+        },
+        {
+          headers: { "ngrok-skip-browser-warning": "true" }
+        }
+      );
 
-      // Guardamos el usuario y el token JWT recibido
       login(response.data.username || username, response.data.token);
-      
-      // Redirigimos al mapa principal
       router.replace('/(tabs)');
     } catch (error) {
       console.error(error);
@@ -48,7 +49,7 @@ export default function LoginScreen() {
         <Text style={styles.label}>Usuario</Text>
         <TextInput
           style={styles.input}
-          placeholder="admin"
+          placeholder="user123"
           placeholderTextColor="#999"
           value={username}
           onChangeText={setUsername}
@@ -84,7 +85,6 @@ export default function LoginScreen() {
   );
 }
 
-// Estilos calcados de tu captura de pantalla
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1E1E1E', justifyContent: 'center', alignItems: 'center', padding: 20 },
   card: { backgroundColor: '#2C2C2C', width: '100%', maxWidth: 400, padding: 30, borderRadius: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.5, shadowRadius: 10, elevation: 10 },
