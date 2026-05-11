@@ -93,6 +93,21 @@ public class SpotService {
         spotRepository.save(spot);
     }
 
+    @Transactional
+    public void deleteSpot(Long spotId, String username) {
+        // Solo el usuario "a" puede borrar
+        if (!"a".equals(username)) {
+            throw new RuntimeException("No tienes permisos de administrador para borrar spots");
+        }
+
+        // 1. Borramos comentarios y valoraciones para evitar errores de integridad (Foreign Key)
+        commentRepository.deleteBySpotId(spotId);
+        ratingRepository.deleteBySpotId(spotId);
+
+        // 2. Borramos el spot
+        spotRepository.deleteById(spotId);
+    }
+
     public RatingDto getUserRating(Long spotId, String username) {
         Spot spot = spotRepository.findById(spotId).orElse(null);
         User user = userRepository.findByUsername(username).orElse(null);

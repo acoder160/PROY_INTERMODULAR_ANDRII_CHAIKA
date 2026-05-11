@@ -64,4 +64,17 @@ public class SpotController {
 
         return ResponseEntity.ok(spotService.getUserRating(spotId, username));
     }
+    // 6. BORRAR SPOT (Solo Admin "a")
+    @DeleteMapping("/{spotId}")
+    public ResponseEntity<?> deleteSpot(@PathVariable Long spotId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        try {
+            spotService.deleteSpot(spotId, username);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).body(e.getMessage()); // 403 Forbidden
+        }
+    }
 }

@@ -19,4 +19,9 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
     // Calcular la media de estrellas directamente en SQL
     @Query("SELECT AVG(r.value) FROM Rating r WHERE r.spot.id = :spotId")
     Double getAverageRating(@Param("spotId") Long spotId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
+    @org.springframework.data.jpa.repository.Query("DELETE FROM #{#entityName} e WHERE e.spot.id = :spotId")
+    void deleteBySpotId(@org.springframework.data.repository.query.Param("spotId") Long spotId);
 }

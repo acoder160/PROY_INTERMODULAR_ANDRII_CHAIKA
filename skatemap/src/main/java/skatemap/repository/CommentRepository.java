@@ -15,4 +15,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // Para contar cuántos comentarios tiene un spot (para listas)
     long countBySpotId(Long spotId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
+    @org.springframework.data.jpa.repository.Query("DELETE FROM #{#entityName} e WHERE e.spot.id = :spotId")
+    void deleteBySpotId(@org.springframework.data.repository.query.Param("spotId") Long spotId);
+
 }
