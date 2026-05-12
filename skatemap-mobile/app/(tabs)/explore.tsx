@@ -68,7 +68,6 @@ export default function AddSpotScreen() {
 
     console.log('Spot listo para enviar al backend (Spring Boot):', newSpot);
     alert('Spot guardado temporalmente (Revisa la consola)');
-    // Aquí integraremos Axios para hacer el POST
   };
 
   return (

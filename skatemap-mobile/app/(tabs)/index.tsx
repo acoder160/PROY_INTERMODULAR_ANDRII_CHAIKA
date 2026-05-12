@@ -1,17 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import SkateMap from '../../components/skatemap';
 import SpotFormModal from '../../components/SpotFormModal';
 import CameraOverlay from '../../components/CameraOverlay';
 import { uploadImageToCloudinary } from '../../utils/cloudinary';
-import { Redirect } from 'expo-router';
+import { Redirect, useFocusEffect } from 'expo-router';
 import { useCameraPermissions } from 'expo-camera';
 import { API_BASE_URL } from '../../constants/api';
 import { useLocation } from '../../hooks/useLocation';
 import { useSpots } from '../../hooks/useSpots';
 import SpotDetailsModal from '../../components/SpotDetailsModal';
+
+const reloadStaticPath = require('../../assets/images/reload_static.png');
+const reloadAnimPath = require('../../assets/images/reload_anim.gif');
+
+// Tiempo del GIF para completar un ciclo natural
+const GIF_CYCLE_DURATION_MS = 2000; 
 
 export default function HomeScreen() {
   const { user, token, logout } = useAuth(); 
@@ -34,13 +40,38 @@ export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [formData, setFormData] = useState({ name: '', description: '', spotType: 'STREET', difficultyLevel: 'INTERMEDIATE' });
   
-  // ESTADO PARA SABER QUÉ SPOT ESTÁ SELECCIONADO (PARA EL POPUP DE DETALLES)
   const [selectedSpot, setSelectedSpot] = useState<any | null>(null);
 
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Lógica para recargar spots asegurando el ciclo del GIF
+  const handleReloadSpots = async () => {
+    if (!token || isRefreshing) return;
+
+    setIsRefreshing(true);
+    
+    try {
+      const fetchPromise = fetchSpots();
+      const animationPromise = new Promise(resolve => setTimeout(resolve, GIF_CYCLE_DURATION_MS));
+      
+      await Promise.all([fetchPromise, animationPromise]);
+      
+    } catch (error) {
+      console.error("Error recargando spots:", error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      handleReloadSpots();
+    }, [token, fetchSpots])
+  );
+
   useEffect(() => { 
-    fetchSpots(); 
     handleRecenter(true, setStatusMessage); 
-  }, [token, fetchSpots]);
+  }, [handleRecenter]);
 
   const startAddingProcess = async () => {
     if (isAddingMode) {
@@ -100,7 +131,6 @@ export default function HomeScreen() {
       setFormData({ name: '', description: '', spotType: 'STREET', difficultyLevel: 'INTERMEDIATE' });
       fetchSpots();
     } catch (error: any) { 
-      // Leemos el mensaje del backend (si es JSON o si es texto plano)
       const errorMsg = error.response?.data?.message || error.response?.data;
       alert(typeof errorMsg === 'string' ? errorMsg : 'Error al guardar el spot. Revisa tu conexión.'); 
     } finally { 
@@ -119,7 +149,6 @@ export default function HomeScreen() {
           userLocation={userLocation} 
           isAddingMode={isAddingMode} 
           onMapClick={(lat, lng) => { setNewSpotLocation({lat, lng}); setModalVisible(true); }}
-          // ESCUCHAMOS EL CLIC EN UN SPOT PARA ABRIR LOS DETALLES
           onSpotClick={(spotId) => {
              const spot = spots.find((s: any) => s.id === spotId);
              if (spot) setSelectedSpot(spot);
@@ -127,6 +156,7 @@ export default function HomeScreen() {
         />
       </View>
 
+      {/* Botón Badge de Usuario (Centrado arriba) */}
       <View style={styles.userBadge}>
         <Text style={styles.userName}>👤 {user}</Text>
         <View style={styles.separator} />
@@ -139,10 +169,25 @@ export default function HomeScreen() {
         </View>
       )}
 
+      {/* Botón Reload Animado (Abajo a la izquierda) */}
+      <TouchableOpacity 
+        style={styles.refreshBadge} 
+        onPress={handleReloadSpots}
+        activeOpacity={0.8}
+      >
+        <Image 
+          source={isRefreshing ? reloadAnimPath : reloadStaticPath} 
+          style={styles.refreshIcon}
+          resizeMode="contain" 
+        />
+      </TouchableOpacity>
+
+      {/* Botón de Centrado GPS (Abajo a la derecha) */}
       <TouchableOpacity style={styles.recenterButton} onPress={() => handleRecenter(false, setStatusMessage)}>
         <Text style={styles.iconText}>🎯</Text>
       </TouchableOpacity>
 
+      {/* Botón Añadir Spot (Centro abajo) */}
       <TouchableOpacity style={[styles.fab, isAddingMode ? styles.fabClose : styles.fabAdd]} onPress={startAddingProcess}>
         {isAddingMode ? <Text style={styles.fabIcon}>✕</Text> : <><Text style={styles.fabIcon}>➕</Text><Text style={styles.fabText}>Añadir Spot</Text></>}
       </TouchableOpacity>
@@ -157,7 +202,6 @@ export default function HomeScreen() {
         isUploading={isUploading}
       />
 
-      {/* MODAL DE DETALLES, COMENTARIOS Y VALORACIÓN */}
       <SpotDetailsModal 
         visible={!!selectedSpot} 
         spot={selectedSpot} 
@@ -176,14 +220,39 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   mapContainer: { ...StyleSheet.absoluteFillObject, elevation: 0 },
-  userBadge: { position: 'absolute', top: 60, alignSelf: 'center', backgroundColor: 'white', flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 20, borderRadius: 25, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 4, elevation: 4, zIndex: 10 },
+  
+  // Badge de usuario centrado arriba
+  userBadge: { 
+    position: 'absolute', 
+    top: 60, 
+    alignSelf: 'center', 
+    backgroundColor: 'white', 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingVertical: 10, 
+    paddingHorizontal: 20, 
+    borderRadius: 25, 
+    shadowColor: '#000', 
+    shadowOpacity: 0.15, 
+    shadowRadius: 4, 
+    elevation: 4, 
+    zIndex: 10 
+  },
+  
   userName: { fontWeight: 'bold', color: '#1A1A1A', marginRight: 10 },
   separator: { width: 1, height: 15, backgroundColor: '#E0E0E0', marginRight: 10 },
   logoutText: { color: '#ff6b6b', fontWeight: 'bold' },
   addingNotice: { position: 'absolute', bottom: 100, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.8)', paddingVertical: 8, paddingHorizontal: 20, borderRadius: 20, zIndex: 10 },
   addingNoticeText: { color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
+  
+  // Botón Reload (Abajo Izquierda)
+  refreshBadge: { position: 'absolute', bottom: 35, left: 20, backgroundColor: 'white', width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 5, elevation: 5, zIndex: 10 },
+  refreshIcon: { width: 30, height: 30 },
+  
+  // Botón GPS (Abajo Derecha)
   recenterButton: { position: 'absolute', right: 20, bottom: 35, backgroundColor: 'white', width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 5, elevation: 5, zIndex: 10 },
   iconText: { fontSize: 24 },
+  
   fab: { position: 'absolute', bottom: 30, alignSelf: 'center', justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 5, elevation: 6, zIndex: 10 },
   fabIcon: { fontSize: 20, marginRight: 8, color: 'white', fontWeight: 'bold' },
   fabText: { color: 'white', fontSize: 16, fontWeight: 'bold' },

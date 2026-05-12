@@ -1,7 +1,7 @@
 // context/AuthContext.tsx
 import React, { createContext, useState, useContext } from 'react';
 
-// Definimos la estructura de nuestro contexto
+// Definimos la estructura del contexto
 interface AuthContextType {
   user: string | null;
   token: string | null;

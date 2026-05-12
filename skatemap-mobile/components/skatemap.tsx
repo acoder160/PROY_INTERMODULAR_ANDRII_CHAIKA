@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { StyleSheet, View, Linking } from 'react-native'; // 🟢 Importamos Linking
+import { StyleSheet, View, Linking } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 // Definimos las propiedades que acepta el mapa
@@ -8,7 +8,7 @@ interface SkateMapProps {
   userLocation?: { lat: number, lng: number } | null;
   isAddingMode?: boolean;
   onMapClick?: (lat: number, lng: number) => void;
-  // 🟢 NUEVO: Callback para cuando se hace clic en un spot existente
+  // Callback para cuando se hace clic en un spot existente
   onSpotClick?: (spotId: number) => void; 
 }
 
@@ -101,12 +101,12 @@ export default function SkateMap({
           .badge-type { background: #2EC4B6; color: white; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; }
           .badge-diff { background: #FF9F1C; color: white; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; }
           
-          /* NUEVOS ESTILOS: Descripción más corta y estrellas */
+       
           .popup-desc { margin: 0 0 10px 0; font-size: 12px; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
           .popup-rating { display: flex; align-items: center; margin-bottom: 8px; }
           .star-icon { color: #FFD700; font-size: 14px; letter-spacing: 2px; }
           
-          /* 🟢 NUEVO ESTILO: Contenedor para botones y botones individuales */
+  
           .btn-container { display: flex; gap: 8px; margin-top: 10px; }
           .details-btn { flex: 1; background: #2ed573; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;}
           .directions-btn { flex: 1; background: #007AFF; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;}
@@ -299,9 +299,9 @@ export default function SkateMap({
             else if (data.type === 'openDetails' && onSpotClick) {
                onSpotClick(data.spotId);
             }
-            // 🟢 NUEVO: Lógica para abrir el GPS
+            // ógica para abrir el GPS
             else if (data.type === 'openDirections') {
-               const url = `https://www.google.com/maps/dir/?api=1&destination=$${data.lat},${data.lng}`;
+               const url = `https://www.google.com/maps/dir/?api=1&destination=${data.lat},${data.lng}`;
                Linking.openURL(url).catch(err => console.error("No se pudo abrir Maps", err));
             }
           } catch (e) {

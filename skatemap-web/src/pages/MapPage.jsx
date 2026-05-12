@@ -44,7 +44,7 @@ function SpotPopup({ spot, onUpdate }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
 
-    // 🟢 NUEVO: Lógica para la imagen del spot
+    // Lógica para la imagen del spot
     const imageUrl = spot.mediaUrl ? spot.mediaUrl : 'https://skateism.com/wp-content/uploads/2019/02/placeholder-skate.jpg';
 
     useEffect(() => {
@@ -244,7 +244,7 @@ export default function MapPage() {
       <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 1000, background: 'rgba(255, 255, 255, 0.95)', padding: '8px 20px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', fontWeight: '500', color: '#333' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>👤 {user?.username || user}</span>
         
-        {/* 🟢 BOTÓN PANEL ADMIN (Solo para el usuario "a") */}
+        {/* BOTÓN PANEL ADMIN (Solo para el usuario "a") */}
         {(user === 'a' || user?.username === 'a') && (
            <>
              <div style={{ width: '1px', height: '20px', background: '#ccc' }}></div>

@@ -16,7 +16,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
   const [showComments, setShowComments] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // 🟢 NUEVO: Referencia al ScrollView para hacer auto-scroll
+  // Referencia al ScrollView para hacer auto-scroll
   const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
 
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
-      {/* 🟢 MEJORA: KeyboardAvoidingView configurado correctamente */}
+      {/* KeyboardAvoidingView configurado */}
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
         style={styles.overlay}
@@ -135,7 +135,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
                                 key={star} 
                                 onPress={() => {
                                     setCurrentRating(star);
-                                    // 🟢 AUTO-SCROLL: Bajamos suavemente para que vea el input
+                                    // Bajamos suavemente para que vea el input
                                     setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
                                 }}
                             >
@@ -161,7 +161,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
                         value={newComment} 
                         onChangeText={setNewComment} 
                         multiline 
-                        // 🟢 AUTO-SCROLL: Cuando toca el input, aseguramos que esté a la vista
+                        // Cuando toca el input, aseguramos que esté a la vista
                         onFocus={() => {
                            setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 200);
                         }}

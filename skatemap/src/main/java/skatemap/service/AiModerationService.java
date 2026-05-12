@@ -28,7 +28,7 @@ public class AiModerationService {
     private static final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
     private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
-    // 🟢 FASE 1: FILTRO LOCAL "TONTO" (Rápido y gratis)
+    // FASE 1: FILTRO LOCAL "TONTO" (Rápido y gratis)
     private static final Pattern PHONE_REGEX = Pattern.compile(".*\\d{6,15}.*");
 
     // Solo dejamos spam comercial descarado, insultos extremos sin contexto y links.
@@ -44,7 +44,7 @@ public class AiModerationService {
 
         String lowerText = textToAnalyze.toLowerCase();
 
-        // 🛡️ 1. COMPROBACIÓN LOCAL
+        // 1. COMPROBACIÓN LOCAL
         if (PHONE_REGEX.matcher(lowerText).matches()) {
             System.out.println("Bloqueo Local: Número de teléfono detectado.");
             return false;
@@ -56,7 +56,7 @@ public class AiModerationService {
             }
         }
 
-        // 🤖 2. COMPROBACIÓN POR IA (Con el prompt completo y detallado)
+        // 2. COMPROBACIÓN POR IA
         String prompt = "Eres un moderador de seguridad estricto pero comprensivo para una app comunitaria de mapas de skate. " +
                 "Tu trabajo es analizar este texto y decidir si es seguro publicarlo.\n\n" +
                 "REGLAS ESTRICTAS PARA BLOQUEAR (debes bloquear si cumple alguna):\n" +

@@ -24,7 +24,7 @@ public class OpenApiConfig {
                 .scheme("bearer")
                 .bearerFormat("JWT");
 
-        // 2. Crear la configuración con los metadatos de tu App
+        // 2. Crear la configuración con los metadatos de la App
         return new OpenAPI()
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components().addSecuritySchemes(securitySchemeName, securityScheme))
