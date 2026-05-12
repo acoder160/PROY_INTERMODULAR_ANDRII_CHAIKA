@@ -95,7 +95,7 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1E1E1E' }, // 🟢 Color de fondo constante en la raíz
+  container: { flex: 1, backgroundColor: '#1E1E1E' }, // Color de fondo constante en la raíz
   scrollContainer: { flexGrow: 1, justifyContent: 'center', padding: 20 },
   card: { backgroundColor: '#2C2C2C', width: '100%', maxWidth: 400, padding: 30, borderRadius: 15, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.5, shadowRadius: 10, elevation: 10 },
   title: { color: 'white', fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginBottom: 5 },
