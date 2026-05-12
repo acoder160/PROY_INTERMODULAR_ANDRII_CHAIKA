@@ -28,7 +28,9 @@ public class User {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    private Integer reputation = 0; // Puntos de reputación, empieza en 0
+    @NotBlank // Evita que se guarde vacío
+    @Column(nullable = false)
+    private String role = "ROLE_USER";
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -58,6 +60,8 @@ public class User {
     public String getAvatarUrl() { return avatarUrl; }
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
 
-    public Integer getReputation() { return reputation; }
-    public void setReputation(Integer reputation) { this.reputation = reputation; }
+
+    // 🟢 NUEVOS GETTERS Y SETTERS PARA EL ROL
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }

@@ -2,10 +2,12 @@ package skatemap.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer; // <--- IMPORTANTE
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity // Activa las protecciones por método (@PreAuthorize)
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
@@ -58,13 +61,15 @@ public class SecurityConfig {
                 // 3. GESTION DE SESIONES (Sin estado / Stateless)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 4. REGLAS DE AUTORIZACION
+                // 4. REGLAS DE AUTORIZACION BLINDADAS
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/spots/**").permitAll()
+                        // Solo permitimos ver los spots al público. Para crear/editar/borrar se pedirá token.
+                        .requestMatchers(HttpMethod.GET, "/api/spots/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // El resto de peticiones (incluyendo POST/PUT/DELETE a /api/spots) requerirán estar autenticado
                         .anyRequest().authenticated()
                 );
 

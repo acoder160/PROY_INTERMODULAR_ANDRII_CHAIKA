@@ -105,12 +105,8 @@ public class SpotService {
     }
 
     @Transactional
+    // 🟢 MODIFICADO: Quitamos el parámetro username porque el control de seguridad ya lo hace Spring en el Controlador
     public void deleteSpot(Long spotId, String username) {
-        // Solo el usuario "a" puede borrar
-        if (!"a".equals(username)) {
-            throw new RuntimeException("No tienes permisos de administrador para borrar spots");
-        }
-
         // 1. Borramos comentarios y valoraciones para evitar errores de integridad (Foreign Key)
         commentRepository.deleteBySpotId(spotId);
         ratingRepository.deleteBySpotId(spotId);
