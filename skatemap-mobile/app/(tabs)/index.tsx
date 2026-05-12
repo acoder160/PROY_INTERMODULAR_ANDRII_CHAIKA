@@ -22,7 +22,6 @@ const GIF_CYCLE_DURATION_MS = 2000;
 export default function HomeScreen() {
   const { user, token, logout } = useAuth(); 
   
-  const { spots, fetchSpots } = useSpots(token);
   const { userLocation, handleRecenter } = useLocation();
   
   const CLOUDINARY_CLOUD_NAME = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME; 
@@ -43,6 +42,7 @@ export default function HomeScreen() {
   const [selectedSpot, setSelectedSpot] = useState<any | null>(null);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { spots, fetchSpots, isOffline } = useSpots(token);
 
   // Lógica para recargar spots asegurando el ciclo del GIF
   const handleReloadSpots = async () => {
@@ -163,6 +163,13 @@ export default function HomeScreen() {
         <TouchableOpacity onPress={logout}><Text style={styles.logoutText}>Salir</Text></TouchableOpacity>
       </View>
 
+      {/* AVISO DE MODO OFFLINE */}
+      {isOffline && (
+        <View style={styles.offlineBadge}>
+          <Text style={styles.offlineText}>⚠️ Modo Offline (Mostrando mapa guardado)</Text>
+        </View>
+      )}
+
       {(statusMessage || (isAddingMode && !newSpotLocation)) && (
         <View style={styles.addingNotice}>
           <Text style={styles.addingNoticeText}>{statusMessage || 'Toca dentro del círculo azul para ubicar 👇'}</Text>
@@ -242,6 +249,28 @@ const styles = StyleSheet.create({
   userName: { fontWeight: 'bold', color: '#1A1A1A', marginRight: 10 },
   separator: { width: 1, height: 15, backgroundColor: '#E0E0E0', marginRight: 10 },
   logoutText: { color: '#ff6b6b', fontWeight: 'bold' },
+
+  // Estilos del aviso de Modo Offline
+  offlineBadge: {
+    position: 'absolute',
+    top: 115, 
+    alignSelf: 'center',
+    backgroundColor: '#ff9f1c',
+    paddingVertical: 6,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    zIndex: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+  offlineText: {
+    color: '#1A1A1A',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+
   addingNotice: { position: 'absolute', bottom: 100, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.8)', paddingVertical: 8, paddingHorizontal: 20, borderRadius: 20, zIndex: 10 },
   addingNoticeText: { color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
   
