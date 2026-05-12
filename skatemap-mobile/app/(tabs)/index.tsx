@@ -34,7 +34,7 @@ export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [formData, setFormData] = useState({ name: '', description: '', spotType: 'STREET', difficultyLevel: 'INTERMEDIATE' });
   
-  // 🟢 ESTADO PARA SABER QUÉ SPOT ESTÁ SELECCIONADO (PARA EL POPUP DE DETALLES)
+  // ESTADO PARA SABER QUÉ SPOT ESTÁ SELECCIONADO (PARA EL POPUP DE DETALLES)
   const [selectedSpot, setSelectedSpot] = useState<any | null>(null);
 
   useEffect(() => { 
@@ -99,7 +99,13 @@ export default function HomeScreen() {
       setModalVisible(false); setIsAddingMode(false); setNewSpotLocation(null); setCapturedPhoto(null); setStatusMessage(null);
       setFormData({ name: '', description: '', spotType: 'STREET', difficultyLevel: 'INTERMEDIATE' });
       fetchSpots();
-    } catch (error) { alert('Error al guardar el spot'); } finally { setIsUploading(false); }
+    } catch (error: any) { 
+      // Leemos el mensaje del backend (si es JSON o si es texto plano)
+      const errorMsg = error.response?.data?.message || error.response?.data;
+      alert(typeof errorMsg === 'string' ? errorMsg : 'Error al guardar el spot. Revisa tu conexión.'); 
+    } finally { 
+      setIsUploading(false); 
+    }
   };
 
   if (!user) return <Redirect href="/login" />;
@@ -113,7 +119,7 @@ export default function HomeScreen() {
           userLocation={userLocation} 
           isAddingMode={isAddingMode} 
           onMapClick={(lat, lng) => { setNewSpotLocation({lat, lng}); setModalVisible(true); }}
-          // 🟢 ESCUCHAMOS EL CLIC EN UN SPOT PARA ABRIR LOS DETALLES
+          // ESCUCHAMOS EL CLIC EN UN SPOT PARA ABRIR LOS DETALLES
           onSpotClick={(spotId) => {
              const spot = spots.find((s: any) => s.id === spotId);
              if (spot) setSelectedSpot(spot);
@@ -151,7 +157,7 @@ export default function HomeScreen() {
         isUploading={isUploading}
       />
 
-      {/* 🟢 NUEVO MODAL DE DETALLES, COMENTARIOS Y VALORACIÓN */}
+      {/* MODAL DE DETALLES, COMENTARIOS Y VALORACIÓN */}
       <SpotDetailsModal 
         visible={!!selectedSpot} 
         spot={selectedSpot} 

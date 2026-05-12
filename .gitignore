@@ -39,6 +39,7 @@ class
 *.zip
 *.tar.gz
 *.rar
+application.properties
 
 # --- IDEs (VS Code, IntelliJ) ---
 .idea/

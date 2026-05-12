@@ -84,7 +84,8 @@ function SpotPopup({ spot, onUpdate }) {
             setShowComments(true); 
             if (onUpdate) onUpdate(); 
         } catch (error) {
-            alert("Error al enviar. ¿Estás logueado?");
+            const errorMsg = error.response?.data?.message || error.response?.data;
+            alert(typeof errorMsg === 'string' ? errorMsg : "Error al enviar. ¿Estás logueado?");
         } finally {
             setIsSubmitting(false);
         }
@@ -95,7 +96,7 @@ function SpotPopup({ spot, onUpdate }) {
     return (
         <div style={{ width: '260px', fontFamily: 'Segoe UI, sans-serif' }}>
             
-            {/* 🟢 NUEVO: IMAGEN DEL SPOT */}
+            {/* IMAGEN DEL SPOT */}
             <img 
               src={imageUrl} 
               alt={spot.name} 
@@ -215,7 +216,7 @@ export default function MapPage() {
   const [spots, setSpots] = useState([]);
   const [myPosition, setMyPosition] = useState(null);
   const { logout, user } = useAuth();
-  const navigate = useNavigate(); // 🟢 Para navegar al panel admin
+  const navigate = useNavigate(); // Para navegar al panel admin
   const pamplonaCenter = [42.8125, -1.6458]; 
 
   useEffect(() => { fetchSpots(); }, []);

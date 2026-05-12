@@ -20,14 +20,22 @@ public class CommentService {
     private final SpotRepository spotRepository;
     private final UserRepository userRepository;
 
-    public CommentService(CommentRepository commentRepository, SpotRepository spotRepository, UserRepository userRepository) {
+    // servicio de moderación de IA
+    private final AiModerationService aiModerationService;
+
+    public CommentService(CommentRepository commentRepository, SpotRepository spotRepository, UserRepository userRepository, AiModerationService aiModerationService) {
         this.commentRepository = commentRepository;
         this.spotRepository = spotRepository;
         this.userRepository = userRepository;
+        this.aiModerationService = aiModerationService;
     }
 
     @Transactional
     public CommentDto addComment(Long spotId, String username, String content) {
+        if (!aiModerationService.isContentAllowed(content)) {
+            throw new IllegalArgumentException("El comentario incumple las normas de la comunidad (Spam, contenido inapropiado o texto sin sentido).");
+        }
+
         // 1. Buscar el Spot
         Spot spot = spotRepository.findById(spotId)
                 .orElseThrow(() -> new RuntimeException("Spot no encontrado con id: " + spotId));

@@ -30,19 +30,30 @@ public class SpotService {
     private final RatingRepository ratingRepository;
     private final CommentRepository commentRepository;
 
+    // Inyectamos el servicio de IA
+    private final AiModerationService aiModerationService;
+
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
     public SpotService(SpotRepository spotRepository,
                        UserRepository userRepository,
                        RatingRepository ratingRepository,
-                       CommentRepository commentRepository) {
+                       CommentRepository commentRepository,
+                       AiModerationService aiModerationService) {
         this.spotRepository = spotRepository;
         this.userRepository = userRepository;
         this.ratingRepository = ratingRepository;
         this.commentRepository = commentRepository;
+        this.aiModerationService = aiModerationService;
     }
 
     public SpotDto createSpot(SpotDto spotDto, String username) {
+        // ANÁLISIS IA ANTES DE CREAR EL SPOT
+        String textToAnalyze = spotDto.getName() + " - " + spotDto.getDescription();
+        if (!aiModerationService.isContentAllowed(textToAnalyze)) {
+            throw new IllegalArgumentException("El contenido del spot incumple las normas de la comunidad (Spam, contenido inapropiado o texto sin sentido).");
+        }
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -124,6 +135,10 @@ public class SpotService {
     }
 
     public void addComment(Long spotId, String content, String username) {
+        if (!aiModerationService.isContentAllowed(content)) {
+            throw new IllegalArgumentException("El comentario incumple las normas de la comunidad.");
+        }
+
         Spot spot = spotRepository.findById(spotId).orElseThrow(() -> new RuntimeException("Spot no encontrado"));
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User no encontrado"));
 
@@ -132,7 +147,6 @@ public class SpotService {
         comment.setUser(user);
         comment.setContent(content);
         commentRepository.save(comment);
-
     }
 
     public List<CommentDto> getCommentsBySpot(Long spotId) {

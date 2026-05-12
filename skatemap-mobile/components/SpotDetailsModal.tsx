@@ -81,8 +81,9 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
       
       setTimeout(() => setSuccessMessage(null), 3000);
       
-    } catch (error) {
-      alert("Hubo un error al enviar. Por favor, revisa tu conexión.");
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || error.response?.data;
+      alert(typeof errorMsg === 'string' ? errorMsg : 'Hubo un error al enviar. Por favor, revisa tu conexión.');
     } finally {
       setIsSubmitting(false);
     }
