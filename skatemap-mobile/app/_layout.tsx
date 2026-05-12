@@ -1,36 +1,46 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { View } from 'react-native';
 import 'react-native-reanimated';
 
-
-import { useColorScheme } from '../hooks/use-color-scheme'; 
 import { AuthProvider } from '../context/AuthContext';
 
-// Evita que la pantalla de carga se oculte demasiado pronto
-SplashScreen.preventAutoHideAsync();
-
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
-  // Ya no esperamos a cargar la fuente, simplemente ocultamos la pantalla de carga al iniciar
+  
   useEffect(() => {
-    SplashScreen.hideAsync();
+    SplashScreen.hideAsync().catch(() => {});
   }, []);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AuthProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="register" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </AuthProvider>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={DarkTheme}>
+        {/* Envolvemos todo en una View negra por si el Stack falla un frame */}
+        <View style={{ flex: 1, backgroundColor: '#1E1E1E' }}>
+          <Stack 
+            screenOptions={{ 
+              headerShown: false, 
+              contentStyle: { backgroundColor: '#1E1E1E' },
+              // Eliminamos el header transparente por si acaso
+              headerStyle: { backgroundColor: '#1E1E1E' },
+            }}
+          >
+            {/*Forzamos animación de desvanecimiento (fade) sin deslizamiento */}
+            <Stack.Screen 
+              name="login" 
+              options={{ animation: 'fade' }} 
+            />
+            <Stack.Screen 
+              name="register" 
+              options={{ animation: 'fade' }} 
+            />
+            
+            {/* Las pestañas principales pueden mantener su animación por defecto */}
+            <Stack.Screen name="(tabs)" />
+          </Stack>
+        </View>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }

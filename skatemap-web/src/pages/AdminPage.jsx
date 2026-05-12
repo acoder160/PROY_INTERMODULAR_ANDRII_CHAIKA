@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../api/axiosConfig';
-import { useAuth } from '../context/AuthContext'; // 🟢 CORRECCIÓN: Usamos tu custom hook
+import { useAuth } from '../context/AuthContext'; //
 import { useNavigate, Navigate } from 'react-router-dom';
-// import './AdminPage.css'; // Mantenlo comentado si no creaste el archivo CSS de la Opción 2
 
 const AdminPage = () => {
-  const { user } = useAuth(); // 🟢 Obtenemos solo el usuario
+  const { user } = useAuth(); // Obtenemos solo el usuario
   const [spots, setSpots] = useState([]);
   const navigate = useNavigate();
   
-  const token = localStorage.getItem('token'); // 🟢 Leemos el token del localStorage
+  const token = localStorage.getItem('token'); // Leemos el token del localStorage
 
-  // 🔒 SEGURIDAD FRONTEND: Validamos user.username en vez de user
+  // SEGURIDAD FRONTEND: Validamos user.username en vez de user
   if (user?.username !== 'a') {
     return <Navigate to="/map" />;
   }
@@ -49,7 +48,7 @@ const AdminPage = () => {
   return (
    <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '1200px', margin: '0 auto', color: '#333' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>🛡️ Panel de Administración</h2>
+        <h2>Panel de Administración</h2>
         <button onClick={() => navigate('/map')} style={{ padding: '10px 15px', background: '#2f3542', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
           Volver al Mapa
         </button>
