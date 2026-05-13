@@ -105,7 +105,7 @@ public class SpotService {
     }
 
     @Transactional
-    // 🟢 MODIFICADO: Quitamos el parámetro username porque el control de seguridad ya lo hace Spring en el Controlador
+    // Quitamos el parámetro username porque el control de seguridad ya lo hace Spring en el Controlador
     public void deleteSpot(Long spotId, String username) {
         // 1. Borramos comentarios y valoraciones para evitar errores de integridad (Foreign Key)
         commentRepository.deleteBySpotId(spotId);

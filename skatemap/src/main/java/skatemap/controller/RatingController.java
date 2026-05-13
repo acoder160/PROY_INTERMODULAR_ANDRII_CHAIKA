@@ -9,7 +9,6 @@ import skatemap.service.RatingService;
 
 @RestController
 @RequestMapping("/api/ratings")
-@CrossOrigin(origins = "*")
 public class RatingController {
 
     private final RatingService ratingService;

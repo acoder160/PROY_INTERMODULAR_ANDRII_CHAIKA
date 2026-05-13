@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/spots")
-@CrossOrigin(origins = "*") // Permite peticiones desde cualquier frontend
 public class SpotController {
 
     private final SpotService spotService;

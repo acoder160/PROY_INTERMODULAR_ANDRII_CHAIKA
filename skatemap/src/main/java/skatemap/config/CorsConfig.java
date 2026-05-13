@@ -1,5 +1,6 @@
 package skatemap.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -12,6 +13,11 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
+    // Leemos la URL del frontend desde application.properties / .env
+    // (Si por algún motivo no encuentra la variable, usará localhost:5173 por defecto para no romper la app)
+    @Value("${cors.allowed.origin}")
+    private String frontendUrl;
+
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -21,11 +27,10 @@ public class CorsConfig {
         config.setAllowCredentials(true);
 
         // 2. Dominios permitidos (Frontend)
-        // IMPORTANTE: Añadimos la IP de tu hotspot y el puerto de Expo (8081)
-        config.setAllowedOrigins(List.of(
-                "http://localhost:5173",      // React Web original
-                "http://localhost:8081",      // Expo Web (Navegador local)
-                "https://provable-stench-congenial.ngrok-free.dev"     // Expo (App móvil vía ngrok)
+        config.setAllowedOrigins(Arrays.asList(
+                frontendUrl,                  // Web
+                "http://localhost:8081",      // Expo Web
+                "https://provable-stench-congenial.ngrok-free.dev" // Expo (App móvil vía ngrok)
         ));
 
         // 3. Headers permitidos
@@ -37,9 +42,7 @@ public class CorsConfig {
         // 4. Métodos permitidos (GET, POST, PUT, DELETE, OPTIONS vital para preflight)
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        // Aplica esta configuración a todas las rutas de tu API
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
-
 }

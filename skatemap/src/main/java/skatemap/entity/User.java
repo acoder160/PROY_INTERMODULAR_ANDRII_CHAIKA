@@ -28,7 +28,7 @@ public class User {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @NotBlank // Evita que se guarde vacío
+    @NotBlank
     @Column(nullable = false)
     private String role = "ROLE_USER";
 
@@ -60,8 +60,6 @@ public class User {
     public String getAvatarUrl() { return avatarUrl; }
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
 
-
-    // 🟢 NUEVOS GETTERS Y SETTERS PARA EL ROL
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 }
