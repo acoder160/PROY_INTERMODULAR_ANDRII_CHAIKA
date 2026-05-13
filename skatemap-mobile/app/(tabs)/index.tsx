@@ -236,7 +236,7 @@ export default function HomeScreen() {
 
       {/* Botón de Centrado GPS (Abajo a la derecha) */}
       <TouchableOpacity style={styles.recenterButton} onPress={() => handleRecenter(false, setStatusMessage)}>
-        <Text style={styles.iconText}>🎯</Text>
+        <Text style={styles.iconText}>📍</Text>
       </TouchableOpacity>
 
       {/* Botón Añadir Spot (Centro abajo) */}
