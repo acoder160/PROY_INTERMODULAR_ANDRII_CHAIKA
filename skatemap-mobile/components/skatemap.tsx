@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { StyleSheet, View, Linking } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { StyleSheet, View, Linking, Image } from 'react-native';
 
 // Definimos las propiedades que acepta el mapa
 interface SkateMapProps {
@@ -20,6 +20,16 @@ export default function SkateMap({
   onSpotClick
 }: SkateMapProps) {
   const webviewRef = useRef<WebView>(null);
+
+  // Resolvemos las URIs locales de los iconos para inyectarlas al mapa
+  const ICONS = {
+    STREET: Image.resolveAssetSource(require('../assets/images/icon_street.png')).uri,
+    PARK: Image.resolveAssetSource(require('../assets/images/icon_park.png')).uri,
+    SKATEPARK: Image.resolveAssetSource(require('../assets/images/icon_park.png')).uri,
+    RAMPS: Image.resolveAssetSource(require('../assets/images/icon_ramps.png')).uri,
+    RAIL: Image.resolveAssetSource(require('../assets/images/icon_rail.png')).uri,
+    LEDGE: Image.resolveAssetSource(require('../assets/images/icon_ledge.png')).uri,
+  };
 
   // --- 1. Sincronizamos los spots sin recargar el mapa ---
   useEffect(() => {
@@ -59,7 +69,7 @@ export default function SkateMap({
     }
   }, [isAddingMode]);
 
-  // --- 4. CLAVE: Usamos useState para que el HTML sea estático ---
+  // --- 4.  Usamos useState para que el HTML sea estático ---
   const [staticHtml] = useState(`
     <!DOCTYPE html>
     <html>
@@ -71,15 +81,6 @@ export default function SkateMap({
           html, body { padding: 0; margin: 0; height: 100%; width: 100%; background-color: #e5e5e5; }
           #map { height: 100%; width: 100%; }
           
-          /* Emojis flotantes con sombra */
-          .custom-marker {
-            font-size: 30px; 
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.4)); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-          }
-
           /* Diseño del Punto Azul de Ubicación */
           .blue-dot { display: flex; justify-content: center; align-items: center; }
           .blue-dot-inner {
@@ -101,12 +102,10 @@ export default function SkateMap({
           .badge-type { background: #2EC4B6; color: white; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; }
           .badge-diff { background: #FF9F1C; color: white; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; }
           
-       
           .popup-desc { margin: 0 0 10px 0; font-size: 12px; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
           .popup-rating { display: flex; align-items: center; margin-bottom: 8px; }
           .star-icon { color: #FFD700; font-size: 14px; letter-spacing: 2px; }
           
-  
           .btn-container { display: flex; gap: 8px; margin-top: 10px; }
           .details-btn { flex: 1; background: #2ed573; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;}
           .directions-btn { flex: 1; background: #007AFF; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;}
@@ -126,22 +125,10 @@ export default function SkateMap({
             attribution: '© OpenStreetMap'
           }).addTo(map);
 
-          // Creamos una capa para los spots para poder borrarlos y redibujarlos dinámicamente
           var spotsLayer = L.layerGroup().addTo(map);
 
-          // 1. LOS IFS PARA LOS ICONOS
-          function getSpotEmoji(type) {
-            var t = (type || '').toUpperCase();
-            switch (t) {
-              case 'STREET': return '🛹';
-              case 'PARK':   return '🏟️';
-              case 'SKATEPARK': return '🏟️';
-              case 'RAMPS':  return '🏂';
-              case 'RAIL':   return '🥖';
-              case 'LEDGE':  return '🧱';
-              default:       return '📍';
-            }
-          }
+          // 1. INYECTAMOS LOS ICONOS DESDE REACT NATIVE
+          var SPOT_ICONS = ${JSON.stringify(ICONS)};
 
           // FUNCIÓN PARA RENDERIZAR SPOTS DINÁMICAMENTE
           window.renderSpots = function(spotsData) {
@@ -149,17 +136,18 @@ export default function SkateMap({
             
             spotsData.forEach(function(spot) {
               if(spot.latitude && spot.longitude) {
-                var emoji = getSpotEmoji(spot.spotType || spot.type);
-                var icon = L.divIcon({
-                  className: 'custom-marker',
-                  html: emoji,
-                  iconSize: [40, 40],
-                  iconAnchor: [20, 20],
-                  popupAnchor: [0, -25]
+                
+                var spotType = (spot.spotType || spot.type || 'STREET').toUpperCase();
+                var iconUrl = SPOT_ICONS[spotType] || SPOT_ICONS['STREET'];
+                
+                var icon = L.icon({
+                  iconUrl: iconUrl,
+                  iconSize: [45, 45],
+                  iconAnchor: [22, 45],
+                  popupAnchor: [0, -40]
                 });
 
                 var imageUrl = spot.mediaUrl ? spot.mediaUrl : 'https://skateism.com/wp-content/uploads/2019/02/placeholder-skate.jpg';
-                var spotType = (spot.spotType || 'SPOT').toUpperCase();
                 var diff = (spot.difficultyLevel || 'MEDIA').toUpperCase();
                 
                 // LÓGICA DE ESTRELLAS
@@ -279,9 +267,12 @@ export default function SkateMap({
       <WebView 
         ref={webviewRef}
         originWhitelist={['*']}
+        allowFileAccess={true}
+        allowFileAccessFromFileURLs={true}
+        allowUniversalAccessFromFileURLs={true}
         javaScriptEnabled={true}
         domStorageEnabled={true}
-        source={{ html: staticHtml }} // Usamos la constante estática
+        source={{ html: staticHtml }} 
         style={styles.map} 
         scrollEnabled={false}
         bounces={false}
@@ -299,9 +290,9 @@ export default function SkateMap({
             else if (data.type === 'openDetails' && onSpotClick) {
                onSpotClick(data.spotId);
             }
-            // ógica para abrir el GPS
+            // Lógica para abrir el GPS corregida
             else if (data.type === 'openDirections') {
-               const url = `https://www.google.com/maps/dir/?api=1&destination=${data.lat},${data.lng}`;
+               const url = `https://maps.google.com/?q=${data.lat},${data.lng}`;
                Linking.openURL(url).catch(err => console.error("No se pudo abrir Maps", err));
             }
           } catch (e) {

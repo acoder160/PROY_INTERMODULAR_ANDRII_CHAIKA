@@ -7,21 +7,21 @@ import { useNavigate } from 'react-router-dom';
 
 // --- ICONOS ---
 const getSpotIcon = (type) => {
-    let emoji = '📍'; 
+    let iconPath = '/icons/icon_street.png'; // Por defecto
     switch (type) {
-        case 'STREET': emoji = '🛹'; break;
-        case 'PARK':   emoji = '🏟️'; break;
-        case 'RAMPS':  emoji = '🏂'; break;
-        case 'RAIL':   emoji = '🥖'; break;
-        case 'LEDGE':  emoji = '🧱'; break;
-        default:       emoji = '📍';
+        case 'STREET': iconPath = '/icons/icon_street.png'; break;
+        case 'PARK':   
+        case 'SKATEPARK': iconPath = '/icons/icon_park.png'; break;
+        case 'RAMPS':  iconPath = '/icons/icon_ramps.png'; break;
+        case 'RAIL':   iconPath = '/icons/icon_rail.png'; break;
+        case 'LEDGE':  iconPath = '/icons/icon_ledge.png'; break;
     }
-    return L.divIcon({
-        className: 'custom-marker',
-        html: `<div style="font-size: 30px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); display: flex; justify-content: center; align-items: center;">${emoji}</div>`,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20],
-        popupAnchor: [0, -25]
+    
+    return L.icon({
+        iconUrl: iconPath,
+        iconSize: [45, 45],    // Reducimos la resolución 300x300 al tamaño del mapa
+        iconAnchor: [22, 45],  // El "punto de anclaje": la base del icono toca el suelo
+        popupAnchor: [0, -40]  // El popup sale justo encima del icono para no taparlo
     });
 };
 
