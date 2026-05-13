@@ -5,7 +5,7 @@ import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom'; 
 
-// --- ICONOS ---
+// --- ICONOS 3D ---
 const getSpotIcon = (type) => {
     let iconPath = '/icons/icon_street.png'; // Por defecto
     switch (type) {
@@ -19,9 +19,9 @@ const getSpotIcon = (type) => {
     
     return L.icon({
         iconUrl: iconPath,
-        iconSize: [45, 45],    // Reducimos la resolución 300x300 al tamaño del mapa
-        iconAnchor: [22, 45],  // El "punto de anclaje": la base del icono toca el suelo
-        popupAnchor: [0, -40]  // El popup sale justo encima del icono para no taparlo
+        iconSize: [45, 45],
+        iconAnchor: [22, 45],
+        popupAnchor: [0, -40]
     });
 };
 
@@ -44,7 +44,6 @@ function SpotPopup({ spot, onUpdate }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
 
-    // Lógica para la imagen del spot
     const imageUrl = spot.mediaUrl ? spot.mediaUrl : 'https://skateism.com/wp-content/uploads/2019/02/placeholder-skate.jpg';
 
     useEffect(() => {
@@ -109,7 +108,6 @@ function SpotPopup({ spot, onUpdate }) {
                 <h3 style={{ margin: '0 0 5px 0', color: '#333', fontSize: '18px' }}>{spot.name}</h3>
                 <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#666' }}>{spot.description}</p>
                 
-                {/* ETIQUETAS: TIPO | DIFICULTAD | RATING */}
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
                     <span style={{ background: '#f0f2f5', color: '#555', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #ddd' }}>
                         {spot.spotType}
@@ -118,7 +116,7 @@ function SpotPopup({ spot, onUpdate }) {
                         {difficultyLabels[spot.difficultyLevel] || spot.difficultyLevel}
                     </span>
                     <span style={{ background: '#fff9c4', color: '#fbc531', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #f9ca24' }}>
-                        ⭐ {spot.surfaceRating || '-'}
+                        ⭐ {spot.surfaceRating ? spot.surfaceRating.toFixed(1) : '-'}
                     </span>
                 </div>
             </div>
@@ -163,7 +161,6 @@ function SpotPopup({ spot, onUpdate }) {
                 </div>
             )}
 
-            {/*BOTÓN CÓMO LLEGAR*/}
             <div style={{ padding: '0 10px', marginTop: '10px' }}>
                 <button
                     onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${spot.latitude},${spot.longitude}`, '_blank')}
@@ -215,8 +212,13 @@ function LocationButton({ setMyPosition }) {
 export default function MapPage() {
   const [spots, setSpots] = useState([]);
   const [myPosition, setMyPosition] = useState(null);
+  
+  // Estados de Filtros
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [filters, setFilters] = useState({ spotType: 'ALL', minRating: 0, maxDistance: 0 });
+
   const { logout, user } = useAuth();
-  const navigate = useNavigate(); // Para navegar al panel admin
+  const navigate = useNavigate(); 
   const pamplonaCenter = [42.8125, -1.6458]; 
 
   useEffect(() => { fetchSpots(); }, []);
@@ -230,6 +232,26 @@ export default function MapPage() {
     } 
   };
 
+  // --- LÓGICA DE FILTRADO (Haversine Formula) ---
+  const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; 
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  const filteredSpots = spots.filter(spot => {
+    if (filters.spotType !== 'ALL' && spot.spotType !== filters.spotType) return false;
+    if (filters.minRating > 0 && (spot.surfaceRating || 0) < filters.minRating) return false;
+    if (filters.maxDistance > 0 && myPosition) {
+      const distance = getDistanceFromLatLonInKm(myPosition.lat, myPosition.lng, spot.latitude, spot.longitude);
+      if (distance > filters.maxDistance) return false;
+    }
+    return true;
+  });
+
   return (
     <div style={{ height: '100vh', width: '100vw', position: 'relative', margin: 0, padding: 0, overflow: 'hidden' }}>
       
@@ -240,11 +262,115 @@ export default function MapPage() {
         .leaflet-popup-tip-container { margin-top: -1px; }
       `}</style>
 
-      {/* HEADER DE USUARIO Y BOTÓN ADMIN */}
-      <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 1000, background: 'rgba(255, 255, 255, 0.95)', padding: '8px 20px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', fontWeight: '500', color: '#333' }}>
+      {/* BOTÓN DE FILTROS (Arriba Izquierda) */}
+      <button 
+        onClick={() => setShowFilterMenu(!showFilterMenu)}
+        style={{
+          position: 'absolute', top: '20px', left: '20px', zIndex: 1000, 
+          background: 'white', border: 'none', padding: '10px 20px', 
+          borderRadius: '20px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', 
+          fontWeight: 'bold', color: '#333', cursor: 'pointer'
+        }}
+      >
+        ⚙️ {filters.spotType !== 'ALL' || filters.minRating > 0 || filters.maxDistance > 0 ? 'Filtros (Activo)' : 'Filtros'}
+      </button>
+
+      {/* 🟢 MENÚ DESPLEGABLE DE FILTROS */}
+      {showFilterMenu && (
+        <div style={{
+          position: 'absolute', top: '70px', left: '20px', zIndex: 1000,
+          background: 'white', padding: '20px', borderRadius: '15px',
+          boxShadow: '0 8px 30px rgba(0,0,0,0.15)', width: '280px',
+          fontFamily: 'Segoe UI, sans-serif'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+            <h3 style={{ margin: 0, fontSize: '18px', color: '#1A1A1A' }}>⚙️ Filtrar Spots</h3>
+            <button onClick={() => setShowFilterMenu(false)} style={{ background:'none', border:'none', fontSize:'18px', cursor:'pointer' }}>✕</button>
+          </div>
+
+          <div style={{ marginBottom: '15px' }}>
+            <strong style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#333' }}>Tipo de Spot</strong>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {['ALL', 'STREET', 'PARK', 'RAMPS', 'RAIL', 'LEDGE'].map(type => (
+                <span 
+                  key={type} 
+                  onClick={() => setFilters({...filters, spotType: type})}
+                  style={{ 
+                    padding: '6px 12px', borderRadius: '15px', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold',
+                    background: filters.spotType === type ? '#2EC4B6' : '#f0f0f0',
+                    color: filters.spotType === type ? 'white' : '#666'
+                  }}
+                >
+                  {type === 'ALL' ? 'Todos' : type}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '15px' }}>
+            <strong style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#333' }}>Distancia Máxima (Requiere GPS)</strong>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {[{l: 'Cualquiera', v: 0}, {l: '< 1 km', v: 1}, {l: '< 5 km', v: 5}, {l: '< 10 km', v: 10}].map(d => (
+                <span 
+                  key={d.v}
+                  onClick={() => { if(myPosition || d.v === 0) setFilters({...filters, maxDistance: d.v}) }}
+                  style={{ 
+                    padding: '6px 12px', borderRadius: '15px', fontSize: '12px', cursor: (!myPosition && d.v > 0) ? 'not-allowed' : 'pointer', fontWeight: 'bold',
+                    background: filters.maxDistance === d.v ? '#007AFF' : '#f0f0f0',
+                    color: filters.maxDistance === d.v ? 'white' : '#666',
+                    opacity: (!myPosition && d.v > 0) ? 0.5 : 1
+                  }}
+                >
+                  {d.l}
+                </span>
+              ))}
+            </div>
+            {!myPosition && <small style={{ color: '#ff6b6b', fontSize: '11px', marginTop: '5px', display: 'block' }}>* Toca el botón 📍 del mapa para usar el GPS</small>}
+          </div>
+
+          <div style={{ marginBottom: '15px' }}>
+            <strong style={{ display: 'block', marginBottom: '8px', fontSize: '14px', color: '#333' }}>Estrellas Mínimas</strong>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {[0, 1, 2, 3, 4, 5].map(r => (
+                <span 
+                  key={r}
+                  onClick={() => setFilters({...filters, minRating: r})}
+                  style={{ 
+                    padding: '6px 12px', borderRadius: '15px', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold',
+                    background: filters.minRating === r ? '#FF9F1C' : '#f0f0f0',
+                    color: filters.minRating === r ? 'white' : '#666'
+                  }}
+                >
+                  {r === 0 ? 'Todas' : `${r} ★`}
+                </span>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* HEADER DE USUARIO Y BOTÓN ADMIN (Vuelto al Centro) */}
+      <div style={{ 
+        position: 'absolute', 
+        top: '20px', 
+        left: '50%',                  //
+        transform: 'translateX(-50%)', // restamos su propio ancho para centrarlo exacto
+        zIndex: 1000, 
+        background: 'rgba(255, 255, 255, 0.95)', 
+        padding: '8px 20px', 
+        borderRadius: '30px', 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '15px', 
+        boxShadow: '0 4px 15px rgba(0,0,0,0.1)', 
+        fontWeight: '500', 
+        color: '#333',
+        whiteSpace: 'nowrap'          // Evita que el nombre se parta en dos líneas
+      }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>👤 {user?.username || user}</span>
         
-        {/* BOTÓN PANEL ADMIN (Solo para el usuario "a") */}
+        {/* BOTÓN PANEL ADMIN */}
         {(user === 'a' || user?.username === 'a') && (
            <>
              <div style={{ width: '1px', height: '20px', background: '#ccc' }}></div>
@@ -263,13 +389,14 @@ export default function MapPage() {
         
         <LocationButton setMyPosition={setMyPosition} />
         
-        {spots.map((spot) => (
+        {/* Dibujamos los spots filtrados */}
+        {filteredSpots.map((spot) => (
           <Marker key={spot.id} position={[spot.latitude, spot.longitude]} icon={getSpotIcon(spot.spotType)}>
             <Popup><SpotPopup spot={spot} onUpdate={fetchSpots} /></Popup>
           </Marker>
         ))}
         
-        {myPosition && <CircleMarker center={myPosition} radius={8} pathOptions={{ color: 'white', fillColor: '#2980b9', fillOpacity: 1 }} />}
+        {myPosition && <CircleMarker center={[myPosition.lat, myPosition.lng]} radius={8} pathOptions={{ color: 'white', fillColor: '#2980b9', fillOpacity: 1 }} />}
       </MapContainer>
     </div>
   );

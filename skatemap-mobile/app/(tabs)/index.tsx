@@ -12,6 +12,7 @@ import { API_BASE_URL } from '../../constants/api';
 import { useLocation } from '../../hooks/useLocation';
 import { useSpots } from '../../hooks/useSpots';
 import SpotDetailsModal from '../../components/SpotDetailsModal';
+import FilterModal from '../../components/FilterModal';
 
 const reloadStaticPath = require('../../assets/images/reload_static.png');
 const reloadAnimPath = require('../../assets/images/reload_anim.gif');
@@ -43,6 +44,10 @@ export default function HomeScreen() {
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { spots, fetchSpots, isOffline } = useSpots(token);
+
+  // Estados para los filtros
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [filters, setFilters] = useState({ minRating: 0, spotType: 'ALL', maxDistance: 0 });
 
   // Lógica para recargar spots asegurando el ciclo del GIF
   const handleReloadSpots = async () => {
@@ -142,6 +147,32 @@ export default function HomeScreen() {
     }
   };
 
+  // --- LÓGICA DE FILTRADO (Haversine Formula) ---
+  const getDistanceFromLatLonInKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // Radio de la tierra en km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  const filteredSpots = spots.filter((spot: any) => {
+    // Filtro por tipo
+    if (filters.spotType !== 'ALL' && spot.spotType !== filters.spotType && spot.type !== filters.spotType) return false;
+    
+    // Filtro por valoración (estrellas)
+    if (filters.minRating > 0 && (spot.surfaceRating || 0) < filters.minRating) return false;
+
+    // Filtro por distancia (si hay ubicación de usuario)
+    if (filters.maxDistance > 0 && userLocation) {
+      const distance = getDistanceFromLatLonInKm(userLocation.lat, userLocation.lng, spot.latitude, spot.longitude);
+      if (distance > filters.maxDistance) return false;
+    }
+
+    return true;
+  });
+
   if (!user) return <Redirect href="/login" />;
 
   return (
@@ -149,7 +180,7 @@ export default function HomeScreen() {
       
       <View style={styles.mapContainer}>
         <SkateMap 
-          spots={spots} 
+          spots={filteredSpots} 
           userLocation={userLocation} 
           isAddingMode={isAddingMode} 
           onMapClick={(lat, lng) => { setNewSpotLocation({lat, lng}); setModalVisible(true); }}
@@ -159,6 +190,16 @@ export default function HomeScreen() {
           }}
         />
       </View>
+
+      {/* NUEVO: Botón de Filtros (Arriba a la izquierda) */}
+      <TouchableOpacity 
+        style={styles.filterButton} 
+        onPress={() => setFilterModalVisible(true)}
+      >
+        <Text style={styles.filterBtnText}>
+          {filters.spotType !== 'ALL' || filters.minRating > 0 || filters.maxDistance > 0 ? '⚙️ Filtros (Activo)' : '⚙️ Filtros'}
+        </Text>
+      </TouchableOpacity>
 
       {/* Botón Badge de Usuario (Centrado arriba) */}
       <View style={styles.userBadge}>
@@ -203,6 +244,7 @@ export default function HomeScreen() {
         {isAddingMode ? <Text style={styles.fabIcon}>✕</Text> : <><Text style={styles.fabIcon}>➕</Text><Text style={styles.fabText}>Añadir Spot</Text></>}
       </TouchableOpacity>
 
+      {/* MODALES */}
       <SpotFormModal 
         visible={modalVisible}
         onClose={() => { setModalVisible(false); setIsAddingMode(false); setCapturedPhoto(null); setStatusMessage(null); }}
@@ -221,6 +263,13 @@ export default function HomeScreen() {
         onSpotUpdated={() => { fetchSpots(); }}
       />
 
+      <FilterModal 
+        visible={filterModalVisible}
+        onClose={() => setFilterModalVisible(false)}
+        filters={filters}
+        setFilters={setFilters}
+      />
+
       {showCamera && (
         <CameraOverlay cameraRef={cameraRef} onCapture={takePicture} onCancel={() => { setShowCamera(false); setStatusMessage(null); }} />
       )}
@@ -232,11 +281,31 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   mapContainer: { ...StyleSheet.absoluteFillObject, elevation: 0 },
   
+  // Estilos del botón de filtros
+  filterButton: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    backgroundColor: 'white',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
+    zIndex: 10,
+  },
+  filterBtnText: {
+    fontWeight: 'bold',
+    color: '#1A1A1A'
+  },
+
   // Badge de usuario centrado arriba
   userBadge: { 
     position: 'absolute', 
     top: 60, 
-    alignSelf: 'center', 
+    right: 20, 
     backgroundColor: 'white', 
     flexDirection: 'row', 
     alignItems: 'center', 
