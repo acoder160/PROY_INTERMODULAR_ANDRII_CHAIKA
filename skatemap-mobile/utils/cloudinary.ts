@@ -3,40 +3,49 @@ import { API_BASE_URL } from '../constants/api';
 
 export const uploadImageToCloudinary = async (imageUri: string, userToken: string): Promise<string> => {
   try {
-    // 1. Pedimos la firma segura a nuestro backend de Spring Boot
+    console.log("1. Pedimos la firma segura a nuestro backend");
     const signatureResponse = await axios.get(`${API_BASE_URL}/api/cloudinary/signature`, {
       headers: { Authorization: `Bearer ${userToken}` }
     });
 
     const { signature, timestamp, api_key, cloud_name } = signatureResponse.data;
+    console.log("2. Firma obtenida:", signatureResponse.data);
 
-    // 2. Preparamos la imagen para subir
     const formData = new FormData();
-    formData.append('file', {
+    
+    // En Android, a veces el uri necesita ser tratado con cuidado
+    const fileToUpload = {
       uri: imageUri,
       type: 'image/jpeg',
-      name: `spot_${timestamp}.jpg`,
-    } as any);
+      name: `upload_${Date.now()}.jpg`,
+    };
 
-    // 3. Adjuntamos la firma en lugar del upload_preset "Unsigned"
-    formData.append('api_key', api_key);
-    formData.append('timestamp', timestamp.toString());
+    // @ts-ignore
+    formData.append('file', fileToUpload);
+    formData.append('api_key', String(api_key)); // Forzamos string
+    formData.append('timestamp', String(timestamp)); // Forzamos string
     formData.append('signature', signature);
     formData.append('folder', 'skatemap_spots');
 
-    // 4. Subimos la foto a Cloudinary
-    const cloudinaryResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, {
+    console.log("3. Subiendo foto a Cloudinary...");
+
+    // Usamos fetch sin headers manuales para que el navegador/móvil 
+    // gestione el 'boundary' del FormData automáticamente
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, {
       method: 'POST',
       body: formData,
     });
 
-    const data = await cloudinaryResponse.json();
+    const data = await response.json();
 
-    if (data.secure_url) {
-      return data.secure_url;
+    if (response.ok) {
+        console.log("4. ¡Subida éxito!");
+        return data.secure_url;
     } else {
-      throw new Error("Cloudinary no devolvió una URL válida");
+        console.error("Error respuesta Cloudinary:", data);
+        throw new Error(data.error?.message || "Error en la subida");
     }
+
   } catch (error) {
     console.error('Error en Signed Upload de Cloudinary:', error);
     throw error;

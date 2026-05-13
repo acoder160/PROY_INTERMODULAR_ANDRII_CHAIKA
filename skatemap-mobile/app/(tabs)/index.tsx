@@ -131,8 +131,12 @@ export default function HomeScreen() {
       setFormData({ name: '', description: '', spotType: 'STREET', difficultyLevel: 'INTERMEDIATE' });
       fetchSpots();
     } catch (error: any) { 
-      const errorMsg = error.response?.data?.message || error.response?.data;
-      alert(typeof errorMsg === 'string' ? errorMsg : 'Error al guardar el spot. Revisa tu conexión.'); 
+      const serverError = error.response?.data?.error; // Captura errores de Bucket4j
+      const serverMessage = error.response?.data?.message; // Captura errores de IA o Validación
+      
+      const finalMsg = serverError || serverMessage || (typeof error.response?.data === 'string' ? error.response?.data : null);
+      
+      alert(finalMsg || 'Error al guardar el spot. Revisa tu conexión.'); 
     } finally { 
       setIsUploading(false); 
     }

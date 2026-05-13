@@ -10,6 +10,7 @@ import skatemap.dto.SpotDto;
 import skatemap.service.SpotService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/spots")
