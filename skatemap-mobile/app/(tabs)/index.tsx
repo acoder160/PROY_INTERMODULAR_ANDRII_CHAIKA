@@ -115,7 +115,7 @@ export default function HomeScreen() {
     let finalImageUrl = null;
 
     try {
-      finalImageUrl = await uploadImageToCloudinary(capturedPhoto, CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET);
+      finalImageUrl = await uploadImageToCloudinary(capturedPhoto, token as string);
     } catch (error) {
       alert("Hubo un problema al subir la foto a la nube.");
       setIsUploading(false); return;
