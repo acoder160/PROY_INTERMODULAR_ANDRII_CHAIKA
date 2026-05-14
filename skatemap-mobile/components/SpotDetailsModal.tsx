@@ -11,6 +11,9 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
   const [myRating, setMyRating] = useState(0); 
   const [currentRating, setCurrentRating] = useState(0); 
   
+  // Controla la nota media visualmente
+  const [localAvgRating, setLocalAvgRating] = useState(0); 
+  
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showComments, setShowComments] = useState(false);
@@ -25,6 +28,10 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
       setNewComment('');
       setSuccessMessage(null);
       setShowComments(false);
+      
+      // Resetea la nota visual con la del spot actual
+      setLocalAvgRating(spot.surfaceRating || 0);
+      
       fetchData();
     }
   }, [visible, spot, token]);
@@ -61,7 +68,8 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
     setIsSubmitting(true);
     setSuccessMessage(null);
     try {
-      await axios.post(`${API_BASE_URL}/api/ratings/${spot.id}`, { value: currentRating }, { 
+      // Guardamos lo que devuelve Spring Boot
+      const response = await axios.post(`${API_BASE_URL}/api/ratings/${spot.id}`, { value: currentRating }, { 
         headers: { Authorization: `Bearer ${token}` } 
       });
 
@@ -74,6 +82,10 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
       setHasVoted(true);
       setMyRating(currentRating);
       setSuccessMessage("¡Gracias por tu valoración! 🛹");
+      
+      if (response.data && response.data.newAverage) {
+         setLocalAvgRating(response.data.newAverage);
+      }
       
       await fetchData();
       onSpotUpdated(); 
@@ -90,7 +102,6 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
   };
 
   if (!spot) return null;
-  const avgRating = spot.surfaceRating || 0;
 
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
@@ -115,7 +126,8 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
               <Text style={styles.desc}>{spot.description}</Text>
 
               <View style={styles.ratingBox}>
-                <Text style={styles.ratingTitle}>Puntuación media: {avgRating.toFixed(1)}/5</Text>
+                {}
+                <Text style={styles.ratingTitle}>Puntuación media: {localAvgRating.toFixed(1)}/5</Text>
                 
                 {hasVoted ? (
                     <View style={{ alignItems: 'center', marginTop: 10 }}>

@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { WebView } from 'react-native-webview';
 import { StyleSheet, View, Linking, Image } from 'react-native';
 
-// Definimos las propiedades que acepta el mapa
+// Props del mapa
 interface SkateMapProps {
   spots?: any[];
   userLocation?: { lat: number, lng: number } | null;
@@ -31,7 +31,7 @@ export default function SkateMap({
     LEDGE: Image.resolveAssetSource(require('../assets/images/icon_ledge.png')).uri,
   };
 
-  // --- 1. Sincronizamos los spots sin recargar el mapa ---
+  // Sincronizar spots
   useEffect(() => {
     if (webviewRef.current) {
       webviewRef.current.injectJavaScript(`
@@ -43,7 +43,7 @@ export default function SkateMap({
     }
   }, [spots]);
 
-  // 2. Sincronizamos la ubicación del usuario
+  // Sincronizamos la ubicación del usuario
   useEffect(() => {
     if (userLocation && webviewRef.current) {
       webviewRef.current.injectJavaScript(`
@@ -55,7 +55,7 @@ export default function SkateMap({
     }
   }, [userLocation]);
 
-  // 3. Sincronizamos el modo "Añadir Spot" para que el mapa deje hacer clic
+  // Sincronizamos el modo "Añadir Spot" para que el mapa deje hacer clic
   useEffect(() => {
     if (webviewRef.current) {
       webviewRef.current.injectJavaScript(`
@@ -69,7 +69,7 @@ export default function SkateMap({
     }
   }, [isAddingMode]);
 
-  // --- 4.  Usamos useState para que el HTML sea estático ---
+  // HTML estatico 
   const [staticHtml] = useState(`
     <!DOCTYPE html>
     <html>
@@ -290,7 +290,7 @@ export default function SkateMap({
             else if (data.type === 'openDetails' && onSpotClick) {
                onSpotClick(data.spotId);
             }
-            // Lógica para abrir el GPS corregida
+            // Abrir GPS
             else if (data.type === 'openDirections') {
                const url = `https://maps.google.com/?q=${data.lat},${data.lng}`;
                Linking.openURL(url).catch(err => console.error("No se pudo abrir Maps", err));

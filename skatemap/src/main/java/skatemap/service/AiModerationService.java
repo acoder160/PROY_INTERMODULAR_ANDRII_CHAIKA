@@ -28,7 +28,7 @@ public class AiModerationService {
     private static final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
     private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
-    // FASE 1: FILTRO LOCAL "TONTO" (Rápido y gratis)
+    // FASE 1 Filtro local básico
     private static final Pattern PHONE_REGEX = Pattern.compile(".*\\d{6,15}.*");
 
     // Solo dejamos spam comercial descarado, insultos extremos sin contexto y links.
@@ -75,23 +75,23 @@ public class AiModerationService {
                 "Responde ÚNICAMENTE con un JSON estricto en este formato exacto: {\"allowed\": true} o {\"allowed\": false}. " +
                 "No añadas Markdown. Texto a analizar: \"" + textToAnalyze + "\"";
 
-        // Capa 1: Llama 3.1 8B (Groq)
+        // Capa 1: Llama 3.1 8B
         Boolean result = callAiApi(GROQ_URL, groqApiKey, "llama-3.1-8b-instant", prompt);
         if (result != null) return result;
 
-        // Capa 2: Llama 3 8B (Groq Fallback)
+        // Capa 2: Llama 3 8B
         result = callAiApi(GROQ_URL, groqApiKey, "llama3-8b-8192", prompt);
         if (result != null) return result;
 
-        // Capa 3: GPT-4o-mini (OpenAI - El salvavidas)
+        // Capa 3: GPT-4o-mini
         result = callAiApi(OPENAI_URL, openaiApiKey, "gpt-4o-mini", prompt);
         if (result != null) return result;
 
-        // Capa 4: Gemma 2 9B (Groq)
+        // Capa 4: Gemma 2 9B
         result = callAiApi(GROQ_URL, groqApiKey, "gemma2-9b-it", prompt);
         if (result != null) return result;
 
-        // Capa 5: Mistral 7B (Groq - Emergencia)
+        // Capa 5: Mistral 7B
         result = callAiApi(GROQ_URL, groqApiKey, "mistral-7b-32768", prompt);
         if (result != null) return result;
 

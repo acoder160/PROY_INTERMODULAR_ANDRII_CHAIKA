@@ -4,19 +4,18 @@ import { useAuth } from '../context/AuthContext';
 import '../Auth.css'; 
 
 export default function LoginPage() {
-  // 1. Estados para guardar lo que escribe el usuario
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Hooks de navegación y contexto
+  const [isLoading, setIsLoading] = useState(false);
+  const [isWakingUp, setIsWakingUp] = useState(false);
+
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // 2. Función que se ejecuta al escribir en los inputs
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -24,37 +23,46 @@ export default function LoginPage() {
     });
   };
 
-  // 3. Función que se ejecuta al pulsar "Entrar"
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Evita que la página se recargue
+    e.preventDefault(); 
     setError('');
     setIsLoading(true);
+    setIsWakingUp(false); // Nos aseguramos de que empiece oculto
+
+    // Si a los 3 segundos no ha terminado, mostramos el aviso.
+    const wakeUpTimer = setTimeout(() => {
+      setIsWakingUp(true);
+    }, 3000);
 
     try {
-      // Llamamos a la función login del AuthContext
       await login(formData.username, formData.password);
-      
-      // Si todo va bien, redirigimos al mapa
       navigate('/map');
     } catch (err) {
-      // Si falla, mostramos mensaje (asumiendo que el backend devuelve un mensaje de error)
       setError('Credenciales incorrectas. Inténtalo de nuevo.');
     } finally {
+      clearTimeout(wakeUpTimer);
       setIsLoading(false);
+      setIsWakingUp(false);
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        {/* Título y Logo */}
         <h1 className="auth-title">🛹 SkateMap</h1>
         <p className="auth-subtitle">Encuentra los mejores spots de la ciudad</p>
 
-        {/* Mensaje de Error (si existe) */}
-        {error && <div className="error-message">{error}</div>}
+        {/* Mensaje de Error */}
+        {error && !isLoading && <div className="error-message">{error}</div>}
 
-        {/* Formulario */}
+        {isWakingUp && (
+          <div className="loading-message">
+            <div className="spinner"></div> 
+            <p className="loading-text">Levantando el servidor...</p>
+            <p className="loading-subtext">(suele tardar entre 1 y 2 minutos)</p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">Usuario</label>

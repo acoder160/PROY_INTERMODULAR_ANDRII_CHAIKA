@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../api/axiosConfig'; // Usamos nuestra configuración de Axios
-import '../Auth.css'; // Reutilizamos el estilo oscuro
+import api from '../api/axiosConfig'; 
+import '../Auth.css'; 
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -10,7 +10,11 @@ export default function RegisterPage() {
     password: ''
   });
   const [error, setError] = useState('');
+  
+  // isLoading bloquea el botón al instante
   const [isLoading, setIsLoading] = useState(false);
+  // isWakingUp muestra el cartel verde solo si tarda mucho
+  const [isWakingUp, setIsWakingUp] = useState(false);
   
   const navigate = useNavigate();
 
@@ -25,24 +29,27 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+    setIsWakingUp(false); 
+
+    const wakeUpTimer = setTimeout(() => {
+      setIsWakingUp(true);
+    }, 3000);
 
     try {
-      // Llamada al endpoint de registro que creamos en el Backend
       await api.post('/auth/register', formData);
-      
-      // Si funciona, redirigimos al login para que entre con su cuenta nueva
       alert('¡Cuenta creada con éxito! Ahora inicia sesión.');
       navigate('/login');
     } catch (err) {
       console.error(err);
-      // Intentamos mostrar el mensaje de error del backend, o uno genérico
       if (err.response && err.response.data && err.response.data.message) {
         setError(err.response.data.message);
       } else {
         setError('Error al registrarse. Puede que el usuario ya exista.');
       }
     } finally {
+      clearTimeout(wakeUpTimer);
       setIsLoading(false);
+      setIsWakingUp(false);
     }
   };
 
@@ -52,10 +59,18 @@ export default function RegisterPage() {
         <h1 className="auth-title">Únete al Crew</h1>
         <p className="auth-subtitle">Crea tu cuenta en SkateMap</p>
 
-        {error && <div className="error-message">{error}</div>}
+        {/* Mensaje de Error */}
+        {error && !isLoading && <div className="error-message">{error}</div>}
+
+        {isWakingUp && (
+          <div className="loading-message">
+            <div className="spinner"></div> 
+            <p className="loading-text">Levantando el servidor...</p>
+            <p className="loading-subtext">(suele tardar entre 1 y 2 minutos)</p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
-          {/* Campo Usuario */}
           <div className="form-group">
             <label className="form-label">Nombre de Usuario</label>
             <input
@@ -69,7 +84,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Campo Email (Nuevo respecto al Login) */}
           <div className="form-group">
             <label className="form-label">Email</label>
             <input
@@ -83,7 +97,6 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Campo Contraseña */}
           <div className="form-group">
             <label className="form-label">Contraseña</label>
             <input
@@ -94,7 +107,7 @@ export default function RegisterPage() {
               value={formData.password}
               onChange={handleChange}
               required
-              minLength={6} // Validación básica de longitud
+              minLength={6} 
             />
           </div>
 
