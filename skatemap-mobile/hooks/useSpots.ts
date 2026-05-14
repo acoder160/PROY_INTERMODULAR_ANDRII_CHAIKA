@@ -29,6 +29,11 @@ export const useSpots = (token: string | null) => {
 
     } catch (error) {
       console.log("Servidor inaccesible. Activando Modo Offline 📡❌");
+
+      console.log("💥 DETALLES DEL ERROR:", error.response?.data || error.message);
+      console.log("🔑 TOKEN QUE ESTAMOS ENVIANDO:", token);
+
+
       setIsOffline(true);
       
       // 4. Si falla la red, leemos la memoria interna del teléfono
