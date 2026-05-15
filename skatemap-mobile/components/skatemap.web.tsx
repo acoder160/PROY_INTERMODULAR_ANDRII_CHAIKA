@@ -65,7 +65,6 @@ export default function SkateMap({ spots = [] }: { spots?: any[] }) {
 
   return (
     <View style={styles.container}>
-      {/* usamos un iframe estándar de la web.*/}
       <iframe 
         srcDoc={leafletHTML}
         style={{ width: '100%', height: '100%', border: 'none' }}

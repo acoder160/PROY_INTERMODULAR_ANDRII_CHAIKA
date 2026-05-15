@@ -3,7 +3,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequest {
     @NotBlank
-    private String username; // Puede ser email también si cambias la lógica
+    private String username;
     @NotBlank
     private String password;
 

@@ -13,7 +13,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     // Ordenados por fecha descendente (los más nuevos primero)
     List<Comment> findBySpotIdOrderByCreatedAtDesc(Long spotId);
 
-    // Para contar cuántos comentarios tiene un spot (para listas)
+    // Contar cuántos comentarios tiene un spot
     long countBySpotId(Long spotId);
 
     @org.springframework.data.jpa.repository.Modifying

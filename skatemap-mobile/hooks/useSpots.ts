@@ -10,7 +10,7 @@ export const useSpots = (token: string | null) => {
 
   const fetchSpots = useCallback(async () => {
     try {
-      // 1. Intentamos conectar con el servidor Spring Boot
+      // Intentamos conectar con el servidor Spring Boot
       const response = await axios.get(`${API_BASE_URL}/api/spots`, {
         headers: token ? { 
           Authorization: `Bearer ${token}`, 
@@ -20,23 +20,31 @@ export const useSpots = (token: string | null) => {
         }
       });
       
-      // 2. Si hay éxito, actualizamos la app y apagamos el modo offline
+      // Si hay éxito, actualizamos la app y apagamos el modo offline
       setSpots(response.data);
       setIsOffline(false);
       
-      // 3. Guardamos silenciosamente la copia de seguridad en el móvil
+      // Guardamos silenciosamente la copia de seguridad en el móvil
       await AsyncStorage.setItem('@skatemap_spots_cache', JSON.stringify(response.data));
 
-    } catch (error) {
+    } catch (err: unknown) {
       console.log("Servidor inaccesible. Activando Modo Offline 📡❌");
 
-      console.log("💥 DETALLES DEL ERROR:", error.response?.data || error.message);
-      console.log("🔑 TOKEN QUE ESTAMOS ENVIANDO:", token);
+      // Manejo seguro del error de tipo desconocido
+      if (axios.isAxiosError(err)) {
+        console.log("DETALLES DEL ERROR:", err.response?.data || err.message);
+      } else if (err instanceof Error) {
+        console.log("DETALLES DEL ERROR:", err.message);
+      } else {
+        console.log("DETALLES DEL ERROR:", String(err));
+      }
+
+      console.log("TOKEN QUE ESTAMOS ENVIANDO:", token);
 
 
       setIsOffline(true);
       
-      // 4. Si falla la red, leemos la memoria interna del teléfono
+      // Si falla la red, leemos la memoria interna del teléfono
       try {
         const cachedSpots = await AsyncStorage.getItem('@skatemap_spots_cache');
         if (cachedSpots !== null) {

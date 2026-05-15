@@ -1,0 +1,27 @@
+name: Render Keep-Alive Service
+
+on:
+  schedule:
+    # Ejecucion programada cada 12 minutos
+    - cron: '*/12 * * * *'
+  # Permite ejecucion manual desde la pestaña 'Actions' de GitHub
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout del codigo fuente
+        uses: actions/checkout@v4
+
+      - name: Configuracion de entorno Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Instalacion de dependencias
+        run: pip install requests
+
+      - name: Ejecucion del script de ping
+        run: python keep_alive.py

@@ -5,15 +5,15 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
-@Entity // Indica a Spring que esto es una tabla de BBDD
+@Entity
 @Table(name = "users") // Nombre real de la tabla en Postgres
 public class User {
 
-    @Id // Clave primaria (Primary Key)
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incremental (1, 2, 3...)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank // Valida que no esté vacío ni sea null
+    @NotBlank
     @Column(unique = true, nullable = false, length = 50)
     private String username;
 
@@ -23,7 +23,7 @@ public class User {
     private String email;
 
     @NotBlank
-    private String password; // Se guardará encriptada
+    private String password;
 
     @Column(name = "avatar_url")
     private String avatarUrl;
@@ -35,7 +35,6 @@ public class User {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    // CONSTRUCTOR VACÍO (Obligatorio para JPA)
     public User() {}
 
     // AUTOMATIZACIÓN: Antes de guardar, poner la fecha actual
@@ -44,7 +43,7 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
-    // GETTERS Y SETTERS (Necesarios para que Spring lea/escriba datos)
+    // GETTERS Y SETTERS
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

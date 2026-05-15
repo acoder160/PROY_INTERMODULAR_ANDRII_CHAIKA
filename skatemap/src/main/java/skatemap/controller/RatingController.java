@@ -33,7 +33,6 @@ public class RatingController {
     public ResponseEntity<RatingDto> checkMyRating(@PathVariable Long spotId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        // Llamamos al método nuevo 'getUserRating'
         RatingDto myRating = ratingService.getUserRating(spotId, auth.getName());
 
         return ResponseEntity.ok(myRating);

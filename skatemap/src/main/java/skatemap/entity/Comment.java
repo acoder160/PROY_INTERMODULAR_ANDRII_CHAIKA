@@ -36,12 +36,11 @@ public class Comment {
         this.createdAt = LocalDateTime.now();
     }
 
-    // --- GETTERS Y SETTERS ---
+    // GETTERS Y SETTERS
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    // Aquí está la clave: getContent y setContent
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
 

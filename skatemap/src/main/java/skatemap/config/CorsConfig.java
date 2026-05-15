@@ -13,7 +13,7 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    // Convierte la cadena separada por comas en una Lista de Strings
+    // Convierte la cadena en una Lista de Strings
     @Value("#{'${cors.allowed.origins}'.split(',')}")
     private List<String> allowedOrigins;
 
@@ -22,22 +22,21 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        // 1. Permitir que se envíen credenciales (cookies, headers de auth)
+        // Permitir que se envíen credenciales
         config.setAllowCredentials(true);
 
-        // 2. Dominios permitidos (Inyectados dinámicamente)
+        // Dominios permitidos
         config.setAllowedOrigins(allowedOrigins);
 
-        // 3. Headers permitidos
+        // Headers permitidos
         config.setAllowedHeaders(Arrays.asList(
                 "Origin", "Content-Type", "Accept", "Authorization",
                 "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"
         ));
 
-        // 4. Métodos permitidos
+        //  Métodos permitidos
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        // Aplica esta configuración a todas las rutas de tu API
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }

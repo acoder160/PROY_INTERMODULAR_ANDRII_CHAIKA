@@ -74,7 +74,6 @@ export default function SpotFormModal({
   );
 }
 
-// Estos son SOLO los estilos que necesita el modal
 const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { backgroundColor: '#fff', width: '85%', borderRadius: 20, overflow: 'hidden', paddingBottom: 20 },

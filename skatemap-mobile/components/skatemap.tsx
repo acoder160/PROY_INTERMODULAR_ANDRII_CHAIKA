@@ -127,7 +127,7 @@ export default function SkateMap({
 
           var spotsLayer = L.layerGroup().addTo(map);
 
-          // 1. INYECTAMOS LOS ICONOS DESDE REACT NATIVE
+          // INYECTAMOS LOS ICONOS DESDE REACT NATIVE
           var SPOT_ICONS = ${JSON.stringify(ICONS)};
 
           // FUNCIÓN PARA RENDERIZAR SPOTS DINÁMICAMENTE
@@ -193,7 +193,7 @@ export default function SkateMap({
             });
           };
 
-          // 2. FUNCIÓN PARA EL BOTÓN DEL PUNTO AZUL Y CÍRCULO
+          // FUNCIÓN PARA EL BOTÓN DEL PUNTO AZUL Y CÍRCULO
           var userMarker = null;
           var locationCircle = null; 
 
@@ -222,7 +222,7 @@ export default function SkateMap({
             map.flyTo([lat, lng], 16, { animate: true, duration: 1.5 });
           };
 
-          // 3. EVENTO DE CLIC EN EL MAPA CON VALIDACIÓN DE 200m
+          // EVENTO DE CLIC EN EL MAPA CON VALIDACIÓN DE 200m
           map.on('click', function(e) {
             if (window.isAddingMode) {
               

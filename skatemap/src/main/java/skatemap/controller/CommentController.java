@@ -19,7 +19,7 @@ public class CommentController {
         this.spotService = spotService;
     }
 
-    // 1. GUARDAR COMENTARIO (POST /api/comments/{spotId})
+    // GUARDAR COMENTARIO
     @PostMapping("/{spotId}")
     public ResponseEntity<?> addComment(@PathVariable Long spotId, @RequestBody CommentDto commentDto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -30,7 +30,7 @@ public class CommentController {
         return ResponseEntity.ok().build();
     }
 
-    // 2. LEER COMENTARIOS (GET /api/comments/spot/{spotId})
+    // LEER COMENTARIOS
     @GetMapping("/spot/{spotId}")
     public ResponseEntity<List<CommentDto>> getComments(@PathVariable Long spotId) {
         return ResponseEntity.ok(spotService.getCommentsBySpot(spotId));

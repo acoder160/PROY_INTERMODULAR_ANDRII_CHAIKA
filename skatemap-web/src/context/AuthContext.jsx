@@ -27,10 +27,10 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await api.post('/auth/login', { username, password });
             
-            // 1. MIRAR EN LA CONSOLA QUÉ LLEGA EXACTAMENTE (El Chivato)
-            console.log("📢 RESPUESTA DEL LOGIN:", response.data); 
+            // MIRAR EN LA CONSOLA QUÉ LLEGA EXACTAMENTE
+            console.log("RESPUESTA DEL LOGIN:", response.data); 
 
-            // 2. BUSCAR EL TOKEN CON VARIOS NOMBRES POSIBLES
+            // BUSCAR EL TOKEN CON VARIOS NOMBRES POSIBLES
             // Si no está en 'accessToken', mira en 'token', y si no en 'jwt'
             const elToken = response.data.accessToken || response.data.token || response.data.jwt;
 
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
                 throw new Error("Token no encontrado en la respuesta");
             }
             
-            // 3. GUARDAR EL TOKEN ENCONTRADO
+            // GUARDAR EL TOKEN
             localStorage.setItem('token', elToken);
             localStorage.setItem('username', username);
             

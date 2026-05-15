@@ -5,7 +5,6 @@ import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom'; 
 
-// --- ICONOS 3D ---
 const getSpotIcon = (type) => {
     let iconPath = '/icons/icon_street.png'; // Por defecto
     switch (type) {
@@ -25,14 +24,14 @@ const getSpotIcon = (type) => {
     });
 };
 
-// --- DICCIONARIO PARA TRADUCIR DIFICULTAD ---
+//  DICCIONARIO PARA TRADUCIR DIFICULTAD 
 const difficultyLabels = {
     'BEGINNER': 'Fácil',
     'INTERMEDIATE': 'Medio',
     'ADVANCED': 'Pro'
 };
 
-// --- COMPONENTE POPUP ---
+// COMPONENTE POPUP 
 function SpotPopup({ spot, onUpdate }) {
     const [myRating, setMyRating] = useState(0);        
     const [hasVoted, setHasVoted] = useState(false);     
@@ -202,7 +201,7 @@ function SpotPopup({ spot, onUpdate }) {
     );
 }
 
-// --- BOTÓN GEOLOCALIZACIÓN ---
+// BOTÓN GEOLOCALIZACIÓN
 function LocationButton({ setMyPosition }) {
     const map = useMap();
     const goToMyLocation = () => { map.locate().on("locationfound", function (e) { setMyPosition(e.latlng); map.flyTo(e.latlng, 15); }); };
@@ -232,7 +231,7 @@ export default function MapPage() {
     } 
   };
 
-  // --- LÓGICA DE FILTRADO (Haversine Formula) ---
+  // LÓGICA DE FILTRADO (Haversine Formula)
   const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
     const R = 6371; 
     const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -275,7 +274,7 @@ export default function MapPage() {
         ⚙️ {filters.spotType !== 'ALL' || filters.minRating > 0 || filters.maxDistance > 0 ? 'Filtros (Activo)' : 'Filtros'}
       </button>
 
-      {/* 🟢 MENÚ DESPLEGABLE DE FILTROS */}
+      {/* MENÚ DESPLEGABLE DE FILTROS */}
       {showFilterMenu && (
         <div style={{
           position: 'absolute', top: '70px', left: '20px', zIndex: 1000,
@@ -354,7 +353,7 @@ export default function MapPage() {
       <div style={{ 
         position: 'absolute', 
         top: '20px', 
-        left: '50%',                  //
+        left: '50%',                  
         transform: 'translateX(-50%)', // restamos su propio ancho para centrarlo exacto
         zIndex: 1000, 
         background: 'rgba(255, 255, 255, 0.95)', 

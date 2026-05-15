@@ -32,7 +32,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
         String username = auth.getName();
 
-        // EXCEPCIÓN: Si es ADMIN, vía libre
+        // EXCEPCION: Si es ADMIN, vía libre
         boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         if (isAdmin) return true;

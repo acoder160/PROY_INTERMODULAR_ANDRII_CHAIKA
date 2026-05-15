@@ -53,16 +53,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 1. ACTIVAR CORS (Usando la configuración de CorsConfig.java)
+                // ACTIVAR CORS
                 .cors(Customizer.withDefaults())
 
-                // 2. DESACTIVAR CSRF (Necesario para APIs REST)
+                // DESACTIVAR CSRF (Necesario para APIs REST)
                 .csrf(csrf -> csrf.disable())
 
-                // 3. GESTION DE SESIONES (Sin estado / Stateless)
+                // Sin estado / Stateless
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 4. REGLAS DE AUTORIZACION BLINDADAS
+                // REGLAS DE AUTORIZACION BLINDADAS
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         // Solo permitimos ver los spots al público. Para crear/editar/borrar se pedirá token.
@@ -70,11 +70,11 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        // El resto de peticiones (incluyendo POST/PUT/DELETE a /api/spots) requerirán estar autenticado
+                        // El resto de peticiones, incluyendo POST/PUT/DELETE a /api/spots requerirán estar autenticado
                         .anyRequest().authenticated()
                 );
 
-        // 5.  FILTROS
+        // FILTROS
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 

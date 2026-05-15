@@ -14,7 +14,7 @@ public class CommentDto {
     // Constructor vacío (Necesario para que Spring lea el JSON)
     public CommentDto() {}
 
-    // Constructor con todos los argumentos (Usado en tu Service)
+    // Constructor con todos los argumentos
     public CommentDto(Long id, String content, String username, LocalDateTime createdAt) {
         this.id = id;
         this.content = content;

@@ -5,7 +5,6 @@ public class RatingDto {
     private Integer value;      // La nota que ha puesto el usuario (ej: 5)
     private Double newAverage;  // La nueva media del spot (ej: 4.5)
 
-    // 1. Constructor Vacío (Obligatorio para JSON)
     public RatingDto() {}
 
     public RatingDto(Integer value, Double newAverage) {

@@ -26,24 +26,24 @@ public class CloudinaryController {
 
     @GetMapping("/signature")
     public ResponseEntity<Map<String, Object>> getSignature() {
-        // 1. Instanciamos Cloudinary con nuestras credenciales
+        // Instanciamos Cloudinary
         Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", cloudName,
                 "api_key", apiKey,
                 "api_secret", apiSecret));
 
-        // 2. Generamos el timestamp (la firma caduca, lo cual es más seguro)
+        // Generamos el timestamp, la firma caduca por la seguridad
         long timestamp = System.currentTimeMillis() / 1000L;
 
-        // 3. Parámetros a firmar
+        // Parametros a firmar
         Map<String, Object> paramsToSign = new HashMap<>();
         paramsToSign.put("timestamp", timestamp);
         paramsToSign.put("folder", "skatemap_spots");
 
-        // 4. Fabricamos la firma criptográfica
+        // Firma criptográfica
         String signature = cloudinary.apiSignRequest(paramsToSign, apiSecret);
 
-        // 5. Devolvemos el "Ticket Dorado" al móvil
+        // Devolvemos el info al movil
         Map<String, Object> response = new HashMap<>();
         response.put("signature", signature);
         response.put("timestamp", timestamp);

@@ -15,7 +15,7 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI myOpenAPI() {
-        // 1. Definir el esquema de seguridad (JWT)
+        // El esquema de seguridad (JWT)
         String securitySchemeName = "BearerAuth";
 
         SecurityScheme securityScheme = new SecurityScheme()
@@ -24,7 +24,7 @@ public class OpenApiConfig {
                 .scheme("bearer")
                 .bearerFormat("JWT");
 
-        // 2. Crear la configuración con los metadatos de la App
+        // Crear la configuración con los metadatos de la App
         return new OpenAPI()
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components().addSecuritySchemes(securitySchemeName, securityScheme))
