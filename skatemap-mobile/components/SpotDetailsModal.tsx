@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Image, KeyboardAvoidingView, Platform, ActivityIndicator, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Image, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
+import { useRouter } from 'expo-router';
 import { API_BASE_URL } from '../constants/api';
 
 export default function SpotDetailsModal({ visible, onClose, spot, token, onSpotUpdated }: any) {
+  const router = useRouter();
   const [comments, setComments] = useState<any[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   
@@ -23,7 +25,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
   const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    if (visible && spot && token) {
+    if (visible && spot) {
       setCurrentRating(0);
       setNewComment('');
       setSuccessMessage(null);
@@ -39,22 +41,37 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
   const fetchData = async () => {
     setIsLoadingComments(true);
     try {
-      try {
-        const ratingRes = await axios.get(`${API_BASE_URL}/api/ratings/check/${spot.id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (ratingRes.data && ratingRes.data.value > 0) {
-          setMyRating(ratingRes.data.value);
-          setHasVoted(true);
-        } else {
+      // 1. Solo comprobamos si ya ha votado cuando el usuario tiene sesión iniciada (token)
+      if (token) {
+        try {
+          const ratingRes = await axios.get(`${API_BASE_URL}/api/ratings/check/${spot.id}`, {
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true"
+            }
+          });
+          if (ratingRes.data && ratingRes.data.value > 0) {
+            setMyRating(ratingRes.data.value);
+            setHasVoted(true);
+          } else {
+            setHasVoted(false);
+          }
+        } catch (e) {
           setHasVoted(false);
         }
-      } catch (e) {
+      } else {
         setHasVoted(false);
+        setMyRating(0);
       }
 
+      // 2. Los comentarios se cargan siempre (con o sin token)
       const commentsRes = await axios.get(`${API_BASE_URL}/api/comments/spot/${spot.id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: token ? { 
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true"
+        } : {
+          "ngrok-skip-browser-warning": "true"
+        }
       });
       setComments(commentsRes.data);
     } catch (e) {
@@ -64,18 +81,55 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
     }
   };
 
+  const handleStarPress = (star: number) => {
+    // Si es un invitado (sin token), le pedimos iniciar sesión al intentar valorar
+    if (!token) {
+      Alert.alert(
+        "Iniciar sesión requerido",
+        "Necesitas iniciar sesión para valorar y comentar este spot.",
+        [
+          { text: "Cancelar", style: "cancel" },
+          { 
+            text: "Iniciar sesión", 
+            onPress: () => {
+              onClose();
+              router.push('/login');
+            } 
+          }
+        ]
+      );
+      return;
+    }
+
+    setCurrentRating(star);
+    // Bajamos suavemente para que vea el input
+    setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
+  };
+
   const handleSendReview = async () => {
+    if (!token) {
+      onClose();
+      router.push('/login');
+      return;
+    }
+
     setIsSubmitting(true);
     setSuccessMessage(null);
     try {
       // Guardamos lo que devuelve Spring Boot
       const response = await axios.post(`${API_BASE_URL}/api/ratings/${spot.id}`, { value: currentRating }, { 
-        headers: { Authorization: `Bearer ${token}` } 
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true"
+        } 
       });
 
       if (newComment.trim().length > 0) {
         await axios.post(`${API_BASE_URL}/api/comments/${spot.id}`, { content: newComment }, { 
-          headers: { Authorization: `Bearer ${token}` } 
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true"
+          } 
         });
       }
 
@@ -126,7 +180,6 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
               <Text style={styles.desc}>{spot.description}</Text>
 
               <View style={styles.ratingBox}>
-                {}
                 <Text style={styles.ratingTitle}>Puntuación media: {localAvgRating.toFixed(1)}/5</Text>
                 
                 {hasVoted ? (
@@ -140,16 +193,14 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
                     </View>
                 ) : (
                     <View style={{ alignItems: 'center', marginTop: 10 }}>
-                        <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#888', marginBottom: 5 }}>Valora este spot:</Text>
+                        <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#888', marginBottom: 5 }}>
+                          {token ? 'Valora este spot:' : 'Toca una estrella para valorar (requiere cuenta):'}
+                        </Text>
                         <View style={styles.starsRow}>
                           {[1, 2, 3, 4, 5].map(star => (
                             <TouchableOpacity 
                                 key={star} 
-                                onPress={() => {
-                                    setCurrentRating(star);
-                                    // Bajamos suavemente para que vea el input
-                                    setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
-                                }}
+                                onPress={() => handleStarPress(star)}
                             >
                               <Text style={star <= currentRating ? styles.starFull : styles.starEmpty}>★</Text>
                             </TouchableOpacity>

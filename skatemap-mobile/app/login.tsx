@@ -25,9 +25,8 @@ export default function LoginScreen() {
     }
 
     setIsLoading(true);
-    setIsWakingUp(false); // Aseguramos que empiece oculto
+    setIsWakingUp(false);
 
-    // cronómetro de 3 segundos
     const wakeUpTimer = setTimeout(() => {
       setIsWakingUp(true);
     }, 3000);
@@ -44,7 +43,6 @@ export default function LoginScreen() {
       console.error(error);
       setErrorMessage("Error al iniciar sesión. Comprueba tus credenciales.");
     } finally {
-
       clearTimeout(wakeUpTimer);
       setIsLoading(false);
       setIsWakingUp(false);
@@ -65,7 +63,6 @@ export default function LoginScreen() {
           <Text style={styles.title}>🛹 SkateMap</Text>
           <Text style={styles.subtitle}>Encuentra los mejores spots de la ciudad</Text>
 
-          {/* CAJA ROJA: Si hay error y NO está cargando */}
           {errorMessage && !isLoading && (
             <View style={styles.errorBox}>
               <Text style={styles.errorText}>{errorMessage}</Text>
@@ -110,6 +107,10 @@ export default function LoginScreen() {
               <Text style={styles.link}>Regístrate aquí</Text>
             </TouchableOpacity>
           </View>
+
+          <TouchableOpacity style={styles.guestButton} onPress={() => router.replace('/(tabs)')}>
+            <Text style={styles.guestButtonText}>← Volver al mapa sin cuenta</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -136,5 +137,7 @@ const styles = StyleSheet.create({
   buttonText: { color: '#1A1A1A', fontSize: 16, fontWeight: 'bold' },
   footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 25 },
   footerText: { color: '#AAA' },
-  link: { color: '#FF9F1C', fontWeight: 'bold' }
+  link: { color: '#FF9F1C', fontWeight: 'bold' },
+  guestButton: { marginTop: 20, alignItems: 'center', paddingVertical: 8 },
+  guestButtonText: { color: '#888', fontSize: 14, textDecorationLine: 'underline' }
 });

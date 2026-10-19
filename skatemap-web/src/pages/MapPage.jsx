@@ -69,7 +69,7 @@ function SpotPopup({ spot, onUpdate }) {
     }, [spot.id]);
 
     const handleSendReview = async () => {
-        setIsSubmitting(true);
+        setIsSubmitting(true); 
         try {
             await api.post(`/ratings/${spot.id}`, { value: currentRating });
             if (newComment.trim().length > 0) {

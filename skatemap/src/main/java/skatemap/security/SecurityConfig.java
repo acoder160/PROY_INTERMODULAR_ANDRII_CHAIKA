@@ -9,6 +9,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -65,12 +66,13 @@ public class SecurityConfig {
                 // REGLAS DE AUTORIZACION BLINDADAS
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Solo permitimos ver los spots al público. Para crear/editar/borrar se pedirá token.
+                        // Permitimos ver los spots y leer los comentarios al público sin token
                         .requestMatchers(HttpMethod.GET, "/api/spots/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        // El resto de peticiones, incluyendo POST/PUT/DELETE a /api/spots requerirán estar autenticado
+                        // El resto de peticiones (POST/PUT/DELETE, votar, comentar, subir fotos) requieren JWT
                         .anyRequest().authenticated()
                 );
 

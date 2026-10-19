@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import SkateMap from '../../components/skatemap';
 import SpotFormModal from '../../components/SpotFormModal';
 import CameraOverlay from '../../components/CameraOverlay';
 import { uploadImageToCloudinary } from '../../utils/cloudinary';
-import { Redirect, useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useCameraPermissions } from 'expo-camera';
 import { API_BASE_URL } from '../../constants/api';
 import { useLocation } from '../../hooks/useLocation';
@@ -22,6 +22,7 @@ const GIF_CYCLE_DURATION_MS = 2000;
 
 export default function HomeScreen() {
   const { user, token, logout } = useAuth(); 
+  const router = useRouter();
   
   const { userLocation, handleRecenter } = useLocation();
   
@@ -49,9 +50,9 @@ export default function HomeScreen() {
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [filters, setFilters] = useState({ minRating: 0, spotType: 'ALL', maxDistance: 0 });
 
-  // Lógica para recargar spots asegurando el ciclo del GIF
+  // Lógica para recargar spots (ahora funciona también sin token para invitados)
   const handleReloadSpots = async () => {
-    if (!token || isRefreshing) return;
+    if (isRefreshing) return;
 
     setIsRefreshing(true);
     
@@ -79,6 +80,19 @@ export default function HomeScreen() {
   }, [handleRecenter]);
 
   const startAddingProcess = async () => {
+    // Si el usuario NO está autenticado, le pedimos iniciar sesión antes de abrir la cámara
+    if (!user || !token) {
+      Alert.alert(
+        "Iniciar sesión requerido",
+        "Necesitas iniciar sesión para añadir un nuevo spot al mapa.",
+        [
+          { text: "Cancelar", style: "cancel" },
+          { text: "Iniciar sesión", onPress: () => router.push('/login') }
+        ]
+      );
+      return;
+    }
+
     if (isAddingMode) {
       setIsAddingMode(false); setNewSpotLocation(null); setCapturedPhoto(null); setStatusMessage(null); return;
     }
@@ -113,6 +127,10 @@ export default function HomeScreen() {
   };
 
   const handleSaveSpot = async () => {
+    if (!user || !token) {
+      router.push('/login');
+      return;
+    }
     if (!newSpotLocation || !formData.name || !capturedPhoto) { alert("Faltan datos o foto"); return; }
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) { alert("Error de configuración de Cloudinary"); return; }
 
@@ -173,8 +191,6 @@ export default function HomeScreen() {
     return true;
   });
 
-  if (!user) return <Redirect href="/login" />;
-
   return (
     <View style={[styles.container, { flex: 1 }]}>
       
@@ -191,7 +207,7 @@ export default function HomeScreen() {
         />
       </View>
 
-      {/* NUEVO: Botón de Filtros (Arriba a la izquierda) */}
+      {/* Botón de Filtros (Arriba a la izquierda) */}
       <TouchableOpacity 
         style={styles.filterButton} 
         onPress={() => setFilterModalVisible(true)}
@@ -201,11 +217,21 @@ export default function HomeScreen() {
         </Text>
       </TouchableOpacity>
 
-      {/* Botón Badge de Usuario (Centrado arriba) */}
+      {/* Botón Badge de Usuario o Botón Entrar (Arriba a la derecha) */}
       <View style={styles.userBadge}>
-        <Text style={styles.userName}>👤 {user}</Text>
-        <View style={styles.separator} />
-        <TouchableOpacity onPress={logout}><Text style={styles.logoutText}>Salir</Text></TouchableOpacity>
+        {user ? (
+          <>
+            <Text style={styles.userName}>👤 {user}</Text>
+            <View style={styles.separator} />
+            <TouchableOpacity onPress={logout}>
+              <Text style={styles.logoutText}>Salir</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <TouchableOpacity onPress={() => router.push('/login')}>
+            <Text style={styles.loginText}>👤 Entrar</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* AVISO DE MODO OFFLINE */}
@@ -279,7 +305,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
-  mapContainer: { ...StyleSheet.absoluteFillObject, elevation: 0 },
+  mapContainer: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, flex: 1, elevation: 0 },
   
   // Estilos del botón de filtros
   filterButton: {
@@ -322,6 +348,7 @@ const styles = StyleSheet.create({
   userName: { fontWeight: 'bold', color: '#1A1A1A', marginRight: 10 },
   separator: { width: 1, height: 15, backgroundColor: '#E0E0E0', marginRight: 10 },
   logoutText: { color: '#ff6b6b', fontWeight: 'bold' },
+  loginText: { color: '#2ed573', fontWeight: 'bold' },
 
   // Estilos del aviso de Modo Offline
   offlineBadge: {

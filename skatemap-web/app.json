@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "fc07263a-b4c3-4572-a55b-92b66381044a"
+      }
+    },
+    "android": {
+      "package": "com.acoder160.skatemapweb"
+    }
+  }
+}

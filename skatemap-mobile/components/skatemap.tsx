@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { WebView } from 'react-native-webview';
-import { StyleSheet, View, Linking, Image } from 'react-native';
+import { StyleSheet, View, Linking, Image, Dimensions } from 'react-native';
+import { CARTO_API_KEY } from '../constants/api';
 
 // Props del mapa
 interface SkateMapProps {
@@ -20,8 +21,9 @@ export default function SkateMap({
   onSpotClick
 }: SkateMapProps) {
   const webviewRef = useRef<WebView>(null);
+  const mapReadyRef = useRef(false);
+  const windowHeight = Dimensions.get('window').height;
 
-  // Resolvemos las URIs locales de los iconos para inyectarlas al mapa
   const ICONS = {
     STREET: Image.resolveAssetSource(require('../assets/images/icon_street.png')).uri,
     PARK: Image.resolveAssetSource(require('../assets/images/icon_park.png')).uri,
@@ -33,7 +35,7 @@ export default function SkateMap({
 
   // Sincronizar spots
   useEffect(() => {
-    if (webviewRef.current) {
+    if (mapReadyRef.current && webviewRef.current) {
       webviewRef.current.injectJavaScript(`
         if(typeof window.renderSpots === 'function') {
           window.renderSpots(${JSON.stringify(spots)});
@@ -45,7 +47,7 @@ export default function SkateMap({
 
   // Sincronizamos la ubicación del usuario
   useEffect(() => {
-    if (userLocation && webviewRef.current) {
+    if (mapReadyRef.current && userLocation && webviewRef.current) {
       webviewRef.current.injectJavaScript(`
         if(typeof window.updateUserLocation === 'function') {
           window.updateUserLocation(${userLocation.lat}, ${userLocation.lng});
@@ -57,7 +59,7 @@ export default function SkateMap({
 
   // Sincronizamos el modo "Añadir Spot" para que el mapa deje hacer clic
   useEffect(() => {
-    if (webviewRef.current) {
+    if (mapReadyRef.current && webviewRef.current) {
       webviewRef.current.injectJavaScript(`
         window.isAddingMode = ${isAddingMode};
         if (!${isAddingMode} && window.newSpotMarker) {
@@ -78,8 +80,8 @@ export default function SkateMap({
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
         <style>
-          html, body { padding: 0; margin: 0; height: 100%; width: 100%; background-color: #e5e5e5; }
-          #map { height: 100%; width: 100%; }
+          html, body { padding: 0; margin: 0; height: 100vh; min-height: 1px; width: 100%; background-color: #e5e5e5; }
+          #map { height: 100vh; min-height: 1px; width: 100%; }
           
           /* Diseño del Punto Azul de Ubicación */
           .blue-dot { display: flex; justify-content: center; align-items: center; }
@@ -118,11 +120,22 @@ export default function SkateMap({
           window.isAddingMode = false;
           window.newSpotMarker = null;
 
+          if (typeof L === 'undefined') {
+            throw new Error('Leaflet is unavailable');
+          }
+
           var map = L.map('map', { zoomControl: false }).setView([42.8125, -1.6458], 14);
 
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+          var tileUrl = ${CARTO_API_KEY
+            ? `'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(CARTO_API_KEY)}'`
+            : "'https://tile.openstreetmap.org/{z}/{x}/{y}.png'"};
+          
+          L.tileLayer(tileUrl, {
             maxZoom: 19,
-            attribution: '© OpenStreetMap'
+            subdomains: 'abcd',
+            attribution: ${CARTO_API_KEY
+              ? "'© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors © <a href=\"https://carto.com/attributions\">CARTO</a>'"
+              : "'© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'"}
           }).addTo(map);
 
           var spotsLayer = L.layerGroup().addTo(map);
@@ -257,6 +270,8 @@ export default function SkateMap({
               }));
             }
           });
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'mapReady' }));
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'mapReady' }));
         </script>
       </body>
     </html>
@@ -273,30 +288,55 @@ export default function SkateMap({
         javaScriptEnabled={true}
         domStorageEnabled={true}
         source={{ html: staticHtml }} 
-        style={styles.map} 
+        style={[styles.map, { height: windowHeight }]} 
         scrollEnabled={false}
         bounces={false}
+        onLoadEnd={() => {
+          mapReadyRef.current = true;
+          webviewRef.current?.injectJavaScript(`
+            if (typeof map !== 'undefined') {
+              document.documentElement.style.height = window.innerHeight + 'px';
+              document.body.style.height = window.innerHeight + 'px';
+              document.getElementById('map').style.height = window.innerHeight + 'px';
+              map.invalidateSize(true);
+              window.renderSpots(${JSON.stringify(spots)});
+              ${userLocation ? `window.updateUserLocation(${userLocation.lat},${userLocation.lng});` : ''}
+              window.isAddingMode = ${isAddingMode};
+            }
+            true;
+          `);
+        }}
+        onLayout={(event) => {
+          const { height } = event.nativeEvent.layout;
+          webviewRef.current?.injectJavaScript(`
+            if (typeof map !== 'undefined') {
+              document.documentElement.style.height = '${height}px';
+              document.body.style.height = '${height}px';
+              document.getElementById('map').style.height = '${height}px';
+              map.invalidateSize(true);
+            }
+            true;
+          `);
+        }}
         onMessage={(event) => {
-          try {
-            const data = JSON.parse(event.nativeEvent.data);
+          const data = JSON.parse(event.nativeEvent.data);
             
-            if (data.type === 'error') {
-               alert(data.message);
-            } 
-            else if (data.type === 'locationSelected' && data.lat && data.lng && onMapClick) {
-               onMapClick(data.lat, data.lng);
-            }
-            // Escuchamos el clic del botón de detalles
-            else if (data.type === 'openDetails' && onSpotClick) {
-               onSpotClick(data.spotId);
-            }
-            // Abrir GPS
-            else if (data.type === 'openDirections') {
-               const url = `https://maps.google.com/?q=${data.lat},${data.lng}`;
-               Linking.openURL(url).catch(err => console.error("No se pudo abrir Maps", err));
-            }
-          } catch (e) {
-            console.error("Error leyendo mensaje del WebView:", e);
+          if (data.type === 'mapReady') {
+            mapReadyRef.current = true;
+          } else if (data.type === 'error') {
+             alert(data.message);
+          } 
+          else if (data.type === 'locationSelected' && data.lat && data.lng && onMapClick) {
+             onMapClick(data.lat, data.lng);
+          }
+          // Escuchamos el clic del botón de detalles
+          else if (data.type === 'openDetails' && onSpotClick) {
+             onSpotClick(data.spotId);
+          }
+          // Abrir GPS
+          else if (data.type === 'openDirections') {
+             const url = `https://maps.google.com/?q=${data.lat},${data.lng}`;
+             Linking.openURL(url).catch(err => console.error("No se pudo abrir Maps", err));
           }
         }}
       />
@@ -306,5 +346,5 @@ export default function SkateMap({
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#e5e5e5' },
-  map: { flex: 1 },
+  map: { width: '100%', flex: 1 },
 });
