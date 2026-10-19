@@ -126,10 +126,11 @@ export default function SkateMap({
 
           var map = L.map('map', { zoomControl: false }).setView([42.8125, -1.6458], 14);
 
+          // Стиль CARTO Voyager (цветной аналог Google Maps)
           var tileUrl = ${CARTO_API_KEY
-            ? `'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(CARTO_API_KEY)}'`
+            ? `'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(CARTO_API_KEY)}'`
             : "'https://tile.openstreetmap.org/{z}/{x}/{y}.png'"};
-          
+            
           L.tileLayer(tileUrl, {
             maxZoom: 19,
             subdomains: 'abcd',
