@@ -5,6 +5,15 @@ import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom'; 
 
+const cartoApiKey = import.meta.env.VITE_CARTO_API_KEY?.trim();
+// Здесь мы применяем стиль "voyager", сохраняя передачу твоего ключа
+const cartoTileUrl = cartoApiKey
+    ? `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(cartoApiKey)}`
+    : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+const cartoAttribution = cartoApiKey
+    ? '&copy; OpenStreetMap contributors &copy; CARTO'
+    : '&copy; OpenStreetMap contributors';
 const getSpotIcon = (type) => {
     let iconPath = '/icons/icon_street.png'; // Por defecto
     switch (type) {
@@ -33,6 +42,8 @@ const difficultyLabels = {
 
 // COMPONENTE POPUP 
 function SpotPopup({ spot, onUpdate }) {
+    const { user } = useAuth();
+    const navigate = useNavigate();
     const [myRating, setMyRating] = useState(0);        
     const [hasVoted, setHasVoted] = useState(false);     
     const [hoverRating, setHoverRating] = useState(0);   
@@ -69,6 +80,11 @@ function SpotPopup({ spot, onUpdate }) {
     }, [spot.id]);
 
     const handleSendReview = async () => {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+
         setIsSubmitting(true); 
         try {
             await api.post(`/ratings/${spot.id}`, { value: currentRating });
@@ -134,7 +150,7 @@ function SpotPopup({ spot, onUpdate }) {
                         <p style={{ margin: '0 0 2px 0', fontSize: '12px', fontWeight: 'bold', color: '#888' }}>Valora este spot:</p>
                         <div style={{ fontSize: '26px', cursor: 'pointer', lineHeight: 1 }}>
                             {[1, 2, 3, 4, 5].map((star) => (
-                                <span key={star} onMouseEnter={() => setHoverRating(star)} onMouseLeave={() => setHoverRating(0)} onClick={() => setCurrentRating(star)} style={{ color: star <= (hoverRating || currentRating) ? '#f1c40f' : '#e0e0e0', transition: 'color 0.2s' }}>★</span>
+                                <span key={star} onMouseEnter={() => setHoverRating(star)} onMouseLeave={() => setHoverRating(0)} onClick={() => user ? setCurrentRating(star) : navigate('/login')} style={{ color: star <= (hoverRating || currentRating) ? '#f1c40f' : '#e0e0e0', transition: 'color 0.2s' }}>★</span>
                             ))}
                         </div>
                     </div>
@@ -157,6 +173,11 @@ function SpotPopup({ spot, onUpdate }) {
                     >
                         {isSubmitting ? 'Enviando...' : 'Enviar Reseña'}
                     </button>
+                    {!user && (
+                        <p style={{ margin: '8px 0 0', fontSize: '11px', color: '#666', textAlign: 'center' }}>
+                            Inicia sesión para publicar tu reseña.
+                        </p>
+                    )}
                 </div>
             )}
 
@@ -367,24 +388,30 @@ export default function MapPage() {
         color: '#333',
         whiteSpace: 'nowrap'          // Evita que el nombre se parta en dos líneas
       }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>👤 {user?.username || user}</span>
-        
-        {/* BOTÓN PANEL ADMIN */}
-        {(user === 'a' || user?.username === 'a') && (
-           <>
-             <div style={{ width: '1px', height: '20px', background: '#ccc' }}></div>
-             <button onClick={() => navigate('/admin')} style={{ background: '#2f3542', border: 'none', color: 'white', fontWeight: 'bold', padding: '5px 10px', borderRadius: '15px', fontSize: '12px', cursor: 'pointer' }}>
-               🛡️ Admin
-             </button>
-           </>
+        {user ? (
+          <>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>👤 {user.username || user}</span>
+            {(user.username === 'a' || user === 'a') && (
+              <>
+                <div style={{ width: '1px', height: '20px', background: '#ccc' }}></div>
+                <button onClick={() => navigate('/admin')} style={{ background: '#2f3542', border: 'none', color: 'white', fontWeight: 'bold', padding: '5px 10px', borderRadius: '15px', fontSize: '12px', cursor: 'pointer' }}>
+                  🛡️ Admin
+                </button>
+              </>
+            )}
+            <div style={{ width: '1px', height: '20px', background: '#ccc' }}></div>
+            <button onClick={logout} style={{ background: 'transparent', border: 'none', color: '#ff6b6b', fontWeight: 'bold', padding: 0, fontSize: '14px', cursor: 'pointer' }}>Salir</button>
+          </>
+        ) : (
+          <>
+            <button onClick={() => navigate('/login')} style={{ background: 'transparent', border: 'none', color: '#0984e3', fontWeight: 'bold', padding: 0, fontSize: '14px', cursor: 'pointer' }}>Entrar</button>
+            <button onClick={() => navigate('/register')} style={{ background: '#2ed573', border: 'none', color: 'white', fontWeight: 'bold', padding: '6px 10px', borderRadius: '15px', fontSize: '12px', cursor: 'pointer' }}>Registrarse</button>
+          </>
         )}
-
-        <div style={{ width: '1px', height: '20px', background: '#ccc' }}></div>
-        <button onClick={logout} style={{ background: 'transparent', border: 'none', color: '#ff6b6b', fontWeight: 'bold', padding: 0, fontSize: '14px', cursor: 'pointer' }}>Salir</button>
       </div>
 
       <MapContainer center={pamplonaCenter} zoom={14} style={{ height: '100%', width: '100%' }} zoomControl={false}>
-        <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
+        <TileLayer attribution={cartoAttribution} url={cartoTileUrl} />
         
         <LocationButton setMyPosition={setMyPosition} />
         
