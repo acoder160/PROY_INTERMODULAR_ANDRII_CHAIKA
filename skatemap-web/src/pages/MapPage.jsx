@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker, useMap } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
@@ -39,6 +40,66 @@ const difficultyLabels = {
     'INTERMEDIATE': 'Medio',
     'ADVANCED': 'Pro'
 };
+
+function DynamicSpotLayer({ spots, onUpdate }) {
+    const map = useMap();
+    const [visibleSpots, setVisibleSpots] = useState([]);
+    const [shouldCluster, setShouldCluster] = useState(false);
+
+    useEffect(() => {
+        const updateVisibleSpots = () => {
+            const bounds = map.getBounds();
+            const nextVisibleSpots = spots.filter((spot) =>
+                spot.latitude !== null &&
+                spot.latitude !== undefined &&
+                spot.longitude !== null &&
+                spot.longitude !== undefined &&
+                bounds.contains([spot.latitude, spot.longitude])
+            );
+
+            setVisibleSpots(nextVisibleSpots);
+            setShouldCluster(nextVisibleSpots.length > 150);
+        };
+
+        updateVisibleSpots();
+        map.on('moveend zoomend', updateVisibleSpots);
+
+        return () => {
+            map.off('moveend zoomend', updateVisibleSpots);
+        };
+    }, [map, spots]);
+
+    const markers = visibleSpots.map((spot) => (
+        <Marker key={spot.id} position={[spot.latitude, spot.longitude]} icon={getSpotIcon(spot.spotType)}>
+            <Popup><SpotPopup spot={spot} onUpdate={onUpdate} /></Popup>
+        </Marker>
+    ));
+
+    if (!shouldCluster) {
+        return <>{markers}</>;
+    }
+
+    return (
+        <MarkerClusterGroup
+            chunkedLoading
+            maxClusterRadius={40}
+            disableClusteringAtZoom={13}
+            spiderfyOnMaxZoom
+            showCoverageOnHover={false}
+            iconCreateFunction={(cluster) => {
+                const count = cluster.getChildCount();
+                const size = count < 10 ? 'small' : count < 100 ? 'medium' : 'large';
+                return L.divIcon({
+                    html: `<div class="spot-cluster-label">+${count}</div>`,
+                    className: `marker-cluster marker-cluster-${size}`,
+                    iconSize: L.point(42, 42),
+                });
+            }}
+        >
+            {markers}
+        </MarkerClusterGroup>
+    );
+}
 
 // COMPONENTE POPUP 
 function SpotPopup({ spot, onUpdate }) {
@@ -415,12 +476,7 @@ export default function MapPage() {
         
         <LocationButton setMyPosition={setMyPosition} />
         
-        {/* Dibujamos los spots filtrados */}
-        {filteredSpots.map((spot) => (
-          <Marker key={spot.id} position={[spot.latitude, spot.longitude]} icon={getSpotIcon(spot.spotType)}>
-            <Popup><SpotPopup spot={spot} onUpdate={fetchSpots} /></Popup>
-          </Marker>
-        ))}
+        <DynamicSpotLayer spots={filteredSpots} onUpdate={fetchSpots} />
         
         {myPosition && <CircleMarker center={[myPosition.lat, myPosition.lng]} radius={8} pathOptions={{ color: 'white', fillColor: '#2980b9', fillOpacity: 1 }} />}
       </MapContainer>

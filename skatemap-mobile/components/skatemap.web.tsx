@@ -95,7 +95,7 @@ export default function SkateMap({ spots = [] }: { spots?: any[] }) {
                 spot.longitude !== null && spot.longitude !== undefined &&
                 bounds.contains([spot.latitude, spot.longitude]);
             });
-            var targetLayer = visibleSpots.length < 50 ? individualSpotsLayer : clusteredSpotsLayer;
+            var targetLayer = visibleSpots.length < 150 ? individualSpotsLayer : clusteredSpotsLayer;
             var markers = visibleSpots.map(createSpotMarker).filter(function(marker) {
               return marker !== null;
             });

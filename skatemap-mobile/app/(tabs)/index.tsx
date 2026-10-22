@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import SkateMap from '../../components/skatemap';
@@ -8,14 +8,12 @@ import CameraOverlay from '../../components/CameraOverlay';
 import { uploadImageToCloudinary } from '../../utils/cloudinary';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCameraPermissions } from 'expo-camera';
+import { LinearGradient } from 'expo-linear-gradient';
 import { API_BASE_URL } from '../../constants/api';
 import { useLocation } from '../../hooks/useLocation';
 import { useSpots } from '../../hooks/useSpots';
 import SpotDetailsModal from '../../components/SpotDetailsModal';
 import FilterModal from '../../components/FilterModal';
-
-const reloadStaticPath = require('../../assets/images/reload_static.png');
-const reloadAnimPath = require('../../assets/images/reload_anim.gif');
 
 // Tiempo del GIF para completar un ciclo natural
 const GIF_CYCLE_DURATION_MS = 2000; 
@@ -252,12 +250,17 @@ export default function HomeScreen() {
         style={styles.refreshBadge} 
         onPress={handleReloadSpots}
         activeOpacity={0.8}
+        accessibilityLabel="Recargar spots"
       >
-        <Image 
-          source={isRefreshing ? reloadAnimPath : reloadStaticPath} 
-          style={styles.refreshIcon}
-          resizeMode="contain" 
-        />
+        <View style={styles.refreshIconShell}>
+          {isRefreshing ? (
+            <ActivityIndicator color="#D0D5DD" size="small" />
+          ) : (
+            <View style={styles.refreshGlyphContainer}>
+              <Text style={styles.refreshGlyph}>↻</Text>
+            </View>
+          )}
+        </View>
       </TouchableOpacity>
 
       {/* Botón de Centrado GPS (Abajo a la derecha) */}
@@ -266,8 +269,30 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       {/* Botón Añadir Spot (Centro abajo) */}
-      <TouchableOpacity style={[styles.fab, isAddingMode ? styles.fabClose : styles.fabAdd]} onPress={startAddingProcess}>
-        {isAddingMode ? <Text style={styles.fabIcon}>✕</Text> : <><Text style={styles.fabIcon}>➕</Text><Text style={styles.fabText}>Añadir Spot</Text></>}
+      <TouchableOpacity 
+        style={[styles.fab, isAddingMode ? styles.fabClose : styles.fabAdd]} 
+        onPress={startAddingProcess}
+        activeOpacity={0.85}
+        accessibilityLabel={isAddingMode ? 'Cancelar añadir spot' : 'Añadir spot'}
+      >
+        {isAddingMode ? (
+          <Text style={styles.fabIcon}>✕</Text>
+        ) : (
+          <LinearGradient
+            pointerEvents="none"
+            colors={['#219E9A', '#167C80', '#105A68']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.fabGradient}
+          >
+            <View style={styles.fabBubbles}>
+              <View style={styles.fabBubbleLarge} />
+              <View style={styles.fabBubbleSmall} />
+            </View>
+            <Text style={styles.fabIcon}>＋</Text>
+            <Text style={styles.fabText}>Añadir Spot</Text>
+          </LinearGradient>
+        )}
       </TouchableOpacity>
 
       {/* MODALES */}
@@ -375,16 +400,106 @@ const styles = StyleSheet.create({
   addingNoticeText: { color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
   
   // Botón Reload (Abajo Izquierda)
-  refreshBadge: { position: 'absolute', bottom: 35, left: 20, backgroundColor: 'white', width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 5, elevation: 5, zIndex: 10 },
-  refreshIcon: { width: 30, height: 30 },
+  refreshBadge: {
+    position: 'absolute',
+    bottom: 32,
+    left: 20,
+    backgroundColor: '#101828',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
+    zIndex: 10,
+  },
+  refreshIconShell: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1D2939',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+  },
+  refreshGlyphContainer: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  refreshGlyph: { color: '#F2F4F7', fontSize: 28, lineHeight: 30, fontWeight: '300', textAlign: 'center', includeFontPadding: false },
   
   // Botón GPS (Abajo Derecha)
   recenterButton: { position: 'absolute', right: 20, bottom: 35, backgroundColor: 'white', width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 5, elevation: 5, zIndex: 10 },
   iconText: { fontSize: 24 },
   
-  fab: { position: 'absolute', bottom: 30, alignSelf: 'center', justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 5, elevation: 6, zIndex: 10 },
-  fabIcon: { fontSize: 20, marginRight: 8, color: 'white', fontWeight: 'bold' },
-  fabText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-  fabAdd: { backgroundColor: '#2ed573', flexDirection: 'row', paddingVertical: 15, paddingHorizontal: 25, borderRadius: 30 },
-  fabClose: { backgroundColor: '#ff4757', width: 60, height: 60, borderRadius: 30 }
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  fabIcon: { fontSize: 19, marginRight: 9, color: 'white', fontWeight: 'bold' },
+  fabText: { color: 'white', fontSize: 15, fontWeight: '800', letterSpacing: 0.2 },
+  fabAdd: {
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    paddingVertical: 16,
+    paddingHorizontal: 26,
+    borderRadius: 32,
+    overflow: 'hidden',
+    padding: 0,
+  },
+  fabGradient: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 26,
+    borderRadius: 32,
+    overflow: 'hidden',
+  },
+  fabBubbles: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+    borderRadius: 32,
+  },
+  fabBubbleLarge: {
+    position: 'absolute',
+    width: 135,
+    height: 80,
+    borderRadius: 50,
+    right: -42,
+    top: -50,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    transform: [{ rotate: '-18deg' }],
+  },
+  fabBubbleSmall: {
+    position: 'absolute',
+    width: 70,
+    height: 45,
+    borderRadius: 30,
+    left: -20,
+    bottom: -25,
+    backgroundColor: 'rgba(0,0,0,0.07)',
+    transform: [{ rotate: '-18deg' }],
+  },
+  fabClose: {
+    backgroundColor: '#B42318',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.45)',
+  }
 });
