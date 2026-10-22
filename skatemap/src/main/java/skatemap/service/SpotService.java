@@ -5,6 +5,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Service;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import skatemap.dto.CommentDto;
 import skatemap.dto.RatingDto;
@@ -105,7 +106,7 @@ public class SpotService {
     }
 
     @Transactional
-    // Quitamos el parámetro username porque el control de seguridad ya lo hace Spring en el Controlador
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteSpot(Long spotId, String username) {
         // 1. Borramos comentarios y valoraciones para evitar errores de integridad (Foreign Key)
         commentRepository.deleteBySpotId(spotId);
