@@ -1,6 +1,8 @@
 # --- LLAVES Y SECRETOS (Lo más importante) ---
 .env
 .env.local
+.env.*
+!.env.example
 .env.development.local
 .env.test.local
 .env.production.local

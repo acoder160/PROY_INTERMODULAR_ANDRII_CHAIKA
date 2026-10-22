@@ -1,5 +1,6 @@
 package skatemap.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +20,7 @@ public class RatingController {
 
     // POST: Guardar valoración
     @PostMapping("/{spotId}")
-    public ResponseEntity<RatingDto> addRating(@PathVariable Long spotId, @RequestBody RatingDto ratingDto) {
+    public ResponseEntity<RatingDto> addRating(@PathVariable Long spotId, @Valid @RequestBody RatingDto ratingDto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         // Llamamos al método 'addRating'

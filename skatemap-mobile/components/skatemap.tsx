@@ -78,7 +78,10 @@ export default function SkateMap({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
         <style>
           html, body { padding: 0; margin: 0; height: 100vh; min-height: 1px; width: 100%; background-color: #e5e5e5; }
           #map { height: 100vh; min-height: 1px; width: 100%; }
@@ -111,6 +114,35 @@ export default function SkateMap({
           .btn-container { display: flex; gap: 8px; margin-top: 10px; }
           .details-btn { flex: 1; background: #2ed573; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;}
           .directions-btn { flex: 1; background: #007AFF; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;}
+          .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
+            background: transparent !important;
+            border: 0 !important;
+          }
+          .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
+            width: 42px !important;
+            height: 42px !important;
+            margin-left: 0 !important;
+            margin-top: 0 !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid white;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2EC4B6, #168AAD);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1 !important;
+          }
+          .spot-cluster-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            line-height: 1;
+          }
         </style>
       </head>
       <body>
@@ -139,73 +171,126 @@ export default function SkateMap({
               : "'© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'"}
           }).addTo(map);
 
-          var spotsLayer = L.layerGroup().addTo(map);
+          var individualSpotsLayer = L.layerGroup();
+          var clusteredSpotsLayer = L.markerClusterGroup({
+            chunkedLoading: true,
+            chunkInterval: 100,
+            chunkDelay: 25,
+            maxClusterRadius: 40,
+            disableClusteringAtZoom: 13,
+            showCoverageOnHover: false,
+            spiderfyOnMaxZoom: true,
+            iconCreateFunction: function(cluster) {
+              var count = cluster.getChildCount();
+              var size = count < 10 ? 'small' : count < 100 ? 'medium' : 'large';
+              return L.divIcon({
+                html: '<div class="spot-cluster-label">+' + count + '</div>',
+                className: 'marker-cluster marker-cluster-' + size,
+                iconSize: L.point(42, 42)
+              });
+            }
+          });
+          var allSpotsData = [];
 
           // INYECTAMOS LOS ICONOS DESDE REACT NATIVE
           var SPOT_ICONS = ${JSON.stringify(ICONS)};
+          var spotIcons = {};
+
+          function getSpotIcon(spotType, iconUrl) {
+            if (!spotIcons[spotType]) {
+              spotIcons[spotType] = L.icon({
+                iconUrl: iconUrl,
+                iconSize: [45, 45],
+                iconAnchor: [22, 45],
+                popupAnchor: [0, -40]
+              });
+            }
+            return spotIcons[spotType];
+          }
 
           // FUNCIÓN PARA RENDERIZAR SPOTS DINÁMICAMENTE
-          window.renderSpots = function(spotsData) {
-            spotsLayer.clearLayers(); 
-            
-            spotsData.forEach(function(spot) {
-              if(spot.latitude && spot.longitude) {
+          function createSpotMarker(spot) {
+            if(spot.latitude === null || spot.latitude === undefined ||
+               spot.longitude === null || spot.longitude === undefined) {
+              return null;
+            }
                 
-                var spotType = (spot.spotType || spot.type || 'STREET').toUpperCase();
-                var iconUrl = SPOT_ICONS[spotType] || SPOT_ICONS['STREET'];
-                
-                var icon = L.icon({
-                  iconUrl: iconUrl,
-                  iconSize: [45, 45],
-                  iconAnchor: [22, 45],
-                  popupAnchor: [0, -40]
-                });
+            var spotType = (spot.spotType || spot.type || 'STREET').toUpperCase();
+            var iconUrl = SPOT_ICONS[spotType] || SPOT_ICONS['STREET'];
+            var icon = getSpotIcon(spotType, iconUrl);
 
-                var imageUrl = spot.mediaUrl ? spot.mediaUrl : 'https://skateism.com/wp-content/uploads/2019/02/placeholder-skate.jpg';
-                var diff = (spot.difficultyLevel || 'MEDIA').toUpperCase();
+            var imageUrl = spot.mediaUrl ? spot.mediaUrl : 'https://skateism.com/wp-content/uploads/2019/02/placeholder-skate.jpg';
+            var diff = (spot.difficultyLevel || 'MEDIA').toUpperCase();
                 
-                // LÓGICA DE ESTRELLAS
-                var rating = spot.surfaceRating || 0;
-                var fullStars = '★'.repeat(Math.round(rating));
-                var emptyStars = '☆'.repeat(5 - Math.round(rating));
+            // LÓGICA DE ESTRELLAS
+            var rating = spot.surfaceRating || 0;
+            var fullStars = '★'.repeat(Math.round(rating));
+            var emptyStars = '☆'.repeat(5 - Math.round(rating));
                 
-                var popupHTML = \`
-                  <div class="popup-card">
-                    <img src="\${imageUrl}" class="popup-image" onerror="this.src='https://via.placeholder.com/220x120?text=Sin+Imagen'" />
-                    <div class="popup-info">
-                      <h3 class="popup-title">\${spot.name || 'Spot Sin Nombre'}</h3>
-                      
-                      <div class="popup-rating">
-                        <span class="star-icon">\${fullStars}\${emptyStars}</span>
-                        <span style="font-size: 11px; color: #666; margin-left: 4px;">(\${rating.toFixed(1)})</span>
-                      </div>
-
-                      <div class="popup-badges">
-                        <span class="badge-type">\${spotType}</span>
-                        <span class="badge-diff">\${diff}</span>
-                      </div>
-                      
-                      <p class="popup-desc">\${spot.description || 'No hay descripción detallada para este spot.'}</p>
-                      
-                      <div class="btn-container">
-                          <button class="details-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDetails', spotId: \${spot.id} }))">
-                            💬 Valorar
-                          </button>
-                          <button class="directions-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDirections', lat: \${spot.latitude}, lng: \${spot.longitude} }))">
-                            🗺️ Ruta
-                          </button>
-                      </div>
-
-                    </div>
+            var popupHTML = \`
+              <div class="popup-card">
+                <img src="\${imageUrl}" class="popup-image" onerror="this.src='https://via.placeholder.com/220x120?text=Sin+Imagen'" />
+                <div class="popup-info">
+                  <h3 class="popup-title">\${spot.name || 'Spot Sin Nombre'}</h3>
+                  <div class="popup-rating">
+                    <span class="star-icon">\${fullStars}\${emptyStars}</span>
+                    <span style="font-size: 11px; color: #666; margin-left: 4px;">(\${rating.toFixed(1)})</span>
                   </div>
-                \`;
+                  <div class="popup-badges">
+                    <span class="badge-type">\${spotType}</span>
+                    <span class="badge-diff">\${diff}</span>
+                  </div>
+                  <p class="popup-desc">\${spot.description || 'No hay descripción detallada para este spot.'}</p>
+                  <div class="btn-container">
+                    <button class="details-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDetails', spotId: \${spot.id} }))">💬 Valorar</button>
+                    <button class="directions-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDirections', lat: \${spot.latitude}, lng: \${spot.longitude} }))">🗺️ Ruta</button>
+                  </div>
+                </div>
+              </div>
+            \`;
 
-                L.marker([spot.latitude, spot.longitude], { icon: icon })
-                  .addTo(spotsLayer) // Añadimos a la capa nueva
-                  .bindPopup(popupHTML);
-              }
+            return L.marker([spot.latitude, spot.longitude], { icon: icon })
+              .bindPopup(popupHTML);
+          }
+
+          function renderVisibleSpots() {
+            individualSpotsLayer.clearLayers();
+            clusteredSpotsLayer.clearLayers();
+            var bounds = map.getBounds();
+            var visibleSpots = allSpotsData.filter(function(spot) {
+              return spot.latitude !== null && spot.latitude !== undefined &&
+                spot.longitude !== null && spot.longitude !== undefined &&
+                bounds.contains([spot.latitude, spot.longitude]);
             });
+            var targetLayer = visibleSpots.length < 50
+              ? individualSpotsLayer
+              : clusteredSpotsLayer;
+            var markers = visibleSpots.map(createSpotMarker).filter(function(marker) {
+              return marker !== null;
+            });
+            if (map.hasLayer(individualSpotsLayer)) {
+              map.removeLayer(individualSpotsLayer);
+            }
+            if (map.hasLayer(clusteredSpotsLayer)) {
+              map.removeLayer(clusteredSpotsLayer);
+            }
+            if (targetLayer.addLayers) {
+              targetLayer.addLayers(markers);
+            } else {
+              markers.forEach(function(marker) {
+                targetLayer.addLayer(marker);
+              });
+            }
+            targetLayer.addTo(map);
+          }
+
+          window.renderSpots = function(spotsData) {
+            allSpotsData = spotsData || [];
+            renderVisibleSpots();
           };
+
+          map.on('moveend zoomend', renderVisibleSpots);
+          window.renderVisibleSpots = renderVisibleSpots;
 
           // FUNCIÓN PARA EL BOTÓN DEL PUNTO AZUL Y CÍRCULO
           var userMarker = null;

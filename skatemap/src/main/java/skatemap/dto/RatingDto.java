@@ -1,7 +1,14 @@
 package skatemap.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
 public class RatingDto {
 
+    @NotNull
+    @Min(1)
+    @Max(5)
     private Integer value;      // La nota que ha puesto el usuario (ej: 5)
     private Double newAverage;  // La nueva media del spot (ej: 4.5)
 
