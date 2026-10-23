@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,24 +67,20 @@ public class AiModerationService {
         }
 
         // 2. COMPROBACIÓN POR IA
-        // Capa 1: Llama 3.1 8B
-        Boolean result = callAiApi(GROQ_URL, groqApiKey, "llama-3.1-8b-instant", textToAnalyze);
+        // Capa 1: model available in the current Groq account catalogue
+        Boolean result = callAiApi(GROQ_URL, groqApiKey, "openai/gpt-oss-20b", textToAnalyze);
         if (result != null) return result;
 
-        // Capa 2: Llama 3 8B
-        result = callAiApi(GROQ_URL, groqApiKey, "llama3-8b-8192", textToAnalyze);
+        // Capa 2: larger Groq fallback
+        result = callAiApi(GROQ_URL, groqApiKey, "openai/gpt-oss-120b", textToAnalyze);
         if (result != null) return result;
 
         // Capa 3: GPT-4o-mini
         result = callAiApi(OPENAI_URL, openaiApiKey, "gpt-4o-mini", textToAnalyze);
         if (result != null) return result;
 
-        // Capa 4: Gemma 2 9B
-        result = callAiApi(GROQ_URL, groqApiKey, "gemma2-9b-it", textToAnalyze);
-        if (result != null) return result;
-
-        // Capa 5: Mistral 7B
-        result = callAiApi(GROQ_URL, groqApiKey, "mistral-7b-32768", textToAnalyze);
+        // Capa 4: Groq safety model
+        result = callAiApi(GROQ_URL, groqApiKey, "openai/gpt-oss-safeguard-20b", textToAnalyze);
         if (result != null) return result;
 
         // Si todo falla (No hay internet o claves incorrectas), bloqueamos por seguridad
@@ -92,6 +89,10 @@ public class AiModerationService {
 
     private Boolean callAiApi(String url, String apiKey, String model, String userText) {
         try {
+            if (apiKey == null || apiKey.isBlank()) {
+                System.err.println("Fallo en la Capa IA [" + model + "]: API key ausente.");
+                return null;
+            }
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.setBearerAuth(apiKey);
@@ -126,8 +127,13 @@ public class AiModerationService {
             }
             return allowedNode.booleanValue();
 
+        } catch (HttpStatusCodeException e) {
+            System.err.println("Fallo en la Capa IA [" + model + "]: HTTP "
+                    + e.getStatusCode().value() + " en " + url);
+            return null;
         } catch (Exception e) {
-            System.err.println("Fallo en la Capa IA [" + model + "]: Saltando al siguiente...");
+            System.err.println("Fallo en la Capa IA [" + model + "]: "
+                    + e.getClass().getSimpleName() + " en " + url);
             return null; // Devolvemos null para que el código intente la siguiente capa
         }
     }
