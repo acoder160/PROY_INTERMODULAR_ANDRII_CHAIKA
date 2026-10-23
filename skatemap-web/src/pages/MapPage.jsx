@@ -34,6 +34,12 @@ const getSpotIcon = (type) => {
     });
 };
 
+const getSingleSpotClusterIcon = () => L.divIcon({
+    html: '<div class="spot-cluster-label">+1</div>',
+    className: 'marker-cluster marker-cluster-small',
+    iconSize: L.point(42, 42),
+});
+
 //  DICCIONARIO PARA TRADUCIR DIFICULTAD 
 const difficultyLabels = {
     'BEGINNER': 'Fácil',
@@ -58,7 +64,9 @@ function DynamicSpotLayer({ spots, onUpdate }) {
             );
 
             setVisibleSpots(nextVisibleSpots);
-            setShouldCluster(nextVisibleSpots.length > 150);
+            setShouldCluster(
+                nextVisibleSpots.length > 150
+            );
         };
 
         updateVisibleSpots();
@@ -70,7 +78,11 @@ function DynamicSpotLayer({ spots, onUpdate }) {
     }, [map, spots]);
 
     const markers = visibleSpots.map((spot) => (
-        <Marker key={spot.id} position={[spot.latitude, spot.longitude]} icon={getSpotIcon(spot.spotType)}>
+        <Marker
+            key={spot.id}
+            position={[spot.latitude, spot.longitude]}
+            icon={shouldCluster ? getSingleSpotClusterIcon() : getSpotIcon(spot.spotType)}
+        >
             <Popup><SpotPopup spot={spot} onUpdate={onUpdate} /></Popup>
         </Marker>
     ));
@@ -83,7 +95,8 @@ function DynamicSpotLayer({ spots, onUpdate }) {
         <MarkerClusterGroup
             chunkedLoading
             maxClusterRadius={40}
-            disableClusteringAtZoom={13}
+            disableClusteringAtZoom={19}
+            singleMarkerMode
             spiderfyOnMaxZoom
             showCoverageOnHover={false}
             iconCreateFunction={(cluster) => {

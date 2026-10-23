@@ -187,7 +187,8 @@ export default function SkateMap({
             chunkInterval: 100,
             chunkDelay: 25,
             maxClusterRadius: 40,
-            disableClusteringAtZoom: 13,
+            disableClusteringAtZoom: 19,
+            singleMarkerMode: true,
             showCoverageOnHover: false,
             spiderfyOnMaxZoom: true,
             iconCreateFunction: function(cluster) {
@@ -205,6 +206,11 @@ export default function SkateMap({
           // INYECTAMOS LOS ICONOS DESDE REACT NATIVE
           var SPOT_ICONS = ${JSON.stringify(ICONS)};
           var spotIcons = {};
+          var singleSpotClusterIcon = L.divIcon({
+            html: '<div class="spot-cluster-label">+1</div>',
+            className: 'marker-cluster marker-cluster-small',
+            iconSize: L.point(42, 42)
+          });
 
           function escapeHtml(value) {
             return String(value == null ? '' : value).replace(/[&<>"']/g, function(character) {
@@ -242,7 +248,7 @@ export default function SkateMap({
           }
 
           // FUNCIÓN PARA RENDERIZAR SPOTS DINÁMICAMENTE
-          function createSpotMarker(spot) {
+          function createSpotMarker(spot, useClusterIcon) {
             if(spot.latitude === null || spot.latitude === undefined ||
                spot.longitude === null || spot.longitude === undefined) {
               return null;
@@ -283,7 +289,9 @@ export default function SkateMap({
               </div>
             \`;
 
-            return L.marker([spot.latitude, spot.longitude], { icon: icon })
+            return L.marker([spot.latitude, spot.longitude], {
+              icon: useClusterIcon ? singleSpotClusterIcon : icon
+            })
               .bindPopup(popupHTML);
           }
 
@@ -296,10 +304,13 @@ export default function SkateMap({
                 spot.longitude !== null && spot.longitude !== undefined &&
                 bounds.contains([spot.latitude, spot.longitude]);
             });
-            var targetLayer = visibleSpots.length < 50
-              ? individualSpotsLayer
-              : clusteredSpotsLayer;
-            var markers = visibleSpots.map(createSpotMarker).filter(function(marker) {
+            var useClusterLayer = visibleSpots.length >= 50;
+            var targetLayer = useClusterLayer
+              ? clusteredSpotsLayer
+              : individualSpotsLayer;
+            var markers = visibleSpots.map(function(spot) {
+              return createSpotMarker(spot, useClusterLayer);
+            }).filter(function(marker) {
               return marker !== null;
             });
             if (map.hasLayer(individualSpotsLayer)) {

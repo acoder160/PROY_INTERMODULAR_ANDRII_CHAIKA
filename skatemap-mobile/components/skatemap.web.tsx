@@ -64,12 +64,18 @@ export default function SkateMap({ spots = [] }: { spots?: any[] }) {
             iconAnchor: [20, 20],
             popupAnchor: [0, -25]
           });
+          var singleSpotClusterIcon = L.divIcon({
+            html: '<div class="spot-cluster-label">+1</div>',
+            className: 'marker-cluster marker-cluster-small',
+            iconSize: L.point(42, 42)
+          });
 
           var spotsData = ${spotsJSON};
           var individualSpotsLayer = L.layerGroup();
           var clusteredSpotsLayer = L.markerClusterGroup({
             maxClusterRadius: 40,
-            disableClusteringAtZoom: 13,
+            disableClusteringAtZoom: 19,
+            singleMarkerMode: true,
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false,
             iconCreateFunction: function(cluster) {
@@ -83,7 +89,7 @@ export default function SkateMap({ spots = [] }: { spots?: any[] }) {
             }
           });
 
-          function createSpotMarker(spot) {
+          function createSpotMarker(spot, useClusterIcon) {
             if (spot.latitude === null || spot.latitude === undefined ||
                 spot.longitude === null || spot.longitude === undefined) {
               return null;
@@ -99,7 +105,9 @@ export default function SkateMap({ spots = [] }: { spots?: any[] }) {
                 }[character];
               });
             }
-            return L.marker([spot.latitude, spot.longitude], { icon: emojiIcon })
+            return L.marker([spot.latitude, spot.longitude], {
+              icon: useClusterIcon ? singleSpotClusterIcon : emojiIcon
+            })
               .bindPopup('<b style="font-size:16px;">' + escapeHtml(spot.name || 'Spot') +
                 '</b><br>' + escapeHtml(spot.description || ''));
           }
@@ -113,8 +121,13 @@ export default function SkateMap({ spots = [] }: { spots?: any[] }) {
                 spot.longitude !== null && spot.longitude !== undefined &&
                 bounds.contains([spot.latitude, spot.longitude]);
             });
-            var targetLayer = visibleSpots.length < 150 ? individualSpotsLayer : clusteredSpotsLayer;
-            var markers = visibleSpots.map(createSpotMarker).filter(function(marker) {
+            var useClusterLayer = visibleSpots.length > 150;
+            var targetLayer = useClusterLayer
+              ? clusteredSpotsLayer
+              : individualSpotsLayer;
+            var markers = visibleSpots.map(function(spot) {
+              return createSpotMarker(spot, useClusterLayer);
+            }).filter(function(marker) {
               return marker !== null;
             });
             if (map.hasLayer(individualSpotsLayer)) map.removeLayer(individualSpotsLayer);
