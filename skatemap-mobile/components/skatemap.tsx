@@ -18,7 +18,6 @@ interface SkateMapProps {
   userLocation?: { lat: number, lng: number } | null;
   isAddingMode?: boolean;
   onMapClick?: (lat: number, lng: number) => void;
-  // Callback para cuando se hace clic en un spot existente
   onSpotClick?: (spotId: number) => void; 
 }
 
@@ -66,7 +65,7 @@ export default function SkateMap({
     }
   }, [userLocation]);
 
-  // Sincronizamos el modo "Añadir Spot" para que el mapa deje hacer clic
+  // Sincronizamos el modo "Añadir Spot"
   useEffect(() => {
     if (mapReadyRef.current && webviewRef.current) {
       webviewRef.current.injectJavaScript(`
@@ -80,23 +79,21 @@ export default function SkateMap({
     }
   }, [isAddingMode]);
 
-  // HTML estatico 
   const [staticHtml] = useState(`
     <!DOCTYPE html>
     <html>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; script-src 'unsafe-inline' https://unpkg.com; style-src 'unsafe-inline' https://unpkg.com; img-src data: blob: https://*.openstreetmap.org https://*.cartocdn.com https://*.cloudinary.com https://via.placeholder.com; connect-src https://*.openstreetmap.org https://*.cartocdn.com https://*.cloudinary.com; font-src data:; form-action 'none';" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" crossorigin="anonymous" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" crossorigin="anonymous" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
-        <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
+        <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob: file:; img-src * data: blob: file: android-webview-video-poster:; connect-src *;" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
         <style>
           html, body { padding: 0; margin: 0; height: 100vh; min-height: 1px; width: 100%; background-color: #e5e5e5; }
           #map { height: 100vh; min-height: 1px; width: 100%; }
           
-          /* Diseño del Punto Azul de Ubicación */
           .blue-dot { display: flex; justify-content: center; align-items: center; }
           .blue-dot-inner {
             background-color: #007AFF; 
@@ -106,7 +103,6 @@ export default function SkateMap({
             box-shadow: 0 0 5px rgba(0,0,0,0.5);
           }
 
-          /* DISEÑO DEL POPUP */
           .leaflet-popup-content-wrapper { border-radius: 12px; overflow: hidden; padding: 0; }
           .leaflet-popup-content { margin: 0; }
           .popup-card { width: 220px; font-family: sans-serif; }
@@ -158,7 +154,6 @@ export default function SkateMap({
       <body>
         <div id="map"></div>
         <script>
-          // Inicializamos los estados
           window.isAddingMode = false;
           window.newSpotMarker = null;
 
@@ -168,7 +163,6 @@ export default function SkateMap({
 
           var map = L.map('map', { zoomControl: false }).setView([42.8125, -1.6458], 14);
 
-          // Стиль CARTO Voyager (цветной аналог Google Maps)
           var tileUrl = ${CARTO_API_KEY
             ? `'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(CARTO_API_KEY)}'`
             : "'https://tile.openstreetmap.org/{z}/{x}/{y}.png'"};
@@ -181,14 +175,17 @@ export default function SkateMap({
               : "'© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'"}
           }).addTo(map);
 
+          // Зум, начиная с которого кружки +1 превращаются в настоящие иконки спотов
+          var ICON_ZOOM_THRESHOLD = 15;
+
           var individualSpotsLayer = L.layerGroup();
           var clusteredSpotsLayer = L.markerClusterGroup({
             chunkedLoading: true,
             chunkInterval: 100,
             chunkDelay: 25,
             maxClusterRadius: 40,
-            disableClusteringAtZoom: 19,
-            singleMarkerMode: true,
+            disableClusteringAtZoom: ICON_ZOOM_THRESHOLD,
+            singleMarkerMode: false, // Управляем иконкой +1 вручную в createSpotMarker, чтобы на зуме >= 15 были картинки
             showCoverageOnHover: false,
             spiderfyOnMaxZoom: true,
             iconCreateFunction: function(cluster) {
@@ -203,7 +200,6 @@ export default function SkateMap({
           });
           var allSpotsData = [];
 
-          // INYECTAMOS LOS ICONOS DESDE REACT NATIVE
           var SPOT_ICONS = ${JSON.stringify(ICONS)};
           var spotIcons = {};
           var singleSpotClusterIcon = L.divIcon({
@@ -224,17 +220,6 @@ export default function SkateMap({
             });
           }
 
-          function getSafeImageUrl(value) {
-            try {
-              var url = new URL(value || '', window.location.href);
-              var trustedHost = url.hostname === 'cloudinary.com' ||
-                url.hostname.endsWith('.cloudinary.com');
-              return url.protocol === 'https:' && trustedHost ? escapeHtml(url.href) : '';
-            } catch (error) {
-              return '';
-            }
-          }
-
           function getSpotIcon(spotType, iconUrl) {
             if (!spotIcons[spotType]) {
               spotIcons[spotType] = L.icon({
@@ -247,8 +232,7 @@ export default function SkateMap({
             return spotIcons[spotType];
           }
 
-          // FUNCIÓN PARA RENDERIZAR SPOTS DINÁMICAMENTE
-          function createSpotMarker(spot, useClusterIcon) {
+          function createSpotMarker(spot, showAsPlusOneBubble) {
             if(spot.latitude === null || spot.latitude === undefined ||
                spot.longitude === null || spot.longitude === undefined) {
               return null;
@@ -258,18 +242,16 @@ export default function SkateMap({
             var iconUrl = SPOT_ICONS[spotType] || SPOT_ICONS['STREET'];
             var icon = getSpotIcon(spotType, iconUrl);
 
-            var imageUrl = getSafeImageUrl(spot.mediaUrl) ||
-              'https://via.placeholder.com/220x120?text=Sin+Imagen';
+            var imageUrl = spot.mediaUrl ? escapeHtml(spot.mediaUrl) : 'https://via.placeholder.com/220x120?text=Sin+Imagen';
             var diff = (spot.difficultyLevel || 'MEDIA').toUpperCase();
                 
-            // LÓGICA DE ESTRELLAS
             var rating = spot.surfaceRating || 0;
             var fullStars = '★'.repeat(Math.round(rating));
             var emptyStars = '☆'.repeat(5 - Math.round(rating));
                 
             var popupHTML = \`
               <div class="popup-card">
-                <img src="\${imageUrl}" class="popup-image" />
+                <img src="\${imageUrl}" class="popup-image" onerror="this.src='https://via.placeholder.com/220x120?text=Sin+Imagen'" />
                 <div class="popup-info">
                   <h3 class="popup-title">\${escapeHtml(spot.name || 'Spot Sin Nombre')}</h3>
                   <div class="popup-rating">
@@ -290,29 +272,37 @@ export default function SkateMap({
             \`;
 
             return L.marker([spot.latitude, spot.longitude], {
-              icon: useClusterIcon ? singleSpotClusterIcon : icon
-            })
-              .bindPopup(popupHTML);
+              icon: showAsPlusOneBubble ? singleSpotClusterIcon : icon
+            }).bindPopup(popupHTML);
           }
 
           function renderVisibleSpots() {
             individualSpotsLayer.clearLayers();
             clusteredSpotsLayer.clearLayers();
             var bounds = map.getBounds();
+            var currentZoom = map.getZoom();
+
             var visibleSpots = allSpotsData.filter(function(spot) {
               return spot.latitude !== null && spot.latitude !== undefined &&
                 spot.longitude !== null && spot.longitude !== undefined &&
                 bounds.contains([spot.latitude, spot.longitude]);
             });
-            var useClusterLayer = visibleSpots.length >= 50;
+
+            // 1. Главный приоритет: если на экране < 50 спотов — всегда показываем иконки
+            // 2. Если >= 50 спотов и зум ниже порога — группируем в кластеры и одиночные прячем в +1
+            var useClusterLayer = visibleSpots.length >= 50 && currentZoom < ICON_ZOOM_THRESHOLD;
+            var showSingleAsBubble = useClusterLayer;
+
             var targetLayer = useClusterLayer
               ? clusteredSpotsLayer
               : individualSpotsLayer;
+
             var markers = visibleSpots.map(function(spot) {
-              return createSpotMarker(spot, useClusterLayer);
+              return createSpotMarker(spot, showSingleAsBubble);
             }).filter(function(marker) {
               return marker !== null;
             });
+
             if (map.hasLayer(individualSpotsLayer)) {
               map.removeLayer(individualSpotsLayer);
             }
@@ -337,7 +327,6 @@ export default function SkateMap({
           map.on('moveend zoomend', renderVisibleSpots);
           window.renderVisibleSpots = renderVisibleSpots;
 
-          // FUNCIÓN PARA EL BOTÓN DEL PUNTO AZUL Y CÍRCULO
           var userMarker = null;
           var locationCircle = null; 
 
@@ -354,22 +343,19 @@ export default function SkateMap({
             
             userMarker = L.marker([lat, lng], { icon: blueDotIcon }).addTo(map);
 
-            // DIBUJAMOS EL RADIO DE 200 METROS
             locationCircle = L.circle([lat, lng], {
                 color: '#3498db',
                 fillColor: '#3498db',
                 fillOpacity: 0.15,
-                radius: 200, // 200 metros
+                radius: 200,
                 weight: 1
             }).addTo(map);
 
             map.flyTo([lat, lng], 16, { animate: true, duration: 1.5 });
           };
 
-          // EVENTO DE CLIC EN EL MAPA CON VALIDACIÓN DE 200m
           map.on('click', function(e) {
             if (window.isAddingMode) {
-              
               if (!userMarker) {
                  window.ReactNativeWebView.postMessage(JSON.stringify({ 
                     type: 'error', 
@@ -402,7 +388,6 @@ export default function SkateMap({
             }
           });
           window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'mapReady' }));
-          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'mapReady' }));
         </script>
       </body>
     </html>
@@ -412,23 +397,17 @@ export default function SkateMap({
     <View style={styles.container}>
       <WebView 
         ref={webviewRef}
-        originWhitelist={['about:blank', 'https://*.openstreetmap.org', 'https://*.cartocdn.com', 'https://*.cloudinary.com', 'https://via.placeholder.com']}
-        allowFileAccess={false}
-        allowFileAccessFromFileURLs={false}
-        allowUniversalAccessFromFileURLs={false}
+        originWhitelist={['*']}
+        allowFileAccess={true}
+        allowFileAccessFromFileURLs={true}
+        allowUniversalAccessFromFileURLs={true}
+        mixedContentMode="always"
         javaScriptEnabled={true}
         domStorageEnabled={true}
         source={{ html: staticHtml }} 
         style={[styles.map, { height: windowHeight }]} 
         scrollEnabled={false}
         bounces={false}
-        onShouldStartLoadWithRequest={(request) => (
-          request.url === 'about:blank' ||
-          request.url.startsWith('https://tile.openstreetmap.org/') ||
-          request.url.includes('.openstreetmap.org/') ||
-          request.url.includes('.cartocdn.com/') ||
-          request.url.startsWith('https://via.placeholder.com/')
-        )}
         onLoadEnd={() => {
           mapReadyRef.current = true;
           webviewRef.current?.injectJavaScript(`
@@ -475,12 +454,10 @@ export default function SkateMap({
             Math.abs(data.lat) <= 90 && Math.abs(data.lng) <= 180 && onMapClick) {
              onMapClick(data.lat, data.lng);
           }
-          // Escuchamos el clic del botón de detalles
           else if (data.type === 'openDetails' &&
             Number.isSafeInteger(data.spotId) && data.spotId > 0 && onSpotClick) {
              onSpotClick(data.spotId);
           }
-          // Abrir GPS
           else if (data.type === 'openDirections' &&
             Number.isFinite(data.lat) && Number.isFinite(data.lng) &&
             Math.abs(data.lat) <= 90 && Math.abs(data.lng) <= 180) {
