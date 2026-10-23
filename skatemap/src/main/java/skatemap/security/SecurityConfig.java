@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +24,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
+
+    @Value("${app.swagger.enabled:true}")
+    private boolean swaggerEnabled;
 
     public SecurityConfig(UserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
@@ -64,17 +68,19 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // REGLAS DE AUTORIZACION BLINDADAS
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        // Permitimos ver los spots y leer los comentarios al público sin token
-                        .requestMatchers(HttpMethod.GET, "/api/spots/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
-                        .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/error").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        // El resto de peticiones (POST/PUT/DELETE, votar, comentar, subir fotos) requieren JWT
-                        .anyRequest().authenticated()
-                );
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/api/auth/**").permitAll();
+                    // Permitimos ver los spots y leer los comentarios al público sin token
+                    auth.requestMatchers(HttpMethod.GET, "/api/spots/**").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll();
+                    auth.requestMatchers("/uploads/**").permitAll();
+                    auth.requestMatchers("/error").permitAll();
+                    if (swaggerEnabled) {
+                        auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
+                    }
+                    // El resto de peticiones (POST/PUT/DELETE, votar, comentar, subir fotos) requieren JWT
+                    auth.anyRequest().authenticated();
+                });
 
         // FILTROS
         http.authenticationProvider(authenticationProvider());

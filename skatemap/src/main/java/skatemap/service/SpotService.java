@@ -175,12 +175,7 @@ public class SpotService {
         dto.setMediaUrl(spot.getMediaUrl());
 
         Double cachedRating = spot.getSurfaceRating();
-        Double persistedAverage = (cachedRating == null || cachedRating == 0.0)
-                ? ratingRepository.getAverageRating(spot.getId())
-                : null;
-        double rating = persistedAverage != null
-                ? persistedAverage
-                : (cachedRating != null ? cachedRating : 0.0);
+        double rating = cachedRating != null ? cachedRating : 0.0;
         dto.setSurfaceRating(Math.round(rating * 10.0) / 10.0);
 
         dto.setCreatedBy(spot.getCreatedBy().getUsername());

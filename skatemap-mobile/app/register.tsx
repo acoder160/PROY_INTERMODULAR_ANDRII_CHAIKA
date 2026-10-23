@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import axios from 'axios';
-import { API_BASE_URL } from '../constants/api';
+import api from '../utils/api';
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState('');
@@ -33,9 +32,8 @@ export default function RegisterScreen() {
     }, 3000);
 
     try {
-      await axios.post(`${API_BASE_URL}/api/auth/register`, 
+      await api.post('/auth/register',
         { username, email, password },
-        { headers: { "ngrok-skip-browser-warning": "true" } }
       );
 
       Alert.alert("¡Bienvenido!", "Cuenta creada con éxito. Ahora puedes iniciar sesión.", [

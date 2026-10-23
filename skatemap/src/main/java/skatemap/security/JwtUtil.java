@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import skatemap.entity.User;
+import skatemap.repository.UserRepository;
 
 import java.security.Key;
 import java.util.Date;
@@ -19,6 +21,12 @@ public class JwtUtil {
     @Value("${skatemap.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
+    private final UserRepository userRepository;
+
+    public JwtUtil(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
@@ -26,9 +34,14 @@ public class JwtUtil {
     // Generar Token al hacer Login
     public String generateJwtToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
+        return generateJwtToken(userPrincipal.getUsername());
+    }
 
+    public String generateJwtToken(String username) {
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
+                .setSubject(username)
+                .claim("token_version", userRepository.findByUsername(username)
+                        .orElseThrow().getTokenVersion())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
@@ -39,6 +52,11 @@ public class JwtUtil {
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
                 .parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public long getTokenVersion(String token) {
+        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
+                .parseClaimsJws(token).getBody().get("token_version", Long.class);
     }
 
     // Validar si el token es real y no ha caducado

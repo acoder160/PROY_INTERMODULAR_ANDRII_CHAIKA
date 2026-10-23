@@ -1,0 +1,2 @@
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://tile.openstreetmap.org https://res.cloudinary.com https://via.placeholder.com; connect-src 'self' https://skatemap.onrender.com https://*.cartocdn.com https://tile.openstreetmap.org; font-src 'self' data:; form-action 'self'; upgrade-insecure-requests

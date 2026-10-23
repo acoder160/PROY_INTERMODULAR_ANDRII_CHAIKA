@@ -2,6 +2,7 @@ package skatemap.repository;
 
 import skatemap.entity.Spot;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -10,6 +11,10 @@ import java.util.List;
 
 @Repository
 public interface SpotRepository extends JpaRepository<Spot, Long> {
+
+    @Override
+    @EntityGraph(attributePaths = "createdBy")
+    List<Spot> findAll();
 
     // Buscar spots por usuario creador
     List<Spot> findByCreatedBy_Id(Long userId);
@@ -22,6 +27,7 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
      * 4326: El sistema de coordenadas GPS mundial.
      * use_spheroid=false: Calcula distancia en esfera (más rápido).
      */
+    @EntityGraph(attributePaths = "createdBy")
     @Query(value = "SELECT * FROM spots s WHERE " +
             "ST_DWithin(s.location, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326), :distanceInMeters, false)",
             nativeQuery = true)

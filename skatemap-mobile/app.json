@@ -7,9 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "skatemapmobile",
     "userInterfaceStyle": "automatic",
-    "extra": {
-      "API_URL": "http://192.168.1.39:8080"
-    },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import axios from 'axios';
+import api from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import SkateMap from '../../components/skatemap';
 import SpotFormModal from '../../components/SpotFormModal';
@@ -9,7 +9,6 @@ import { uploadImageToCloudinary } from '../../utils/cloudinary';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCameraPermissions } from 'expo-camera';
 import { LinearGradient } from 'expo-linear-gradient';
-import { API_BASE_URL } from '../../constants/api';
 import { useLocation } from '../../hooks/useLocation';
 import { useSpots } from '../../hooks/useSpots';
 import SpotDetailsModal from '../../components/SpotDetailsModal';
@@ -136,14 +135,14 @@ export default function HomeScreen() {
     let finalImageUrl = null;
 
     try {
-      finalImageUrl = await uploadImageToCloudinary(capturedPhoto, token as string);
+      finalImageUrl = await uploadImageToCloudinary(capturedPhoto);
     } catch (error) {
       alert("Hubo un problema al subir la foto a la nube.");
       setIsUploading(false); return;
     }
 
     try {
-      await axios.post(`${API_BASE_URL}/api/spots`, { 
+      await api.post(`/spots`, {
         ...formData, latitude: newSpotLocation.lat, longitude: newSpotLocation.lng, mediaUrl: finalImageUrl
       }, { headers: { Authorization: `Bearer ${token}`, "ngrok-skip-browser-warning": "true" } });
       

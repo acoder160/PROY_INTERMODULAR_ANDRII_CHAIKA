@@ -3,6 +3,15 @@ import { WebView } from 'react-native-webview';
 import { StyleSheet, View, Linking, Image, Dimensions } from 'react-native';
 import { CARTO_API_KEY } from '../constants/api';
 
+function serializeForInlineScript(value: unknown): string {
+  return (JSON.stringify(value) ?? 'null')
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+}
+
 // Props del mapa
 interface SkateMapProps {
   spots?: any[];
@@ -38,7 +47,7 @@ export default function SkateMap({
     if (mapReadyRef.current && webviewRef.current) {
       webviewRef.current.injectJavaScript(`
         if(typeof window.renderSpots === 'function') {
-          window.renderSpots(${JSON.stringify(spots)});
+          window.renderSpots(${serializeForInlineScript(spots)});
         }
         true;
       `);
@@ -77,11 +86,12 @@ export default function SkateMap({
     <html>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-        <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; script-src 'unsafe-inline' https://unpkg.com; style-src 'unsafe-inline' https://unpkg.com; img-src data: blob: https://*.openstreetmap.org https://*.cartocdn.com https://*.cloudinary.com https://via.placeholder.com; connect-src https://*.openstreetmap.org https://*.cartocdn.com https://*.cloudinary.com; font-src data:; form-action 'none';" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" crossorigin="anonymous" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
         <style>
           html, body { padding: 0; margin: 0; height: 100vh; min-height: 1px; width: 100%; background-color: #e5e5e5; }
           #map { height: 100vh; min-height: 1px; width: 100%; }
@@ -196,6 +206,29 @@ export default function SkateMap({
           var SPOT_ICONS = ${JSON.stringify(ICONS)};
           var spotIcons = {};
 
+          function escapeHtml(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, function(character) {
+              return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+              }[character];
+            });
+          }
+
+          function getSafeImageUrl(value) {
+            try {
+              var url = new URL(value || '', window.location.href);
+              var trustedHost = url.hostname === 'cloudinary.com' ||
+                url.hostname.endsWith('.cloudinary.com');
+              return url.protocol === 'https:' && trustedHost ? escapeHtml(url.href) : '';
+            } catch (error) {
+              return '';
+            }
+          }
+
           function getSpotIcon(spotType, iconUrl) {
             if (!spotIcons[spotType]) {
               spotIcons[spotType] = L.icon({
@@ -219,7 +252,8 @@ export default function SkateMap({
             var iconUrl = SPOT_ICONS[spotType] || SPOT_ICONS['STREET'];
             var icon = getSpotIcon(spotType, iconUrl);
 
-            var imageUrl = spot.mediaUrl ? spot.mediaUrl : 'https://skateism.com/wp-content/uploads/2019/02/placeholder-skate.jpg';
+            var imageUrl = getSafeImageUrl(spot.mediaUrl) ||
+              'https://via.placeholder.com/220x120?text=Sin+Imagen';
             var diff = (spot.difficultyLevel || 'MEDIA').toUpperCase();
                 
             // LÓGICA DE ESTRELLAS
@@ -229,21 +263,21 @@ export default function SkateMap({
                 
             var popupHTML = \`
               <div class="popup-card">
-                <img src="\${imageUrl}" class="popup-image" onerror="this.src='https://via.placeholder.com/220x120?text=Sin+Imagen'" />
+                <img src="\${imageUrl}" class="popup-image" />
                 <div class="popup-info">
-                  <h3 class="popup-title">\${spot.name || 'Spot Sin Nombre'}</h3>
+                  <h3 class="popup-title">\${escapeHtml(spot.name || 'Spot Sin Nombre')}</h3>
                   <div class="popup-rating">
                     <span class="star-icon">\${fullStars}\${emptyStars}</span>
                     <span style="font-size: 11px; color: #666; margin-left: 4px;">(\${rating.toFixed(1)})</span>
                   </div>
                   <div class="popup-badges">
-                    <span class="badge-type">\${spotType}</span>
-                    <span class="badge-diff">\${diff}</span>
+                    <span class="badge-type">\${escapeHtml(spotType)}</span>
+                    <span class="badge-diff">\${escapeHtml(diff)}</span>
                   </div>
-                  <p class="popup-desc">\${spot.description || 'No hay descripción detallada para este spot.'}</p>
+                  <p class="popup-desc">\${escapeHtml(spot.description || 'No hay descripción detallada para este spot.')}</p>
                   <div class="btn-container">
-                    <button class="details-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDetails', spotId: \${spot.id} }))">💬 Valorar</button>
-                    <button class="directions-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDirections', lat: \${spot.latitude}, lng: \${spot.longitude} }))">🗺️ Ruta</button>
+                    <button class="details-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDetails', spotId: \${Number(spot.id) || 0} }))">💬 Valorar</button>
+                    <button class="directions-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDirections', lat: \${Number(spot.latitude)}, lng: \${Number(spot.longitude)} }))">🗺️ Ruta</button>
                   </div>
                 </div>
               </div>
@@ -367,16 +401,23 @@ export default function SkateMap({
     <View style={styles.container}>
       <WebView 
         ref={webviewRef}
-        originWhitelist={['*']}
-        allowFileAccess={true}
-        allowFileAccessFromFileURLs={true}
-        allowUniversalAccessFromFileURLs={true}
+        originWhitelist={['about:blank', 'https://*.openstreetmap.org', 'https://*.cartocdn.com', 'https://*.cloudinary.com', 'https://via.placeholder.com']}
+        allowFileAccess={false}
+        allowFileAccessFromFileURLs={false}
+        allowUniversalAccessFromFileURLs={false}
         javaScriptEnabled={true}
         domStorageEnabled={true}
         source={{ html: staticHtml }} 
         style={[styles.map, { height: windowHeight }]} 
         scrollEnabled={false}
         bounces={false}
+        onShouldStartLoadWithRequest={(request) => (
+          request.url === 'about:blank' ||
+          request.url.startsWith('https://tile.openstreetmap.org/') ||
+          request.url.includes('.openstreetmap.org/') ||
+          request.url.includes('.cartocdn.com/') ||
+          request.url.startsWith('https://via.placeholder.com/')
+        )}
         onLoadEnd={() => {
           mapReadyRef.current = true;
           webviewRef.current?.injectJavaScript(`
@@ -385,7 +426,7 @@ export default function SkateMap({
               document.body.style.height = window.innerHeight + 'px';
               document.getElementById('map').style.height = window.innerHeight + 'px';
               map.invalidateSize(true);
-              window.renderSpots(${JSON.stringify(spots)});
+              window.renderSpots(${serializeForInlineScript(spots)});
               ${userLocation ? `window.updateUserLocation(${userLocation.lat},${userLocation.lng});` : ''}
               window.isAddingMode = ${isAddingMode};
             }
@@ -405,22 +446,33 @@ export default function SkateMap({
           `);
         }}
         onMessage={(event) => {
-          const data = JSON.parse(event.nativeEvent.data);
+          let data;
+          try {
+            data = JSON.parse(event.nativeEvent.data);
+          } catch {
+            return;
+          }
+          if (!data || typeof data.type !== 'string') return;
             
           if (data.type === 'mapReady') {
             mapReadyRef.current = true;
           } else if (data.type === 'error') {
              alert(data.message);
           } 
-          else if (data.type === 'locationSelected' && data.lat && data.lng && onMapClick) {
+          else if (data.type === 'locationSelected' &&
+            Number.isFinite(data.lat) && Number.isFinite(data.lng) &&
+            Math.abs(data.lat) <= 90 && Math.abs(data.lng) <= 180 && onMapClick) {
              onMapClick(data.lat, data.lng);
           }
           // Escuchamos el clic del botón de detalles
-          else if (data.type === 'openDetails' && onSpotClick) {
+          else if (data.type === 'openDetails' &&
+            Number.isSafeInteger(data.spotId) && data.spotId > 0 && onSpotClick) {
              onSpotClick(data.spotId);
           }
           // Abrir GPS
-          else if (data.type === 'openDirections') {
+          else if (data.type === 'openDirections' &&
+            Number.isFinite(data.lat) && Number.isFinite(data.lng) &&
+            Math.abs(data.lat) <= 90 && Math.abs(data.lng) <= 180) {
              const url = `https://maps.google.com/?q=${data.lat},${data.lng}`;
              Linking.openURL(url).catch(err => console.error("No se pudo abrir Maps", err));
           }

@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Image, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
-import axios from 'axios';
+import api from '../utils/api';
 import { useRouter } from 'expo-router';
-import { API_BASE_URL } from '../constants/api';
 
 export default function SpotDetailsModal({ visible, onClose, spot, token, onSpotUpdated }: any) {
   const router = useRouter();
@@ -44,7 +43,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
       // 1. Solo comprobamos si ya ha votado cuando el usuario tiene sesión iniciada (token)
       if (token) {
         try {
-          const ratingRes = await axios.get(`${API_BASE_URL}/api/ratings/check/${spot.id}`, {
+          const ratingRes = await api.get(`/ratings/check/${spot.id}`, {
             headers: { 
               Authorization: `Bearer ${token}`,
               "ngrok-skip-browser-warning": "true"
@@ -65,7 +64,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
       }
 
       // 2. Los comentarios se cargan siempre (con o sin token)
-      const commentsRes = await axios.get(`${API_BASE_URL}/api/comments/spot/${spot.id}`, {
+      const commentsRes = await api.get(`/comments/spot/${spot.id}`, {
         headers: token ? { 
           Authorization: `Bearer ${token}`,
           "ngrok-skip-browser-warning": "true"
@@ -117,7 +116,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
     setSuccessMessage(null);
     try {
       // Guardamos lo que devuelve Spring Boot
-      const response = await axios.post(`${API_BASE_URL}/api/ratings/${spot.id}`, { value: currentRating }, { 
+      const response = await api.post(`/ratings/${spot.id}`, { value: currentRating }, {
         headers: { 
           Authorization: `Bearer ${token}`,
           "ngrok-skip-browser-warning": "true"
@@ -125,7 +124,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
       });
 
       if (newComment.trim().length > 0) {
-        await axios.post(`${API_BASE_URL}/api/comments/${spot.id}`, { content: newComment }, { 
+        await api.post(`/comments/${spot.id}`, { content: newComment }, {
           headers: { 
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "true"

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import axios from 'axios';
+import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL } from '../constants/api';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
@@ -32,12 +31,19 @@ export default function LoginScreen() {
     }, 3000);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, 
+      const response = await api.post('/auth/login',
         { username, password },
-        { headers: { "ngrok-skip-browser-warning": "true" } }
       );
 
-      login(response.data.username || username, response.data.token);
+      if (Platform.OS !== 'web' && !response.data.refreshToken) {
+        throw new Error('Refresh token missing from login response');
+      }
+
+      await login(
+        response.data.username || username,
+        response.data.token,
+        response.data.refreshToken
+      );
       router.replace('/(tabs)');
     } catch (error) {
       console.error(error);

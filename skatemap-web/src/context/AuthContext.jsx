@@ -1,66 +1,70 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-import api from '../api/axiosConfig';
+import api, { clearAccessToken, setAccessToken } from '../api/axiosConfig';
 
-// Creamos el contexto
 const AuthContext = createContext();
 
-// Hook personalizado para usar el contexto facil
 export const useAuth = () => useContext(AuthContext);
 
-// El proveedor que envolvera la app
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Al arrancar, miramos si hay token guardado
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const username = localStorage.getItem('username');
-        
-        if (token && username) {
-            setUser({ username }); // Si hay token, restauramos al usuario
-        }
-        setLoading(false);
+        api.post('/auth/refresh')
+            .then((response) => {
+                setAccessToken(response.data.token);
+                setUser({
+                    id: response.data.id,
+                    username: response.data.username,
+                    email: response.data.email,
+                });
+            })
+            .catch((error) => {
+                clearAccessToken();
+                if (error.response?.status !== 401) {
+                    console.error('Error restoring session:', error);
+                }
+            })
+            .finally(() => setLoading(false));
     }, []);
 
     const login = async (username, password) => {
         try {
             const response = await api.post('/auth/login', { username, password });
-            
-            // MIRAR EN LA CONSOLA QUÉ LLEGA EXACTAMENTE
-            console.log("RESPUESTA DEL LOGIN:", response.data); 
+            const token = response.data.accessToken || response.data.token || response.data.jwt;
 
-            // BUSCAR EL TOKEN CON VARIOS NOMBRES POSIBLES
-            // Si no está en 'accessToken', mira en 'token', y si no en 'jwt'
-            const elToken = response.data.accessToken || response.data.token || response.data.jwt;
-
-            if (!elToken) {
-                alert("ERROR CRÍTICO: El backend no ha devuelto ningún token válido.");
-                throw new Error("Token no encontrado en la respuesta");
+            if (!token) {
+                throw new Error('Token no encontrado en la respuesta');
             }
-            
-            // GUARDAR EL TOKEN
-            localStorage.setItem('token', elToken);
-            localStorage.setItem('username', username);
-            
-            setUser({ username });
-            return true; 
+
+            setAccessToken(token);
+            setUser({
+                id: response.data.id,
+                username: response.data.username || username,
+                email: response.data.email,
+            });
+            return true;
         } catch (error) {
-            console.error("Error login:", error);
-            throw error; 
+            console.error('Error login:', error);
+            throw error;
         }
     };
 
-    // Función de Logout
-    const logout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
+    const logout = async () => {
+        clearAccessToken();
         setUser(null);
+        try {
+            await api.post('/auth/logout');
+        } catch (error) {
+            if (error.response?.status !== 401) {
+                console.error('Error logging out:', error);
+            }
+        }
     };
 
     return (
         <AuthContext.Provider value={{ user, login, logout, loading }}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };

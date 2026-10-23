@@ -26,13 +26,23 @@ public class CorsConfig {
         config.setAllowCredentials(true);
 
         // Dominios permitidos
-        config.setAllowedOrigins(allowedOrigins);
+        List<String> normalizedOrigins = allowedOrigins.stream()
+                .map(String::trim)
+                .filter(origin -> !origin.isBlank())
+                .toList();
+        if (normalizedOrigins.contains("*")) {
+            throw new IllegalStateException(
+                    "CORS_ORIGINS must list explicit origins when credentials are enabled");
+        }
+        config.setAllowedOrigins(normalizedOrigins);
 
         // Headers permitidos
         config.setAllowedHeaders(Arrays.asList(
                 "Origin", "Content-Type", "Accept", "Authorization",
-                "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"
+                "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials",
+                "X-Client-Type", "X-Refresh-Token", "ngrok-skip-browser-warning"
         ));
+        config.setExposedHeaders(List.of("Set-Cookie"));
 
         //  Métodos permitidos
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
