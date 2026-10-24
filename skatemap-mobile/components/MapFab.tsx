@@ -59,7 +59,7 @@ export default function MapFab({ icon, onPress, label, spinning = false, iconOff
           style={styles.sheen}
         />
         <Animated.View style={[styles.iconBox, { transform: [{ rotate: spin }] }]}>
-          <Ionicons name={icon} size={ICON} color="#66E3E7" style={[styles.glyph, iconOffsetY ? { top: -iconOffsetY } : null]} />
+          <Ionicons name={icon} size={ICON} color="#FFFFFF" style={[styles.glyph, iconOffsetY ? { top: -iconOffsetY } : null]} />
         </Animated.View>
       </LinearGradient>
     </TouchableOpacity>

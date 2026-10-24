@@ -100,7 +100,22 @@ export default function SkateMap({
             border-radius: 50%; 
             border: 3px solid white; 
             box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            position: relative;
           }
+          .blue-dot-inner::after {
+            content: '';
+            position: absolute;
+            top: -3px; left: -3px; right: -3px; bottom: -3px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 122, 255, 0.55);
+            animation: dot-pulse 2.2s ease-out infinite;
+          }
+          @keyframes dot-pulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            100% { transform: scale(2.8); opacity: 0; }
+          }
+          .user-radius { animation: radius-in 0.6s ease-out; }
+          @keyframes radius-in { from { opacity: 0; } to { opacity: 1; } }
 
           .leaflet-popup-content-wrapper { border-radius: 12px; overflow: hidden; padding: 0; }
           .leaflet-popup-content { margin: 0; }
@@ -379,30 +394,70 @@ export default function SkateMap({
           window.renderVisibleSpots = renderVisibleSpots;
 
           var userMarker = null;
-          var locationCircle = null; 
+          var locationCircle = null;
+          var userLatLng = null;
+          var radiusTimer = null;
+
+          var blueDotIcon = L.divIcon({
+            className: 'blue-dot',
+            html: '<div class="blue-dot-inner"></div>',
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+          });
+
+          // El radio (círculo vectorial) se escala de golpe durante un zoom animado y se ve gigante:
+          // lo ocultamos al empezar cualquier zoom y lo mostramos con un fundido al terminar.
+          function hideRadius() {
+            clearTimeout(radiusTimer);
+            if (locationCircle) {
+              map.removeLayer(locationCircle);
+              locationCircle = null;
+            }
+          }
+
+          function showRadius() {
+            clearTimeout(radiusTimer);
+            radiusTimer = setTimeout(function() {
+              if (!userLatLng || locationCircle) return;
+              locationCircle = L.circle(userLatLng, {
+                color: '#3FA9F5',
+                fillColor: '#3FA9F5',
+                fillOpacity: 0.12,
+                radius: 200, // 200 metros
+                weight: 1.5,
+                dashArray: '4 6',
+                className: 'user-radius',
+                interactive: false
+              }).addTo(map);
+            }, 150);
+          }
+
+          map.on('zoomstart', hideRadius);
+          map.on('zoomend', showRadius);
 
           window.updateUserLocation = function(lat, lng) {
-            if (userMarker) map.removeLayer(userMarker);
-            if (locationCircle) map.removeLayer(locationCircle);
+            userLatLng = L.latLng(lat, lng);
 
-            var blueDotIcon = L.divIcon({
-              className: 'blue-dot',
-              html: '<div class="blue-dot-inner"></div>',
-              iconSize: [24, 24],
-              iconAnchor: [12, 12]
+            if (userMarker) {
+              userMarker.setLatLng(userLatLng);
+            } else {
+              userMarker = L.marker(userLatLng, { icon: blueDotIcon, zIndexOffset: 1000 }).addTo(map);
+            }
+
+            hideRadius();
+
+            // Si ya estamos ahí (p. ej. al afinar la posición) solo movemos el punto, sin volver a hacer zoom
+            var distance = map.getCenter().distanceTo(userLatLng);
+            if (map.getZoom() >= 15 && distance < 80) {
+              showRadius();
+              return;
+            }
+
+            map.flyTo(userLatLng, 16, {
+              animate: true,
+              duration: distance > 20000 ? 2.2 : 1.2,
+              easeLinearity: 0.25
             });
-            
-            userMarker = L.marker([lat, lng], { icon: blueDotIcon }).addTo(map);
-
-            locationCircle = L.circle([lat, lng], {
-                color: '#3498db',
-                fillColor: '#3498db',
-                fillOpacity: 0.15,
-                radius: 200,
-                weight: 1
-            }).addTo(map);
-
-            map.flyTo([lat, lng], 16, { animate: true, duration: 1.5 });
           };
 
           map.on('click', function(e) {

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { MapContainer, CircleMarker, useMap } from 'react-leaflet';
+import { MapContainer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
@@ -548,6 +548,81 @@ function ZoomLimit() {
     return null;
 }
 
+// PUNTO AZUL DE UBICACIÓN + RADIO
+// El punto es un marcador DOM (no se deforma al hacer zoom). El radio es un círculo vectorial, que
+// Leaflet escala de golpe durante un zoom animado; por eso lo quitamos al empezar el zoom y lo
+// volvemos a mostrar con un fundido al terminar.
+const userDotIcon = L.divIcon({
+    className: 'user-dot',
+    html: '<div class="user-dot-inner"></div>',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+});
+
+function UserLocation({ position }) {
+    const map = useMap();
+    const markerRef = useRef(null);
+    const circleRef = useRef(null);
+    const timerRef = useRef(null);
+    const positionRef = useRef(null);
+
+    useEffect(() => {
+        const hideRadius = () => {
+            clearTimeout(timerRef.current);
+            if (circleRef.current) {
+                map.removeLayer(circleRef.current);
+                circleRef.current = null;
+            }
+        };
+        const showRadius = () => {
+            clearTimeout(timerRef.current);
+            timerRef.current = setTimeout(() => {
+                const pos = positionRef.current;
+                if (!pos || circleRef.current) return;
+                const radius = Math.min(Math.max(pos.accuracy || 100, 40), 500);
+                circleRef.current = L.circle(pos, {
+                    color: '#3FA9F5',
+                    fillColor: '#3FA9F5',
+                    fillOpacity: 0.12,
+                    weight: 1.5,
+                    dashArray: '4 6',
+                    radius,
+                    className: 'user-radius',
+                    interactive: false,
+                }).addTo(map);
+            }, 150);
+        };
+
+        map.on('zoomstart', hideRadius);
+        map.on('zoomend', showRadius);
+        map._userLocationControls = { hideRadius, showRadius };
+
+        return () => {
+            map.off('zoomstart', hideRadius);
+            map.off('zoomend', showRadius);
+            hideRadius();
+            if (markerRef.current) {
+                map.removeLayer(markerRef.current);
+                markerRef.current = null;
+            }
+        };
+    }, [map]);
+
+    useEffect(() => {
+        if (!position) return;
+        positionRef.current = position;
+        if (markerRef.current) {
+            markerRef.current.setLatLng(position);
+        } else {
+            markerRef.current = L.marker(position, { icon: userDotIcon, zIndexOffset: 1000, interactive: false }).addTo(map);
+        }
+        map._userLocationControls?.hideRadius();
+        map._userLocationControls?.showRadius();
+    }, [map, position]);
+
+    return null;
+}
+
 // BOTÓN GEOLOCALIZACIÓN
 function LocationButton({ setMyPosition }) {
     const map = useMap();
@@ -575,9 +650,21 @@ function LocationButton({ setMyPosition }) {
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
+                latlng.accuracy = pos.coords.accuracy;
                 setMyPosition(latlng);
-                map.flyTo(latlng, 15);
                 setMessage(null);
+
+                // Vuelo suave: más largo si el destino está lejos; si ya estamos cerca, solo desplazamos
+                const distance = map.getCenter().distanceTo(latlng);
+                if (map.getZoom() >= 15 && distance < 80) {
+                    map.panTo(latlng, { animate: true, duration: 0.5 });
+                } else {
+                    map.flyTo(latlng, 16, {
+                        animate: true,
+                        duration: distance > 20000 ? 2.2 : 1.2,
+                        easeLinearity: 0.25,
+                    });
+                }
             },
             (err) => {
                 console.error('Error de geolocalización:', err);
@@ -782,7 +869,7 @@ export default function MapPage() {
         
         <DynamicSpotLayer spots={filteredSpots} onUpdate={fetchSpots} />
         
-        {myPosition && <CircleMarker center={[myPosition.lat, myPosition.lng]} radius={8} pathOptions={{ color: 'white', fillColor: '#2980b9', fillOpacity: 1 }} />}
+        <UserLocation position={myPosition} />
       </MapContainer>
     </div>
   );
