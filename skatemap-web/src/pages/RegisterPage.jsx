@@ -56,6 +56,7 @@ export default function RegisterPage() {
   return (
     <div className="auth-container">
       <div className="auth-card">
+        <p className="auth-eyebrow">SKATEMAP / JOIN THE RIDE</p>
         <h1 className="auth-title">Únete al Crew</h1>
         <p className="auth-subtitle">Crea tu cuenta en SkateMap</p>
 
@@ -120,6 +121,7 @@ export default function RegisterPage() {
           ¿Ya tienes cuenta?{' '}
           <Link to="/login" className="auth-link">Inicia sesión</Link>
         </div>
+        <Link to="/map" className="auth-guest">← Volver al mapa sin cuenta</Link>
       </div>
     </div>
   );

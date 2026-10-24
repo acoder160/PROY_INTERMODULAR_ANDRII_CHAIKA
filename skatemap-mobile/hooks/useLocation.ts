@@ -23,7 +23,26 @@ export function useLocation() {
         notify('⚠️ Permiso de GPS denegado', true);
         return null;
       }
-      let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      // Camino rápido: última posición conocida (instantánea) y la afinamos en segundo plano
+      const cached = await Location.getLastKnownPositionAsync({ maxAge: 5 * 60 * 1000, requiredAccuracy: 200 });
+      if (cached) {
+        const cachedCoords = { lat: cached.coords.latitude, lng: cached.coords.longitude };
+        setUserLocation(cachedCoords);
+        notify(null);
+        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })
+          .then((fresh) => {
+            const freshCoords = { lat: fresh.coords.latitude, lng: fresh.coords.longitude };
+            // Solo actualizamos si nos hemos movido de forma apreciable (evita saltos innecesarios)
+            const dLat = (freshCoords.lat - cachedCoords.lat) * 111320;
+            const dLng = (freshCoords.lng - cachedCoords.lng) * 111320 * Math.cos(cachedCoords.lat * Math.PI / 180);
+            if (Math.hypot(dLat, dLng) > 30) setUserLocation(freshCoords);
+          })
+          .catch(() => {});
+        return cachedCoords;
+      }
+
+      // Sin caché: primero una lectura rápida de baja precisión
+      let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low });
       const coords = { lat: location.coords.latitude, lng: location.coords.longitude };
       setUserLocation(coords);
       notify(null);

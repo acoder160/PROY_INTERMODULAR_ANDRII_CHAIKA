@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface FilterState {
   minRating: number;
@@ -81,8 +82,10 @@ export default function FilterModal({ visible, onClose, filters, setFilters }: F
 
           </ScrollView>
 
-          <TouchableOpacity style={styles.applyBtn} onPress={onClose}>
-            <Text style={styles.applyBtnText}>Ver Resultados</Text>
+          <TouchableOpacity onPress={onClose} activeOpacity={0.88}>
+            <LinearGradient colors={['#2EC4B6', '#168AAD']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.applyBtn}>
+              <Text style={styles.applyBtnText}>Ver Resultados</Text>
+            </LinearGradient>
           </TouchableOpacity>
 
         </View>
@@ -92,18 +95,18 @@ export default function FilterModal({ visible, onClose, filters, setFilters }: F
 }
 
 const styles = StyleSheet.create({
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, maxHeight: '80%' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(3, 14, 25, 0.68)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#0B243B', borderTopLeftRadius: 26, borderTopRightRadius: 26, padding: 20, maxHeight: '80%', borderWidth: 1, borderColor: 'rgba(126, 232, 236, 0.18)' },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  title: { fontSize: 20, fontWeight: 'bold', color: '#1A1A1A' },
-  closeBtn: { fontSize: 22, color: '#666', padding: 5 },
+  title: { fontSize: 20, fontWeight: '800', color: '#F5FEFF' },
+  closeBtn: { fontSize: 22, color: '#9DC1CD', padding: 5 },
   scroll: { marginBottom: 20 },
-  sectionTitle: { fontSize: 16, fontWeight: 'bold', color: '#333', marginBottom: 10, marginTop: 10 },
+  sectionTitle: { fontSize: 16, fontWeight: '800', color: '#D5E8EE', marginBottom: 10, marginTop: 10 },
   pillContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  pill: { paddingVertical: 8, paddingHorizontal: 15, borderRadius: 20, backgroundColor: '#f0f0f0', borderWidth: 1, borderColor: '#ddd' },
-  pillActive: { backgroundColor: '#2EC4B6', borderColor: '#2EC4B6' },
-  pillText: { color: '#666', fontWeight: '600' },
+  pill: { paddingVertical: 8, paddingHorizontal: 15, borderRadius: 20, backgroundColor: 'rgba(4, 20, 35, 0.62)', borderWidth: 1, borderColor: 'rgba(126, 195, 211, 0.25)' },
+  pillActive: { backgroundColor: '#168AAD', borderColor: '#66E3E7' },
+  pillText: { color: '#A9C5D2', fontWeight: '600' },
   pillTextActive: { color: 'white' },
-  applyBtn: { backgroundColor: '#1A1A1A', padding: 15, borderRadius: 10, alignItems: 'center' },
+  applyBtn: { padding: 15, borderRadius: 13, alignItems: 'center', shadowColor: '#168AAD', shadowOffset: { width: 0, height: 7 }, shadowOpacity: 0.32, shadowRadius: 10, elevation: 5 },
   applyBtnText: { color: 'white', fontWeight: 'bold', fontSize: 16 }
 });

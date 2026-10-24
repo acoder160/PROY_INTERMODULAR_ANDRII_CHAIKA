@@ -49,7 +49,8 @@ export default function LoginPage() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1 className="auth-title">🛹 SkateMap</h1>
+        <p className="auth-eyebrow">SKATEMAP / EXPLORE MORE</p>
+        <h1 className="auth-title">Bienvenido de nuevo</h1>
         <p className="auth-subtitle">Encuentra los mejores spots de la ciudad</p>
 
         {/* Mensaje de Error */}
@@ -99,6 +100,7 @@ export default function LoginPage() {
           ¿No tienes cuenta?{' '}
           <Link to="/register" className="auth-link">Regístrate aquí</Link>
         </div>
+        <Link to="/map" className="auth-guest">← Volver al mapa sin cuenta</Link>
       </div>
     </div>
   );

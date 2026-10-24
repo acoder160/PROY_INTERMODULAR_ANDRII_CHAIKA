@@ -12,8 +12,8 @@ interface CameraOverlayProps {
 export default function CameraOverlay({ cameraRef, onCapture, onCancel }: CameraOverlayProps) {
   return (
     <View style={[StyleSheet.absoluteFill, { zIndex: 100 }]}>
-      <CameraView style={{ flex: 1 }} ref={cameraRef} facing="back">
-        <View style={styles.cameraOverlay}>
+      <CameraView style={StyleSheet.absoluteFill} ref={cameraRef} facing="back" />
+      <View style={styles.cameraOverlay}>
           <View style={styles.cameraHeader}>
             <Text style={styles.cameraText}>Haz una foto del spot 🛹</Text>
           </View>
@@ -27,13 +27,12 @@ export default function CameraOverlay({ cameraRef, onCapture, onCancel }: Camera
             <View style={{width: 60}} />
           </View>
         </View>
-      </CameraView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  cameraOverlay: { flex: 1, backgroundColor: 'transparent', justifyContent: 'space-between' },
+  cameraOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'transparent', justifyContent: 'space-between' },
   cameraHeader: { backgroundColor: 'rgba(0,0,0,0.5)', padding: 20, paddingTop: 60, alignItems: 'center' },
   cameraText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
   cameraFooter: { backgroundColor: 'rgba(0,0,0,0.5)', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 30, paddingBottom: 50 },

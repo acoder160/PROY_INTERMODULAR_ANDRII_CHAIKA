@@ -84,7 +84,6 @@ export default function SkateMap({
     <html>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob: file:; img-src * data: blob: file: android-webview-video-poster:; connect-src *;" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
@@ -118,8 +117,33 @@ export default function SkateMap({
           .star-icon { color: #FFD700; font-size: 14px; letter-spacing: 2px; }
           
           .btn-container { display: flex; gap: 8px; margin-top: 10px; }
-          .details-btn { flex: 1; background: #2ed573; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;}
-          .directions-btn { flex: 1; background: #007AFF; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;}
+          .btn-container { gap: 8px; margin-top: 12px; }
+          .details-btn, .directions-btn {
+            flex: 1;
+            border: none;
+            padding: 10px 8px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+          }
+          .details-btn:active, .directions-btn:active { transform: scale(0.96); }
+          .details-btn {
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #2EC4B6 0%, #168AAD 55%, #105A68 100%);
+            box-shadow: 0 4px 10px rgba(22, 138, 173, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+          }
+          .directions-btn {
+            color: #7EE8EC;
+            background: linear-gradient(135deg, #2A3442 0%, #161D28 100%);
+            border: 1px solid rgba(126, 232, 236, 0.45);
+            box-shadow: 0 4px 10px rgba(10, 20, 30, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+          }
           .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
             background: transparent !important;
             border: 0 !important;
@@ -169,7 +193,14 @@ export default function SkateMap({
             
           L.tileLayer(tileUrl, {
             maxZoom: 19,
+            maxNativeZoom: 18, // a zoom máximo se escala el tile en vez de pedir otros nuevos (menos carga)
             subdomains: 'abcd',
+            // Carga fluida: cargar tiles mientras se mueve (en móvil por defecto espera a que pare)
+            // y mantener una franja amplia de tiles alrededor de la pantalla
+            updateWhenIdle: false,
+            updateWhenZooming: false,
+            updateInterval: 100,
+            keepBuffer: 3,
             attribution: ${CARTO_API_KEY
               ? "'© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors © <a href=\"https://carto.com/attributions\">CARTO</a>'"
               : "'© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'"}
@@ -232,7 +263,7 @@ export default function SkateMap({
             return spotIcons[spotType];
           }
 
-          function createSpotMarker(spot, showAsPlusOneBubble) {
+          function createSpotMarker(spot, showAsPlusOneBubble, lngOffset) {
             if(spot.latitude === null || spot.latitude === undefined ||
                spot.longitude === null || spot.longitude === undefined) {
               return null;
@@ -249,7 +280,8 @@ export default function SkateMap({
             var fullStars = '★'.repeat(Math.round(rating));
             var emptyStars = '☆'.repeat(5 - Math.round(rating));
                 
-            var popupHTML = \`
+            // El HTML del popup se construye solo al abrirlo (no para cada marcador en cada movimiento)
+            var buildPopup = function() { return \`
               <div class="popup-card">
                 <img src="\${imageUrl}" class="popup-image" onerror="this.src='https://via.placeholder.com/220x120?text=Sin+Imagen'" />
                 <div class="popup-info">
@@ -269,11 +301,11 @@ export default function SkateMap({
                   </div>
                 </div>
               </div>
-            \`;
+            \`; };
 
-            return L.marker([spot.latitude, spot.longitude], {
+            return L.marker([spot.latitude, spot.longitude + (lngOffset || 0)], {
               icon: showAsPlusOneBubble ? singleSpotClusterIcon : icon
-            }).bindPopup(popupHTML);
+            }).bindPopup(buildPopup);
           }
 
           function renderVisibleSpots() {
@@ -282,10 +314,25 @@ export default function SkateMap({
             var bounds = map.getBounds();
             var currentZoom = map.getZoom();
 
-            var visibleSpots = allSpotsData.filter(function(spot) {
-              return spot.latitude !== null && spot.latitude !== undefined &&
-                spot.longitude !== null && spot.longitude !== undefined &&
-                bounds.contains([spot.latitude, spot.longitude]);
+            // El mundo se repite horizontalmente: dibujamos cada spot en todas las copias visibles
+            var west = bounds.getWest();
+            var east = bounds.getEast();
+            var south = bounds.getSouth();
+            var north = bounds.getNorth();
+            var visibleSpots = [];
+            allSpotsData.forEach(function(spot) {
+              if (spot.latitude === null || spot.latitude === undefined ||
+                  spot.longitude === null || spot.longitude === undefined) {
+                return;
+              }
+              if (spot.latitude < south || spot.latitude > north) {
+                return;
+              }
+              var firstCopy = Math.ceil((west - spot.longitude) / 360);
+              var lastCopy = Math.floor((east - spot.longitude) / 360);
+              for (var copy = firstCopy; copy <= lastCopy; copy++) {
+                visibleSpots.push({ spot: spot, offset: copy * 360 });
+              }
             });
 
             // 1. Главный приоритет: если на экране < 50 спотов — всегда показываем иконки
@@ -297,8 +344,8 @@ export default function SkateMap({
               ? clusteredSpotsLayer
               : individualSpotsLayer;
 
-            var markers = visibleSpots.map(function(spot) {
-              return createSpotMarker(spot, showSingleAsBubble);
+            var markers = visibleSpots.map(function(item) {
+              return createSpotMarker(item.spot, showSingleAsBubble, item.offset);
             }).filter(function(marker) {
               return marker !== null;
             });
@@ -324,7 +371,11 @@ export default function SkateMap({
             renderVisibleSpots();
           };
 
-          map.on('moveend zoomend', renderVisibleSpots);
+          var renderTimer = null;
+          map.on('moveend zoomend', function() {
+            clearTimeout(renderTimer);
+            renderTimer = setTimeout(renderVisibleSpots, 120);
+          });
           window.renderVisibleSpots = renderVisibleSpots;
 
           var userMarker = null;
@@ -382,8 +433,8 @@ export default function SkateMap({
               
               window.ReactNativeWebView.postMessage(JSON.stringify({ 
                 type: 'locationSelected', 
-                lat: e.latlng.lat, 
-                lng: e.latlng.lng 
+                lat: e.latlng.wrap().lat, 
+                lng: e.latlng.wrap().lng 
               }));
             }
           });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import api from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import SkateMap from '../../components/skatemap';
@@ -13,6 +13,7 @@ import { useLocation } from '../../hooks/useLocation';
 import { useSpots } from '../../hooks/useSpots';
 import SpotDetailsModal from '../../components/SpotDetailsModal';
 import FilterModal from '../../components/FilterModal';
+import MapFab from '../../components/MapFab';
 
 // Tiempo del GIF para completar un ciclo natural
 const GIF_CYCLE_DURATION_MS = 2000; 
@@ -205,17 +206,26 @@ export default function HomeScreen() {
       </View>
 
       {/* Botón de Filtros (Arriba a la izquierda) */}
-      <TouchableOpacity 
-        style={styles.filterButton} 
-        onPress={() => setFilterModalVisible(true)}
-      >
-        <Text style={styles.filterBtnText}>
-          {filters.spotType !== 'ALL' || filters.minRating > 0 || filters.maxDistance > 0 ? '⚙️ Filtros (Activo)' : '⚙️ Filtros'}
-        </Text>
+      <TouchableOpacity onPress={() => setFilterModalVisible(true)} activeOpacity={0.88}>
+        <LinearGradient
+          colors={['#1B5A86', '#123B5D', '#0A223B']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.filterButton}
+        >
+          <Text style={styles.filterBtnText}>
+            {filters.spotType !== 'ALL' || filters.minRating > 0 || filters.maxDistance > 0 ? '⚙️  Filtros (Activo)' : '⚙️  Filtros'}
+          </Text>
+        </LinearGradient>
       </TouchableOpacity>
 
       {/* Botón Badge de Usuario o Botón Entrar (Arriba a la derecha) */}
-      <View style={styles.userBadge}>
+      <LinearGradient
+        colors={['#1B5A86', '#123B5D', '#0A223B']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.userBadge}
+      >
         {user ? (
           <>
             <Text style={styles.userName}>👤 {user}</Text>
@@ -229,7 +239,7 @@ export default function HomeScreen() {
             <Text style={styles.loginText}>👤 Entrar</Text>
           </TouchableOpacity>
         )}
-      </View>
+      </LinearGradient>
 
       {/* AVISO DE MODO OFFLINE */}
       {isOffline && (
@@ -245,27 +255,22 @@ export default function HomeScreen() {
       )}
 
       {/* Botón Reload Animado (Abajo a la izquierda) */}
-      <TouchableOpacity 
-        style={styles.refreshBadge} 
+      <MapFab
+        icon="refresh"
+        label="Recargar spots"
         onPress={handleReloadSpots}
-        activeOpacity={0.8}
-        accessibilityLabel="Recargar spots"
-      >
-        <View style={styles.refreshIconShell}>
-          {isRefreshing ? (
-            <ActivityIndicator color="#D0D5DD" size="small" />
-          ) : (
-            <View style={styles.refreshGlyphContainer}>
-              <Text style={styles.refreshGlyph}>↻</Text>
-            </View>
-          )}
-        </View>
-      </TouchableOpacity>
+        spinning={isRefreshing}
+        iconOffsetY={2}
+        style={{ left: 20 }}
+      />
 
       {/* Botón de Centrado GPS (Abajo a la derecha) */}
-      <TouchableOpacity style={styles.recenterButton} onPress={() => handleRecenter(false, setStatusMessage)}>
-        <Text style={styles.iconText}>📍</Text>
-      </TouchableOpacity>
+      <MapFab
+        icon="locate"
+        label="Centrar en mi ubicación"
+        onPress={() => handleRecenter(false, setStatusMessage)}
+        style={{ right: 20 }}
+      />
 
       {/* Botón Añadir Spot (Centro abajo) */}
       <TouchableOpacity 
@@ -334,50 +339,54 @@ const styles = StyleSheet.create({
   // Estilos del botón de filtros
   filterButton: {
     position: 'absolute',
-    top: 60,
+    top: 40,
     left: 20,
-    backgroundColor: 'white',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
+    paddingVertical: 11,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(126, 232, 236, 0.55)',
+    shadowColor: '#66E3E7',
+    shadowOpacity: 0.28,
+    shadowRadius: 8,
     elevation: 4,
     zIndex: 10,
   },
   filterBtnText: {
-    fontWeight: 'bold',
-    color: '#1A1A1A'
+    fontWeight: '800',
+    color: '#F4FEFF',
+    letterSpacing: 0.2
   },
 
   // Badge de usuario centrado arriba
   userBadge: { 
     position: 'absolute', 
-    top: 60, 
+    top: 40, 
     right: 20, 
-    backgroundColor: 'white', 
     flexDirection: 'row', 
     alignItems: 'center', 
     paddingVertical: 10, 
-    paddingHorizontal: 20, 
-    borderRadius: 25, 
-    shadowColor: '#000', 
-    shadowOpacity: 0.15, 
-    shadowRadius: 4, 
+    paddingHorizontal: 18, 
+    borderRadius: 16, 
+    borderWidth: 1,
+    borderColor: 'rgba(126, 232, 236, 0.55)',
+    shadowColor: '#66E3E7', 
+    shadowOpacity: 0.28, 
+    shadowRadius: 8, 
     elevation: 4, 
+    overflow: 'hidden',
     zIndex: 10 
   },
   
-  userName: { fontWeight: 'bold', color: '#1A1A1A', marginRight: 10 },
-  separator: { width: 1, height: 15, backgroundColor: '#E0E0E0', marginRight: 10 },
-  logoutText: { color: '#ff6b6b', fontWeight: 'bold' },
-  loginText: { color: '#2ed573', fontWeight: 'bold' },
+  userName: { fontWeight: '800', color: '#FFFFFF', marginRight: 10 },
+  separator: { width: 1, height: 15, backgroundColor: 'rgba(126, 195, 211, 0.35)', marginRight: 10 },
+  logoutText: { color: '#FF8A8A', fontWeight: '800' },
+  loginText: { color: '#FFFFFF', fontWeight: '800' },
 
   // Estilos del aviso de Modo Offline
   offlineBadge: {
     position: 'absolute',
-    top: 115, 
+    top: 95, 
     alignSelf: 'center',
     backgroundColor: '#ff9f1c',
     paddingVertical: 6,
@@ -395,50 +404,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  addingNotice: { position: 'absolute', bottom: 100, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.8)', paddingVertical: 8, paddingHorizontal: 20, borderRadius: 20, zIndex: 10 },
+  addingNotice: { position: 'absolute', bottom: 130, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.8)', paddingVertical: 8, paddingHorizontal: 20, borderRadius: 20, zIndex: 10 },
   addingNoticeText: { color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
-  
-  // Botón Reload (Abajo Izquierda)
-  refreshBadge: {
-    position: 'absolute',
-    bottom: 32,
-    left: 20,
-    backgroundColor: '#101828',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
-    zIndex: 10,
-  },
-  refreshIconShell: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#1D2939',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
-  },
-  refreshGlyphContainer: {
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  refreshGlyph: { color: '#F2F4F7', fontSize: 28, lineHeight: 30, fontWeight: '300', textAlign: 'center', includeFontPadding: false },
-  
-  // Botón GPS (Abajo Derecha)
-  recenterButton: { position: 'absolute', right: 20, bottom: 35, backgroundColor: 'white', width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 5, elevation: 5, zIndex: 10 },
-  iconText: { fontSize: 24 },
   
   fab: {
     position: 'absolute',

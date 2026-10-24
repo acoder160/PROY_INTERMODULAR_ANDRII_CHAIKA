@@ -1,3 +1,4 @@
+import { File } from 'expo-file-system';
 import api from './api';
 
 export const uploadImageToCloudinary = async (imageUri: string): Promise<string> => {
@@ -6,14 +7,9 @@ export const uploadImageToCloudinary = async (imageUri: string): Promise<string>
     const { signature, timestamp, api_key, cloud_name } = signatureResponse.data;
 
     const formData = new FormData();
-    const fileToUpload = {
-      uri: imageUri,
-      type: 'image/jpeg',
-      name: `upload_${Date.now()}.jpg`,
-    };
-
-    // @ts-ignore React Native FormData accepts the native file descriptor.
-    formData.append('file', fileToUpload);
+    // Con el fetch de Expo el archivo debe ser un File/Blob, no un descriptor {uri,type,name}
+    // @ts-ignore expo-file-system File implementa la interfaz Blob.
+    formData.append('file', new File(imageUri));
     formData.append('api_key', String(api_key));
     formData.append('timestamp', String(timestamp));
     formData.append('signature', signature);
