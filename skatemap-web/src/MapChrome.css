@@ -1,3 +1,8 @@
+/* Fondo del mapa parecido al de los tiles: si falta alguno apenas se nota */
+.leaflet-container {
+  background: #ebe9e4;
+}
+
 .map-chrome-btn,
 .map-chrome-chip,
 .map-filter-panel,

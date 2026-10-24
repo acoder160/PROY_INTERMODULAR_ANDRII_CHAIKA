@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { MapContainer, TileLayer, CircleMarker, useMap } from 'react-leaflet';
+import { MapContainer, CircleMarker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
@@ -490,6 +490,39 @@ function SpotPopup({ spot, onUpdate }) {
     );
 }
 
+// TILES CON PRERENDER: carga una franja extra de tiles alrededor de la pantalla (en todas las
+// direcciones) y conserva los que quedan detrás, así al arrastrar rápido no se ve el fondo gris.
+const PRELOAD_TILES = 2;   // cuántos tiles extra se cargan por delante, en cada lado
+const PaddedTileLayer = L.TileLayer.extend({
+    _getTiledPixelBounds(center) {
+        const bounds = L.TileLayer.prototype._getTiledPixelBounds.call(this, center);
+        const pad = this.getTileSize().x * PRELOAD_TILES;
+        return L.bounds(bounds.min.subtract([pad, pad]), bounds.max.add([pad, pad]));
+    },
+});
+
+function PrerenderedTiles() {
+    const map = useMap();
+
+    useEffect(() => {
+        const layer = new PaddedTileLayer(cartoTileUrl, {
+            attribution: cartoAttribution,
+            maxZoom: 19,
+            maxNativeZoom: 18,
+            keepBuffer: 8,          // tiles que se conservan detrás/alrededor antes de descartarlos
+            updateWhenIdle: false,  // cargar mientras se arrastra, no al soltar
+            updateWhenZooming: false,
+            updateInterval: 80,
+        });
+        layer.addTo(map);
+        return () => {
+            map.removeLayer(layer);
+        };
+    }, [map]);
+
+    return null;
+}
+
 // LÍMITE DE ZOOM: el mundo siempre llena la pantalla (no se puede alejar más allá del borde del mapa)
 const WORLD_BOUNDS = L.latLngBounds([-85.0511, -180], [85.0511, 180]);
 
@@ -743,7 +776,7 @@ export default function MapPage() {
         worldCopyJump
       >
         <ZoomLimit />
-        <TileLayer attribution={cartoAttribution} url={cartoTileUrl} maxNativeZoom={18} maxZoom={19} keepBuffer={3} />
+        <PrerenderedTiles />
         
         <LocationButton setMyPosition={setMyPosition} />
         
