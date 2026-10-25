@@ -1,13 +1,16 @@
 // skatemap-mobile/hooks/useLocation.ts
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as Location from 'expo-location';
 
 export function useLocation() {
+  const { t } = useTranslation();
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
 
   // Le pasamos la función setStatusMessage para que pueda enviar mensajes a la pantalla principal
-  const handleRecenter = async (silent = false, setStatusMessage?: (msg: string | null) => void) => {
-    
+  // (useCallback: la función es estable, así los useEffect que dependen de ella no se repiten en cada render)
+  const handleRecenter = useCallback(async (silent = false, setStatusMessage?: (msg: string | null) => void) => {
+
     const notify = (msg: string | null, isError = false) => {
       if (!silent && setStatusMessage) {
         setStatusMessage(msg);
@@ -15,12 +18,12 @@ export function useLocation() {
       }
     };
 
-    notify('📍 Obteniendo tu ubicación actual...');
+    notify(t('status.gettingLocation'));
 
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        notify('⚠️ Permiso de GPS denegado', true);
+        notify(t('status.gpsDenied'), true);
         return null;
       }
       // Camino rápido: última posición conocida (instantánea) y la afinamos en segundo plano
@@ -54,12 +57,12 @@ export function useLocation() {
         setUserLocation(coords);
         notify(null);
         return coords;
-      } else { 
-        notify('⚠️ Error buscando ubicación', true);
+      } else {
+        notify(t('status.locationError'), true);
         return null;
       }
     }
-  };
+  }, [t]);
 
   return { userLocation, handleRecenter };
 }

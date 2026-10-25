@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "skatemap-spots": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npm",
+        "--silent",
+        "--prefix",
+        "C:\\Users\\Admin\\Desktop\\Proyecto\\mcp-server",
+        "start"
+      ]
+    }
+  }
+}

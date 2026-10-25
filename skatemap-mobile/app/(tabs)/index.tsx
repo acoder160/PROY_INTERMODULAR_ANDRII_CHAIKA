@@ -13,12 +13,14 @@ import { useLocation } from '../../hooks/useLocation';
 import { useSpots } from '../../hooks/useSpots';
 import SpotDetailsModal from '../../components/SpotDetailsModal';
 import FilterModal from '../../components/FilterModal';
+import { useTranslation } from 'react-i18next';
 import MapFab from '../../components/MapFab';
 
 // Tiempo del GIF para completar un ciclo natural
 const GIF_CYCLE_DURATION_MS = 2000; 
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const { user, token, logout } = useAuth(); 
   const router = useRouter();
   
@@ -81,11 +83,11 @@ export default function HomeScreen() {
     // Si el usuario NO está autenticado, le pedimos iniciar sesión antes de abrir la cámara
     if (!user || !token) {
       Alert.alert(
-        "Iniciar sesión requerido",
-        "Necesitas iniciar sesión para añadir un nuevo spot al mapa.",
+        t('auth.loginRequiredTitle'),
+        t('auth.loginRequiredAdd'),
         [
-          { text: "Cancelar", style: "cancel" },
-          { text: "Iniciar sesión", onPress: () => router.push('/login') }
+          { text: t('common.cancel'), style: "cancel" },
+          { text: t('common.login'), onPress: () => router.push('/login') }
         ]
       );
       return;
@@ -95,15 +97,15 @@ export default function HomeScreen() {
       setIsAddingMode(false); setNewSpotLocation(null); setCapturedPhoto(null); setStatusMessage(null); return;
     }
 
-    setStatusMessage('📸 Preparando la cámara...');
+    setStatusMessage(t('status.preparingCamera'));
     if (!permission?.granted) {
       const { granted } = await requestPermission();
-      if (!granted) { setStatusMessage('⚠️ Permiso de cámara denegado'); setTimeout(() => setStatusMessage(null), 3000); return; }
+      if (!granted) { setStatusMessage(t('status.cameraDenied')); setTimeout(() => setStatusMessage(null), 3000); return; }
     }
     
     let loc = userLocation;
     if (!loc) {
-        setStatusMessage('⚠️ Esperando GPS...');
+        setStatusMessage(t('status.waitingGps'));
         loc = await handleRecenter(true, setStatusMessage);
         if(!loc) return; 
     }
@@ -114,12 +116,12 @@ export default function HomeScreen() {
 
   const takePicture = async () => {
     if (cameraRef.current) {
-      setStatusMessage('📸 Procesando foto...');
+      setStatusMessage(t('status.processingPhoto'));
       const photo = await cameraRef.current.takePictureAsync({ quality: 0.6 });
       setCapturedPhoto(photo.uri);
       setShowCamera(false);
       setIsAddingMode(true);
-      setStatusMessage('📍 Toca dentro del círculo azul para ubicar 👇');
+      setStatusMessage(t('status.tapCircle'));
       handleRecenter(true, setStatusMessage); 
     }
   };
@@ -129,8 +131,8 @@ export default function HomeScreen() {
       router.push('/login');
       return;
     }
-    if (!newSpotLocation || !formData.name || !capturedPhoto) { alert("Faltan datos o foto"); return; }
-    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) { alert("Error de configuración de Cloudinary"); return; }
+    if (!newSpotLocation || !formData.name || !capturedPhoto) { alert(t('errors.missingData')); return; }
+    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) { alert(t('errors.cloudinaryConfig')); return; }
 
     setIsUploading(true);
     let finalImageUrl = null;
@@ -138,7 +140,7 @@ export default function HomeScreen() {
     try {
       finalImageUrl = await uploadImageToCloudinary(capturedPhoto);
     } catch (error) {
-      alert("Hubo un problema al subir la foto a la nube.");
+      alert(t('errors.uploadFailed'));
       setIsUploading(false); return;
     }
 
@@ -147,7 +149,7 @@ export default function HomeScreen() {
         ...formData, latitude: newSpotLocation.lat, longitude: newSpotLocation.lng, mediaUrl: finalImageUrl
       }, { headers: { Authorization: `Bearer ${token}`, "ngrok-skip-browser-warning": "true" } });
       
-      alert('¡Spot creado correctamente!');
+      alert(t('errors.spotCreated'));
       setModalVisible(false); setIsAddingMode(false); setNewSpotLocation(null); setCapturedPhoto(null); setStatusMessage(null);
       setFormData({ name: '', description: '', spotType: 'STREET', difficultyLevel: 'INTERMEDIATE' });
       fetchSpots();
@@ -157,7 +159,7 @@ export default function HomeScreen() {
       
       const finalMsg = serverError || serverMessage || (typeof error.response?.data === 'string' ? error.response?.data : null);
       
-      alert(finalMsg || 'Error al guardar el spot. Revisa tu conexión.'); 
+      alert(finalMsg || t('errors.saveFailed')); 
     } finally { 
       setIsUploading(false); 
     }
@@ -205,7 +207,8 @@ export default function HomeScreen() {
         />
       </View>
 
-      {/* Botón de Filtros (Arriba a la izquierda) */}
+      {/* Filtros e idioma (arriba a la izquierda) */}
+      <View style={styles.topLeftRow}>
       <TouchableOpacity onPress={() => setFilterModalVisible(true)} activeOpacity={0.88}>
         <LinearGradient
           colors={['#1B5A86', '#123B5D', '#0A223B']}
@@ -214,10 +217,11 @@ export default function HomeScreen() {
           style={styles.filterButton}
         >
           <Text style={styles.filterBtnText}>
-            {filters.spotType !== 'ALL' || filters.minRating > 0 || filters.maxDistance > 0 ? '⚙️  Filtros (Activo)' : '⚙️  Filtros'}
+            {filters.spotType !== 'ALL' || filters.minRating > 0 || filters.maxDistance > 0 ? `⚙️  ${t('map.filtersActive')}` : `⚙️  ${t('map.filters')}`}
           </Text>
         </LinearGradient>
       </TouchableOpacity>
+      </View>
 
       {/* Botón Badge de Usuario o Botón Entrar (Arriba a la derecha) */}
       <LinearGradient
@@ -231,12 +235,12 @@ export default function HomeScreen() {
             <Text style={styles.userName}>👤 {user}</Text>
             <View style={styles.separator} />
             <TouchableOpacity onPress={logout}>
-              <Text style={styles.logoutText}>Salir</Text>
+              <Text style={styles.logoutText}>{t('map.logout')}</Text>
             </TouchableOpacity>
           </>
         ) : (
           <TouchableOpacity onPress={() => router.push('/login')}>
-            <Text style={styles.loginText}>👤 Entrar</Text>
+            <Text style={styles.loginText} numberOfLines={1}>👤 {t('map.enter')}</Text>
           </TouchableOpacity>
         )}
       </LinearGradient>
@@ -244,20 +248,20 @@ export default function HomeScreen() {
       {/* AVISO DE MODO OFFLINE */}
       {isOffline && (
         <View style={styles.offlineBadge}>
-          <Text style={styles.offlineText}>⚠️ Modo Offline (Mostrando mapa guardado)</Text>
+          <Text style={styles.offlineText}>⚠️ {t('map.offlineMode')}</Text>
         </View>
       )}
 
       {(statusMessage || (isAddingMode && !newSpotLocation)) && (
         <View style={styles.addingNotice}>
-          <Text style={styles.addingNoticeText}>{statusMessage || 'Toca dentro del círculo azul para ubicar 👇'}</Text>
+          <Text style={styles.addingNoticeText}>{statusMessage || t('status.tapCircle')}</Text>
         </View>
       )}
 
       {/* Botón Reload Animado (Abajo a la izquierda) */}
       <MapFab
         icon="refresh"
-        label="Recargar spots"
+        label={t('map.reloadSpots')}
         onPress={handleReloadSpots}
         spinning={isRefreshing}
         iconOffsetY={2}
@@ -267,7 +271,7 @@ export default function HomeScreen() {
       {/* Botón de Centrado GPS (Abajo a la derecha) */}
       <MapFab
         icon="locate"
-        label="Centrar en mi ubicación"
+        label={t('map.centerOnMe')}
         onPress={() => handleRecenter(false, setStatusMessage)}
         style={{ right: 20 }}
       />
@@ -277,7 +281,7 @@ export default function HomeScreen() {
         style={[styles.fab, isAddingMode ? styles.fabClose : styles.fabAdd]} 
         onPress={startAddingProcess}
         activeOpacity={0.85}
-        accessibilityLabel={isAddingMode ? 'Cancelar añadir spot' : 'Añadir spot'}
+        accessibilityLabel={isAddingMode ? t('map.cancelAddSpot') : t('map.addSpot')}
       >
         {isAddingMode ? (
           <Text style={styles.fabIcon}>✕</Text>
@@ -294,7 +298,7 @@ export default function HomeScreen() {
               <View style={styles.fabBubbleSmall} />
             </View>
             <Text style={styles.fabIcon}>＋</Text>
-            <Text style={styles.fabText}>Añadir Spot</Text>
+            <Text style={styles.fabText}>{t('map.addSpot')}</Text>
           </LinearGradient>
         )}
       </TouchableOpacity>
@@ -337,10 +341,16 @@ const styles = StyleSheet.create({
   mapContainer: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, flex: 1, elevation: 0 },
   
   // Estilos del botón de filtros
-  filterButton: {
+  topLeftRow: {
     position: 'absolute',
     top: 40,
     left: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    zIndex: 10,
+  },
+  filterButton: {
     paddingVertical: 11,
     paddingHorizontal: 16,
     borderRadius: 14,
@@ -375,13 +385,14 @@ const styles = StyleSheet.create({
     shadowRadius: 8, 
     elevation: 4, 
     overflow: 'hidden',
+    backgroundColor: '#123B5D',
     zIndex: 10 
   },
   
   userName: { fontWeight: '800', color: '#FFFFFF', marginRight: 10 },
   separator: { width: 1, height: 15, backgroundColor: 'rgba(126, 195, 211, 0.35)', marginRight: 10 },
   logoutText: { color: '#FF8A8A', fontWeight: '800' },
-  loginText: { color: '#FFFFFF', fontWeight: '800' },
+  loginText: { color: '#FFFFFF', fontWeight: '800', fontSize: 15, textShadowColor: 'rgba(0, 0, 0, 0.45)', textShadowRadius: 3 },
 
   // Estilos del aviso de Modo Offline
   offlineBadge: {

@@ -1,5 +1,6 @@
 // skatemap-mobile/components/SpotFormModal.tsx
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, KeyboardAvoidingView, Platform, Image, ActivityIndicator } from 'react-native';
 
 interface SpotFormModalProps {
@@ -21,14 +22,15 @@ export default function SpotFormModal({
   capturedPhoto,
   isUploading
 }: SpotFormModalProps) {
+  const { t } = useTranslation();
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalOverlay}>
         <View style={[styles.modalContent, { maxHeight: '90%' }]}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Nuevo Spot 📍</Text>
+            <Text style={styles.modalTitle}>{t('form.newSpot')}</Text>
             <TouchableOpacity onPress={onClose}>
-              <Text style={styles.closeButtonText}>✕ Cancelar</Text>
+              <Text style={styles.closeButtonText}>{t('form.close')}</Text>
             </TouchableOpacity>
           </View>
           
@@ -37,25 +39,25 @@ export default function SpotFormModal({
             {capturedPhoto && (
               <View style={styles.previewContainer}>
                   <Image source={{ uri: capturedPhoto }} style={styles.previewImage} />
-                  <Text style={styles.previewText}>Foto capturada ✔️</Text>
+                  <Text style={styles.previewText}>{t('form.photoCaptured')}</Text>
               </View>
             )}
 
-            <TextInput style={styles.input} placeholder="Nombre" value={formData.name} onChangeText={(text) => setFormData({...formData, name: text})} />
-            <TextInput style={[styles.input, {height: 80}]} placeholder="Descripción..." multiline value={formData.description} onChangeText={(text) => setFormData({...formData, description: text})} />
+            <TextInput style={styles.input} placeholder={t('form.name')} value={formData.name} onChangeText={(text) => setFormData({...formData, name: text})} />
+            <TextInput style={[styles.input, {height: 80}]} placeholder={t('form.description')} multiline value={formData.description} onChangeText={(text) => setFormData({...formData, description: text})} />
             
             <View style={styles.selectRow}>
               <View style={styles.pickerBox}>
-                <Text style={styles.pickerLabel}>Tipo</Text>
+                <Text style={styles.pickerLabel}>{t('form.type')}</Text>
                 <TouchableOpacity style={styles.pickerButton} onPress={() => setFormData({...formData, spotType: formData.spotType === 'STREET' ? 'PARK' : formData.spotType === 'PARK' ? 'RAIL' : formData.spotType === 'RAIL' ? 'LEDGE' : formData.spotType === 'LEDGE' ? 'RAMPS' : 'STREET'})}>
-                  <Text>{formData.spotType}</Text>
+                  <Text>{t(`types.${formData.spotType}`, { defaultValue: formData.spotType })}</Text>
                 </TouchableOpacity>
               </View>
 
               <View style={styles.pickerBox}>
-                <Text style={styles.pickerLabel}>Nivel</Text>
+                <Text style={styles.pickerLabel}>{t('form.level')}</Text>
                 <TouchableOpacity style={styles.pickerButton} onPress={() => setFormData({...formData, difficultyLevel: formData.difficultyLevel === 'BEGINNER' ? 'INTERMEDIATE' : formData.difficultyLevel === 'INTERMEDIATE' ? 'ADVANCED' : 'BEGINNER'})}>
-                  <Text>{formData.difficultyLevel}</Text>
+                  <Text>{t(`difficulty.${formData.difficultyLevel}`, { defaultValue: formData.difficultyLevel })}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -64,7 +66,7 @@ export default function SpotFormModal({
               {isUploading ? (
                 <ActivityIndicator color="white" />
               ) : (
-                <Text style={styles.saveButtonText}>Guardar Spot</Text>
+                <Text style={styles.saveButtonText}>{t('form.save')}</Text>
               )}
             </TouchableOpacity>
           </ScrollView>

@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Image, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import api from '../utils/api';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export default function SpotDetailsModal({ visible, onClose, spot, token, onSpotUpdated }: any) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [comments, setComments] = useState<any[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
@@ -84,12 +86,12 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
     // Si es un invitado (sin token), le pedimos iniciar sesión al intentar valorar
     if (!token) {
       Alert.alert(
-        "Iniciar sesión requerido",
-        "Necesitas iniciar sesión para valorar y comentar este spot.",
+        t('auth.loginRequiredTitle'),
+        t('auth.loginRequiredRate'),
         [
-          { text: "Cancelar", style: "cancel" },
+          { text: t('common.cancel'), style: "cancel" },
           { 
-            text: "Iniciar sesión", 
+            text: t('common.login'), 
             onPress: () => {
               onClose();
               router.push('/login');
@@ -134,7 +136,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
 
       setHasVoted(true);
       setMyRating(currentRating);
-      setSuccessMessage("¡Gracias por tu valoración! 🛹");
+      setSuccessMessage(t('popup.thanks'));
       
       if (response.data && response.data.newAverage) {
          setLocalAvgRating(response.data.newAverage);
@@ -148,7 +150,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
       
     } catch (error: any) {
       const errorMsg = error.response?.data?.message || error.response?.data;
-      alert(typeof errorMsg === 'string' ? errorMsg : 'Hubo un error al enviar. Por favor, revisa tu conexión.');
+      alert(typeof errorMsg === 'string' ? errorMsg : t('popup.sendErrorConnection'));
     } finally {
       setIsSubmitting(false);
     }
@@ -179,11 +181,11 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
               <Text style={styles.desc}>{spot.description}</Text>
 
               <View style={styles.ratingBox}>
-                <Text style={styles.ratingTitle}>Puntuación media: {localAvgRating.toFixed(1)}/5</Text>
+                <Text style={styles.ratingTitle}>{t('popup.averageRating', { value: localAvgRating.toFixed(1) })}</Text>
                 
                 {hasVoted ? (
                     <View style={{ alignItems: 'center', marginTop: 10 }}>
-                      <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#2ed573', marginBottom: 5 }}>✅ Tu voto:</Text>
+                      <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#2ed573', marginBottom: 5 }}>✅ {t('popup.yourVote')}</Text>
                       <View style={styles.starsRow}>
                         {[1, 2, 3, 4, 5].map(star => (
                            <Text key={star} style={star <= myRating ? styles.starFull : styles.starEmpty}>★</Text>
@@ -193,7 +195,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
                 ) : (
                     <View style={{ alignItems: 'center', marginTop: 10 }}>
                         <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#888', marginBottom: 5 }}>
-                          {token ? 'Valora este spot:' : 'Toca una estrella para valorar (requiere cuenta):'}
+                          {token ? t('popup.rateSpot') : t('popup.rateSpotTap')}
                         </Text>
                         <View style={styles.starsRow}>
                           {[1, 2, 3, 4, 5].map(star => (
@@ -219,7 +221,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
                   <View style={styles.commentInputBox}>
                     <TextInput 
                         style={styles.input} 
-                        placeholder="Escribe tu opinión (opcional)..." 
+                        placeholder={t('popup.opinionPlaceholder')} 
                         value={newComment} 
                         onChangeText={setNewComment} 
                         multiline 
@@ -229,13 +231,13 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
                         }}
                     />
                     <TouchableOpacity style={styles.sendBtn} onPress={handleSendReview} disabled={isSubmitting}>
-                      {isSubmitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.sendText}>Enviar</Text>}
+                      {isSubmitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.sendText}>{t('popup.send')}</Text>}
                     </TouchableOpacity>
                   </View>
               )}
 
               <TouchableOpacity style={styles.accordionHeader} onPress={() => setShowComments(!showComments)}>
-                <Text style={styles.accordionTitle}>Ver {comments.length} Comentarios</Text>
+                <Text style={styles.accordionTitle}>{t('popup.comments', { count: comments.length })}</Text>
                 <Text>{showComments ? '▲' : '▼'}</Text>
               </TouchableOpacity>
 
@@ -245,11 +247,11 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
                      <ActivityIndicator size="small" color="#007AFF" style={{marginTop: 10}} />
                   ) : (
                     <>
-                      {comments.length === 0 && <Text style={styles.noComments}>Sé el primero en comentar.</Text>}
+                      {comments.length === 0 && <Text style={styles.noComments}>{t('popup.firstComment')}</Text>}
                       {comments.map((c: any, index: number) => (
                         <View key={index} style={styles.commentItem}>
                           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                              <Text style={styles.commentAuthor}>{c.username || 'Usuario'}</Text>
+                              <Text style={styles.commentAuthor}>{c.username || t('common.user')}</Text>
                               {c.rating > 0 && (
                                   <Text style={{ color: '#f1c40f', fontSize: 10 }}>{'★'.repeat(c.rating)}</Text>
                               )}

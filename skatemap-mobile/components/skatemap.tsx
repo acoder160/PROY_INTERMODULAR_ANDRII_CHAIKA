@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { WebView } from 'react-native-webview';
 import { StyleSheet, View, Linking, Image, Dimensions } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { CARTO_API_KEY } from '../constants/api';
 
 function serializeForInlineScript(value: unknown): string {
@@ -28,9 +29,42 @@ export default function SkateMap({
   onMapClick,
   onSpotClick
 }: SkateMapProps) {
+  const { t, i18n } = useTranslation();
   const webviewRef = useRef<WebView>(null);
   const mapReadyRef = useRef(false);
   const windowHeight = Dimensions.get('window').height;
+
+  const strings = {
+    rate: t('webview.rate'),
+    route: t('webview.route'),
+    unnamed: t('webview.unnamed'),
+    noDescription: t('webview.noDescription'),
+    noImage: t('popup.noImage'),
+    types: {
+      STREET: t('types.STREET'),
+      PARK: t('types.PARK'),
+      SKATEPARK: t('types.SKATEPARK'),
+      RAMPS: t('types.RAMPS'),
+      RAIL: t('types.RAIL'),
+      LEDGE: t('types.LEDGE'),
+    },
+    difficulty: {
+      BEGINNER: t('difficulty.BEGINNER'),
+      INTERMEDIATE: t('difficulty.INTERMEDIATE'),
+      ADVANCED: t('difficulty.ADVANCED'),
+    },
+  };
+  const stringsJson = serializeForInlineScript(strings);
+
+  // Al cambiar el idioma del teléfono, actualizamos los textos del mapa (los popups se crean al abrirlos)
+  useEffect(() => {
+    if (mapReadyRef.current && webviewRef.current) {
+      webviewRef.current.injectJavaScript(`
+        window.I18N = ${stringsJson};
+        true;
+      `);
+    }
+  }, [stringsJson]);
 
   const ICONS = {
     STREET: Image.resolveAssetSource(require('../assets/images/icon_street.png')).uri,
@@ -200,7 +234,7 @@ export default function SkateMap({
             throw new Error('Leaflet is unavailable');
           }
 
-          var map = L.map('map', { zoomControl: false }).setView([42.8125, -1.6458], 14);
+          var map = L.map('map', { zoomControl: false, doubleClickZoom: false, zoomSnap: 0, fadeAnimation: false }).setView([41.3874, 2.1686], 14);
 
           var tileUrl = ${CARTO_API_KEY
             ? `'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(CARTO_API_KEY)}'`
@@ -213,7 +247,7 @@ export default function SkateMap({
             // Carga fluida: cargar tiles mientras se mueve (en móvil por defecto espera a que pare)
             // y mantener una franja amplia de tiles alrededor de la pantalla
             updateWhenIdle: false,
-            updateWhenZooming: false,
+            updateWhenZooming: true,
             updateInterval: 100,
             keepBuffer: 3,
             attribution: ${CARTO_API_KEY
@@ -223,6 +257,119 @@ export default function SkateMap({
 
           // Зум, начиная с которого кружки +1 превращаются в настоящие иконки спотов
           var ICON_ZOOM_THRESHOLD = 15;
+
+          // ZOOM CON UN DEDO (como Google Maps):
+          //  - doble toque: acerca un nivel sobre el punto tocado
+          //  - doble toque y arrastrar sin soltar: zoom continuo (hacia abajo acerca, hacia arriba aleja)
+          // Usa el mismo mecanismo que el zoom con dos dedos de Leaflet (map._move con pinch + _animateZoom
+          // sin recargar tiles): los tiles actuales se escalan y siguen visibles, no aparece el fondo gris.
+          (function() {
+            var container = map.getContainer();
+            var lastTap = { time: 0, x: 0, y: 0 };
+            var gesture = null;
+            var frame = null;
+
+            // Centro del mapa que mantiene fijo el punto tocado al cambiar el zoom
+            function centerFor(g, zoom) {
+              var scale = map.getZoomScale(zoom, g.startZoom);
+              var half = map.getSize().divideBy(2);
+              var offset = g.point.subtract(half).multiplyBy(1 - 1 / scale);
+              return map.unproject(map.project(g.startCenter, g.startZoom).add(offset), g.startZoom);
+            }
+
+            function clampZoom(zoom) {
+              return Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), zoom));
+            }
+
+            // Zoom animado y suave, con los tiles actuales escalados
+            function animateTo(g, zoom) {
+              var center = centerFor(g, zoom);
+              if (typeof map._animateZoom === 'function' && typeof map._moveStart === 'function') {
+                map._moveStart(true, false);
+                map._animateZoom(center, zoom, true, map.options.zoomSnap);
+              } else {
+                map.setZoomAround(g.point, zoom, { animate: true });
+              }
+            }
+
+            container.addEventListener('touchstart', function(e) {
+              if (e.touches.length !== 1) { lastTap.time = 0; gesture = null; return; }
+              // Los toques sobre marcadores, popups o controles no cuentan
+              if (e.target.closest && e.target.closest('.leaflet-marker-icon, .leaflet-popup, .leaflet-control')) {
+                lastTap.time = 0;
+                return;
+              }
+              var touch = e.touches[0];
+              var now = Date.now();
+              var isDoubleTap = now - lastTap.time < 300 &&
+                Math.abs(touch.clientX - lastTap.x) < 30 &&
+                Math.abs(touch.clientY - lastTap.y) < 30;
+
+              if (isDoubleTap) {
+                var rect = container.getBoundingClientRect();
+                gesture = {
+                  startY: touch.clientY,
+                  startZoom: map.getZoom(),
+                  startCenter: map.getCenter(),
+                  point: L.point(touch.clientX - rect.left, touch.clientY - rect.top),
+                  zoom: map.getZoom(),
+                  center: map.getCenter(),
+                  moved: false
+                };
+                lastTap.time = 0;
+                map.dragging.disable();
+                e.preventDefault(); // evita el clic sintético (no se coloca un spot por error)
+              } else {
+                lastTap = { time: now, x: touch.clientX, y: touch.clientY };
+              }
+            }, { passive: false });
+
+            container.addEventListener('touchmove', function(e) {
+              if (!gesture || e.touches.length !== 1) return;
+              var dy = e.touches[0].clientY - gesture.startY;
+              if (!gesture.moved) {
+                if (Math.abs(dy) < 8) return;
+                gesture.moved = true;
+                if (typeof map._stop === 'function') map._stop();
+                if (typeof map._moveStart === 'function') map._moveStart(true, false);
+              }
+              e.preventDefault();
+
+              var g = gesture;
+              g.zoom = clampZoom(g.startZoom + dy / 90);
+              g.center = centerFor(g, g.zoom);
+              if (frame) cancelAnimationFrame(frame);
+              frame = requestAnimationFrame(function() {
+                frame = null;
+                if (typeof map._move === 'function') {
+                  map._move(g.center, g.zoom, { pinch: true, round: false });
+                } else {
+                  map.setZoomAround(g.point, g.zoom, { animate: false });
+                }
+              });
+            }, { passive: false });
+
+            function endGesture() {
+              if (!gesture) return;
+              var g = gesture;
+              gesture = null;
+              if (frame) { cancelAnimationFrame(frame); frame = null; }
+              map.dragging.enable();
+
+              if (g.moved) {
+                // Termina el gesto igual que el zoom con dos dedos: animación final sin recargar tiles
+                if (typeof map._animateZoom === 'function') {
+                  map._animateZoom(g.center, g.zoom, true, map.options.zoomSnap);
+                } else {
+                  map.setZoomAround(g.point, g.zoom, { animate: false });
+                }
+              } else {
+                animateTo(g, clampZoom(Math.round(g.startZoom) + 1));
+              }
+            }
+            container.addEventListener('touchend', endGesture);
+            container.addEventListener('touchcancel', endGesture);
+          })();
 
           var individualSpotsLayer = L.layerGroup();
           var clusteredSpotsLayer = L.markerClusterGroup({
@@ -247,6 +394,7 @@ export default function SkateMap({
           var allSpotsData = [];
 
           var SPOT_ICONS = ${JSON.stringify(ICONS)};
+          window.I18N = ${stringsJson};
           var spotIcons = {};
           var singleSpotClusterIcon = L.divIcon({
             html: '<div class="spot-cluster-label">+1</div>',
@@ -288,8 +436,9 @@ export default function SkateMap({
             var iconUrl = SPOT_ICONS[spotType] || SPOT_ICONS['STREET'];
             var icon = getSpotIcon(spotType, iconUrl);
 
-            var imageUrl = spot.mediaUrl ? escapeHtml(spot.mediaUrl) : 'https://via.placeholder.com/220x120?text=Sin+Imagen';
-            var diff = (spot.difficultyLevel || 'MEDIA').toUpperCase();
+            var noImageUrl = 'https://via.placeholder.com/220x120?text=' + encodeURIComponent(window.I18N.noImage);
+            var imageUrl = spot.mediaUrl ? escapeHtml(spot.mediaUrl) : noImageUrl;
+            var diff = (spot.difficultyLevel || 'INTERMEDIATE').toUpperCase();
                 
             var rating = spot.surfaceRating || 0;
             var fullStars = '★'.repeat(Math.round(rating));
@@ -298,21 +447,21 @@ export default function SkateMap({
             // El HTML del popup se construye solo al abrirlo (no para cada marcador en cada movimiento)
             var buildPopup = function() { return \`
               <div class="popup-card">
-                <img src="\${imageUrl}" class="popup-image" onerror="this.src='https://via.placeholder.com/220x120?text=Sin+Imagen'" />
+                <img src="\${imageUrl}" class="popup-image" onerror="this.onerror=null;this.src=window.I18N ? 'https://via.placeholder.com/220x120?text=' + encodeURIComponent(window.I18N.noImage) : ''" />
                 <div class="popup-info">
-                  <h3 class="popup-title">\${escapeHtml(spot.name || 'Spot Sin Nombre')}</h3>
+                  <h3 class="popup-title">\${escapeHtml(spot.name || window.I18N.unnamed)}</h3>
                   <div class="popup-rating">
                     <span class="star-icon">\${fullStars}\${emptyStars}</span>
                     <span style="font-size: 11px; color: #666; margin-left: 4px;">(\${rating.toFixed(1)})</span>
                   </div>
                   <div class="popup-badges">
-                    <span class="badge-type">\${escapeHtml(spotType)}</span>
-                    <span class="badge-diff">\${escapeHtml(diff)}</span>
+                    <span class="badge-type">\${escapeHtml(window.I18N.types[spotType] || spotType)}</span>
+                    <span class="badge-diff">\${escapeHtml(window.I18N.difficulty[diff] || diff)}</span>
                   </div>
-                  <p class="popup-desc">\${escapeHtml(spot.description || 'No hay descripción detallada para este spot.')}</p>
+                  <p class="popup-desc">\${escapeHtml(spot.description || window.I18N.noDescription)}</p>
                   <div class="btn-container">
-                    <button class="details-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDetails', spotId: \${Number(spot.id) || 0} }))">💬 Valorar</button>
-                    <button class="directions-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDirections', lat: \${Number(spot.latitude)}, lng: \${Number(spot.longitude)} }))">🗺️ Ruta</button>
+                    <button class="details-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDetails', spotId: \${Number(spot.id) || 0} }))">\${escapeHtml(window.I18N.rate)}</button>
+                    <button class="directions-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDirections', lat: \${Number(spot.latitude)}, lng: \${Number(spot.longitude)} }))">\${escapeHtml(window.I18N.route)}</button>
                   </div>
                 </div>
               </div>
@@ -465,7 +614,7 @@ export default function SkateMap({
               if (!userMarker) {
                  window.ReactNativeWebView.postMessage(JSON.stringify({ 
                     type: 'error', 
-                    message: 'Por favor, espera a que el GPS detecte tu ubicación.' 
+                    code: 'gpsWaiting'
                  }));
                  return;
               }
@@ -476,7 +625,8 @@ export default function SkateMap({
               if (distanceInMeters > 200) {
                  window.ReactNativeWebView.postMessage(JSON.stringify({ 
                     type: 'error', 
-                    message: 'Estás a ' + Math.round(distanceInMeters) + 'm. Debes estar a menos de 200m del spot para añadirlo.' 
+                    code: 'tooFar',
+                    meters: Math.round(distanceInMeters)
                  }));
                  return;
               }
@@ -553,7 +703,11 @@ export default function SkateMap({
           if (data.type === 'mapReady') {
             mapReadyRef.current = true;
           } else if (data.type === 'error') {
-             alert(data.message);
+             if (data.code === 'tooFar') {
+               alert(t('errors.tooFar', { meters: Number(data.meters) || 0 }));
+             } else if (data.code === 'gpsWaiting') {
+               alert(t('errors.gpsWaiting'));
+             }
           } 
           else if (data.type === 'locationSelected' &&
             Number.isFinite(data.lat) && Number.isFinite(data.lng) &&

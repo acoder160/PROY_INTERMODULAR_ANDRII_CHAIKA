@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
 
+import '../i18n';
 import { AuthProvider } from '../context/AuthContext';
 
 export default function RootLayout() {

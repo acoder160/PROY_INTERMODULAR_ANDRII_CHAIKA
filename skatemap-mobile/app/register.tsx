@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
 
 export default function RegisterScreen() {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +22,7 @@ export default function RegisterScreen() {
     setErrorMessage(null);
 
     if (!username || !email || !password) {
-      setErrorMessage("Por favor, rellena todos los campos.");
+      setErrorMessage(t('auth.fillAll'));
       return;
     }
 
@@ -37,13 +39,13 @@ export default function RegisterScreen() {
         { username, email, password },
       );
 
-      Alert.alert("¡Bienvenido!", "Cuenta creada con éxito. Ahora puedes iniciar sesión.", [
-        { text: "OK", onPress: () => router.replace('/login') }
+      Alert.alert(t('auth.welcomeTitle'), t('auth.accountCreated'), [
+        { text: t('common.ok'), onPress: () => router.replace('/login') }
       ]);
       
     } catch (error) {
       console.error(error);
-      setErrorMessage("Error al registrar la cuenta. El usuario o email podría existir.");
+      setErrorMessage(t('auth.registerFailed'));
     } finally {
       // Paramos el cronómetro y limpiamos estados
       clearTimeout(wakeUpTimer);
@@ -69,8 +71,8 @@ export default function RegisterScreen() {
             <Text style={styles.brandMarkText}>S</Text>
           </LinearGradient>
           <Text style={styles.eyebrow}>SKATEMAP / JOIN THE RIDE</Text>
-          <Text style={styles.title}>Únete al Crew</Text>
-          <Text style={styles.subtitle}>Crea tu cuenta en SkateMap</Text>
+          <Text style={styles.title}>{t('auth.joinCrew')}</Text>
+          <Text style={styles.subtitle}>{t('auth.createAccountSubtitle')}</Text>
 
 
           {errorMessage && !isLoading && (
@@ -83,25 +85,25 @@ export default function RegisterScreen() {
           {isWakingUp && (
             <View style={styles.loadingBox}>
               <ActivityIndicator size="small" color="#66E3E7" />
-              <Text style={styles.loadingText}>Levantando el servidor...</Text>
-              <Text style={styles.loadingSubText}>(suele tardar entre 1 y 2 minutos)</Text>
+              <Text style={styles.loadingText}>{t('auth.wakingUp')}</Text>
+              <Text style={styles.loadingSubText}>{t('auth.wakingUpHint')}</Text>
             </View>
           )}
 
-          <Text style={styles.label}>Nombre de Usuario</Text>
+          <Text style={styles.label}>{t('auth.username')}</Text>
           <TextInput 
             style={styles.input} 
-            placeholder="skater_pro"
+            placeholder={t('auth.registerUsernamePlaceholder')}
             placeholderTextColor="#888"
             value={username} 
             onChangeText={setUsername} 
             autoCapitalize="none" 
           />
 
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>{t('auth.email')}</Text>
           <TextInput 
             style={styles.input} 
-            placeholder="tu@email.com" 
+            placeholder={t('auth.emailPlaceholder')} 
             placeholderTextColor="#888" 
             value={email} 
             onChangeText={setEmail} 
@@ -109,7 +111,7 @@ export default function RegisterScreen() {
             keyboardType="email-address" 
           />
 
-          <Text style={styles.label}>Contraseña</Text>
+          <Text style={styles.label}>{t('auth.password')}</Text>
           <TextInput 
             style={styles.input} 
             placeholder="••••••••"
@@ -121,15 +123,15 @@ export default function RegisterScreen() {
 
           <TouchableOpacity onPress={handleRegister} disabled={isLoading} activeOpacity={0.88}>
             <LinearGradient colors={['#2EC4B6', '#168AAD']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.button}>
-              {isLoading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Crear Cuenta</Text>}
+              {isLoading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>{t('auth.createAccount')}</Text>}
             </LinearGradient>
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>¿Ya tienes cuenta? </Text>
+            <Text style={styles.footerText}>{t('auth.haveAccount')} </Text>
             <TouchableOpacity onPress={() => router.back()}>
               <LinearGradient colors={['#66E3E7', '#2EC4B6']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.linkPill}>
-                <Text style={styles.link}>Inicia sesión</Text>
+                <Text style={styles.link}>{t('auth.loginLink')}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>

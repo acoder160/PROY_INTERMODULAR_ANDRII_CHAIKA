@@ -1,4 +1,5 @@
 import axios from 'axios';
+import i18n from '../i18n';
 
 let accessToken = null;
 
@@ -23,6 +24,7 @@ api.interceptors.request.use(
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
+        config.headers['Accept-Language'] = i18n.language || 'en';
         return config;
     },
     (error) => Promise.reject(error)

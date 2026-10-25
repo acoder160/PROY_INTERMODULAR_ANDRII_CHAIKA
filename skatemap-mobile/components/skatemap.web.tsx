@@ -50,7 +50,7 @@ export default function SkateMap({ spots = [] }: { spots?: any[] }) {
         <script>
           var map = L.map('map', {
             zoomControl: false 
-          }).setView([42.8125, -1.6458], 14);
+          }).setView([41.3874, 2.1686], 14);
 
           L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             maxZoom: 19,

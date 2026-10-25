@@ -8,6 +8,8 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import '../MapChrome.css'; 
 
 const cartoApiKey = import.meta.env.VITE_CARTO_API_KEY?.trim();
@@ -47,13 +49,6 @@ const getSingleSpotClusterIcon = () => singleSpotClusterIcon || (singleSpotClust
     className: 'marker-cluster marker-cluster-small',
     iconSize: L.point(42, 42),
 }));
-
-//  DICCIONARIO PARA TRADUCIR DIFICULTAD 
-const difficultyLabels = {
-    'BEGINNER': 'Fácil',
-    'INTERMEDIATE': 'Medio',
-    'ADVANCED': 'Pro'
-};
 
 // Copias del mundo en las que se dibuja cada spot (izquierda, centro, derecha). Con worldCopyJump
 // el mapa vuelve al mundo central al alejarse, así que tres copias cubren cualquier posición.
@@ -310,6 +305,7 @@ function DynamicSpotLayer({ spots, onUpdate }) {
 
 // COMPONENTE POPUP 
 function SpotPopup({ spot, onUpdate }) {
+    const { t } = useTranslation();
     const { user } = useAuth();
     const navigate = useNavigate();
     const [myRating, setMyRating] = useState(0);        
@@ -367,13 +363,13 @@ function SpotPopup({ spot, onUpdate }) {
             if (onUpdate) onUpdate(); 
         } catch (error) {
             const errorMsg = error.response?.data?.message || error.response?.data;
-            alert(typeof errorMsg === 'string' ? errorMsg : "Error al enviar. ¿Estás logueado?");
+            alert(typeof errorMsg === 'string' ? errorMsg : t('popup.sendError'));
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    if (loadingData) return <div style={{padding:'10px'}}>Cargando...</div>;
+    if (loadingData) return <div style={{padding:'10px'}}>{t('popup.loading')}</div>;
 
     return (
         <div style={{ width: '260px', fontFamily: 'Segoe UI, sans-serif' }}>
@@ -383,7 +379,7 @@ function SpotPopup({ spot, onUpdate }) {
               src={imageUrl} 
               alt={spot.name} 
               style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px 8px 0 0', marginBottom: '10px' }}
-              onError={(e) => { e.target.src = 'https://via.placeholder.com/400x200?text=Sin+Imagen' }}
+              onError={(e) => { e.target.src = `https://via.placeholder.com/400x200?text=${encodeURIComponent(t('popup.noImage'))}` }}
             />
 
             {/* INFO HEADER */}
@@ -393,10 +389,10 @@ function SpotPopup({ spot, onUpdate }) {
                 
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
                     <span style={{ background: '#f0f2f5', color: '#555', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #ddd' }}>
-                        {spot.spotType}
+                        {t(`types.${spot.spotType}`, { defaultValue: spot.spotType })}
                     </span>
                     <span style={{ background: '#e3f2fd', color: '#0984e3', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #74b9ff' }}>
-                        {difficultyLabels[spot.difficultyLevel] || spot.difficultyLevel}
+                        {t(`difficulty.${spot.difficultyLevel}`, { defaultValue: spot.difficultyLevel })}
                     </span>
                     <span style={{ background: '#fff9c4', color: '#fbc531', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #f9ca24' }}>
                         ⭐ {spot.surfaceRating ? spot.surfaceRating.toFixed(1) : '-'}
@@ -410,12 +406,12 @@ function SpotPopup({ spot, onUpdate }) {
             <div style={{ textAlign: 'center', marginBottom: '10px', padding: '0 10px' }}>
                 {hasVoted ? (
                     <div>
-                        <p style={{ margin: '0 0 2px 0', fontSize: '12px', fontWeight: 'bold', color: '#2ed573' }}>✅ Tu voto:</p>
+                        <p style={{ margin: '0 0 2px 0', fontSize: '12px', fontWeight: 'bold', color: '#2ed573' }}>✅ {t('popup.yourVote')}</p>
                         <div style={{ fontSize: '26px', color: '#f1c40f', lineHeight: 1 }}>{'★'.repeat(myRating)}{'☆'.repeat(5 - myRating)}</div>
                     </div>
                 ) : (
                     <div>
-                        <p style={{ margin: '0 0 2px 0', fontSize: '12px', fontWeight: 'bold', color: '#888' }}>Valora este spot:</p>
+                        <p style={{ margin: '0 0 2px 0', fontSize: '12px', fontWeight: 'bold', color: '#888' }}>{t('popup.rateSpot')}</p>
                         <div style={{ fontSize: '26px', cursor: 'pointer', lineHeight: 1 }}>
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <span key={star} onMouseEnter={() => setHoverRating(star)} onMouseLeave={() => setHoverRating(0)} onClick={() => user ? setCurrentRating(star) : navigate('/login')} style={{ color: star <= (hoverRating || currentRating) ? '#f1c40f' : '#e0e0e0', transition: 'color 0.2s' }}>★</span>
@@ -429,7 +425,7 @@ function SpotPopup({ spot, onUpdate }) {
             {!hasVoted && currentRating > 0 && (
                 <div style={{ animation: 'fadeIn 0.3s', padding: '0 10px' }}>
                     <textarea
-                        placeholder="Escribe tu opinión (opcional)..."
+                        placeholder={t('popup.opinionPlaceholder')}
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         style={{ width: '100%', height: '60px', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '13px', resize: 'none', marginBottom: '8px', background: '#ffffff', color: '#333333', boxSizing: 'border-box' }}
@@ -439,11 +435,11 @@ function SpotPopup({ spot, onUpdate }) {
                         disabled={isSubmitting}
                         className="map-popup-primary"
                     >
-                        {isSubmitting ? 'Enviando...' : 'Enviar Reseña'}
+                        {isSubmitting ? t('popup.sending') : t('popup.sendReview')}
                     </button>
                     {!user && (
                         <p style={{ margin: '8px 0 0', fontSize: '11px', color: '#666', textAlign: 'center' }}>
-                            Inicia sesión para publicar tu reseña.
+                            {t('popup.loginToReview')}
                         </p>
                     )}
                 </div>
@@ -454,7 +450,7 @@ function SpotPopup({ spot, onUpdate }) {
                     onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${spot.latitude},${spot.longitude}`, '_blank')}
                     className="map-popup-nav"
                 >
-                    <span style={{ fontSize: '16px' }}>🗺️</span> Cómo llegar
+                    <span style={{ fontSize: '16px' }}>🗺️</span> {t('popup.directions')}
                 </button>
             </div>
 
@@ -464,13 +460,13 @@ function SpotPopup({ spot, onUpdate }) {
                     onClick={() => setShowComments(!showComments)}
                     className="map-popup-link"
                 >
-                    {showComments ? 'Ocultar comentarios ▲' : `Ver ${comments.length} comentarios ▼`}
+                    {showComments ? `${t('popup.hideComments')} ▲` : `${t('popup.comments', { count: comments.length })} ▼`}
                 </button>
 
                 {showComments && (
                     <div style={{ marginTop: '10px', maxHeight: '150px', overflowY: 'auto', paddingRight: '5px' }}>
                         {comments.length === 0 ? (
-                            <p style={{ fontSize: '12px', color: '#999', fontStyle: 'italic', textAlign: 'center' }}>Sé el primero en comentar 🛹</p>
+                            <p style={{ fontSize: '12px', color: '#999', fontStyle: 'italic', textAlign: 'center' }}>{t('popup.firstComment')}</p>
                         ) : (
                             comments.map((c, i) => (
                                 <div key={i} style={{ background: '#f8f9fa', padding: '10px', borderRadius: '8px', marginBottom: '8px', border: '1px solid #eee' }}>
@@ -625,6 +621,7 @@ function UserLocation({ position }) {
 
 // BOTÓN GEOLOCALIZACIÓN
 function LocationButton({ setMyPosition }) {
+    const { t } = useTranslation();
     const map = useMap();
     const buttonRef = useRef(null);
     const [message, setMessage] = useState(null);
@@ -643,10 +640,10 @@ function LocationButton({ setMyPosition }) {
 
     const goToMyLocation = () => {
         if (!navigator.geolocation) {
-            showMessage('Tu navegador no soporta geolocalización');
+            showMessage(t('map.geoUnsupported'));
             return;
         }
-        setMessage('Obteniendo tu ubicación...');
+        setMessage(t('status.gettingLocation'));
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
@@ -669,8 +666,8 @@ function LocationButton({ setMyPosition }) {
             (err) => {
                 console.error('Error de geolocalización:', err);
                 showMessage(err.code === 1
-                    ? 'Permiso de ubicación denegado. Actívalo en el navegador.'
-                    : 'No se pudo obtener tu ubicación.');
+                    ? t('map.geoDenied')
+                    : t('map.geoFailed'));
             },
             { enableHighAccuracy: false, timeout: 10000, maximumAge: 5 * 60 * 1000 }
         );
@@ -679,7 +676,7 @@ function LocationButton({ setMyPosition }) {
     return (
         <>
             {message && <div className="map-toast">{message}</div>}
-            <button ref={buttonRef} onClick={goToMyLocation} className="map-location-btn" title="Mi Ubicación" aria-label="Centrar en mi ubicación">
+            <button ref={buttonRef} onClick={goToMyLocation} className="map-location-btn" title={t('map.myLocation')} aria-label={t('map.centerOnMe')}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                     <circle cx="12" cy="12" r="7" />
                     <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
@@ -691,6 +688,7 @@ function LocationButton({ setMyPosition }) {
 }
 
 export default function MapPage() {
+  const { t } = useTranslation();
   const [spots, setSpots] = useState([]);
   const [myPosition, setMyPosition] = useState(null);
   
@@ -700,7 +698,7 @@ export default function MapPage() {
 
   const { logout, user } = useAuth();
   const navigate = useNavigate(); 
-  const pamplonaCenter = [42.8125, -1.6458]; 
+  const initialCenter = [41.3874, 2.1686]; // Barcelona 
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -757,19 +755,19 @@ export default function MapPage() {
         onClick={() => setShowFilterMenu(!showFilterMenu)}
         className="map-chrome-btn"
       >
-        ⚙️ {filters.spotType !== 'ALL' || filters.minRating > 0 || filters.maxDistance > 0 ? 'Filtros (Activo)' : 'Filtros'}
+        ⚙️ {filters.spotType !== 'ALL' || filters.minRating > 0 || filters.maxDistance > 0 ? t('map.filtersActive') : t('map.filters')}
       </button>
 
       {/* MENÚ DESPLEGABLE DE FILTROS */}
       {showFilterMenu && (
         <div className="map-filter-panel">
           <div className="map-filter-header">
-            <h3>⚙️ Filtrar Spots</h3>
+            <h3>⚙️ {t('filters.title')}</h3>
             <button onClick={() => setShowFilterMenu(false)} className="map-filter-close">✕</button>
           </div>
 
           <div className="map-filter-section">
-            <strong>Tipo de Spot</strong>
+            <strong>{t('filters.spotType')}</strong>
             <div className="map-filter-pills">
               {['ALL', 'STREET', 'PARK', 'RAMPS', 'RAIL', 'LEDGE'].map(type => (
                 <span
@@ -777,16 +775,16 @@ export default function MapPage() {
                   onClick={() => setFilters({...filters, spotType: type})}
                   className={`map-filter-pill${filters.spotType === type ? ' active' : ''}`}
                 >
-                  {type === 'ALL' ? 'Todos' : type}
+                  {type === 'ALL' ? t('filters.all') : t(`types.${type}`)}
                 </span>
               ))}
             </div>
           </div>
 
           <div className="map-filter-section">
-            <strong>Distancia Máxima (Requiere GPS)</strong>
+            <strong>{t('filters.maxDistanceGps')}</strong>
             <div className="map-filter-pills">
-              {[{l: 'Cualquiera', v: 0}, {l: '< 1 km', v: 1}, {l: '< 5 km', v: 5}, {l: '< 10 km', v: 10}].map(d => (
+              {[{l: t('filters.anyDistance'), v: 0}, ...[1, 5, 10].map(km => ({l: t('filters.under', { km }), v: km}))].map(d => (
                 <span
                   key={d.v}
                   onClick={() => { if(myPosition || d.v === 0) setFilters({...filters, maxDistance: d.v}) }}
@@ -796,11 +794,11 @@ export default function MapPage() {
                 </span>
               ))}
             </div>
-            {!myPosition && <small className="map-filter-hint">* Toca el botón 📍 del mapa para usar el GPS</small>}
+            {!myPosition && <small className="map-filter-hint">{t('filters.gpsHint')}</small>}
           </div>
 
           <div className="map-filter-section">
-            <strong>Estrellas Mínimas</strong>
+            <strong>{t('filters.minStars')}</strong>
             <div className="map-filter-pills">
               {[0, 1, 2, 3, 4, 5].map(r => (
                 <span
@@ -808,7 +806,7 @@ export default function MapPage() {
                   onClick={() => setFilters({...filters, minRating: r})}
                   className={`map-filter-pill${filters.minRating === r ? ' active' : ''}`}
                 >
-                  {r === 0 ? 'Todas' : `${r} ★`}
+                  {r === 0 ? t('filters.allStars') : `${r} ★`}
                 </span>
               ))}
             </div>
@@ -825,27 +823,29 @@ export default function MapPage() {
               <>
                 <div className="map-chip-divider"></div>
                 <button onClick={() => navigate('/admin')} className="map-chip-admin">
-                  🛡️ Admin
+                  🛡️ {t('map.admin')}
                 </button>
               </>
             )}
             <div className="map-chip-divider"></div>
-            <button onClick={logout} className="map-chip-logout">Salir</button>
+            <button onClick={logout} className="map-chip-logout">{t('map.logout')}</button>
           </>
         ) : (
           <>
-            <button onClick={() => navigate('/login')} className="map-chip-ghost">Entrar</button>
-            <button onClick={() => navigate('/register')} className="map-chip-primary">Registrarse</button>
+            <button onClick={() => navigate('/login')} className="map-chip-ghost">{t('map.enter')}</button>
+            <button onClick={() => navigate('/register')} className="map-chip-primary">{t('map.register')}</button>
           </>
         )}
+        <div className="map-chip-divider"></div>
+        <LanguageSwitcher />
       </div>
 
       {/* BOTÓN RECARGAR SPOTS (Abajo Izquierda) */}
       <button
         onClick={handleRefresh}
         className={`map-refresh-btn${refreshing ? ' spinning' : ''}`}
-        title="Recargar spots"
-        aria-label="Recargar spots"
+        title={t('map.reloadSpots')}
+        aria-label={t('map.reloadSpots')}
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20 12a8 8 0 1 1-2.6-5.9" />
@@ -854,7 +854,7 @@ export default function MapPage() {
       </button>
 
       <MapContainer
-        center={pamplonaCenter}
+        center={initialCenter}
         zoom={14}
         style={{ height: '100%', width: '100%' }}
         zoomControl={false}

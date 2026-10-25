@@ -2,6 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { CameraView } from 'expo-camera';
+import { useTranslation } from 'react-i18next';
 
 interface CameraOverlayProps {
   cameraRef: any;
@@ -10,16 +11,17 @@ interface CameraOverlayProps {
 }
 
 export default function CameraOverlay({ cameraRef, onCapture, onCancel }: CameraOverlayProps) {
+  const { t } = useTranslation();
   return (
     <View style={[StyleSheet.absoluteFill, { zIndex: 100 }]}>
       <CameraView style={StyleSheet.absoluteFill} ref={cameraRef} facing="back" />
       <View style={styles.cameraOverlay}>
           <View style={styles.cameraHeader}>
-            <Text style={styles.cameraText}>Haz una foto del spot 🛹</Text>
+            <Text style={styles.cameraText}>{t('camera.takePhoto')}</Text>
           </View>
           <View style={styles.cameraFooter}>
             <TouchableOpacity style={styles.cancelBtn} onPress={onCancel}>
-              <Text style={styles.cancelBtnText}>Cancelar</Text>
+              <Text style={styles.cancelBtnText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.captureBtn} onPress={onCapture}>
               <View style={styles.captureBtnInner} />

@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen() {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +22,7 @@ export default function LoginScreen() {
     setErrorMessage(null);
 
     if (!username || !password) {
-      setErrorMessage("Por favor, rellena todos los campos.");
+      setErrorMessage(t('auth.fillAll'));
       return;
     }
 
@@ -48,7 +50,7 @@ export default function LoginScreen() {
       router.replace('/(tabs)');
     } catch (error) {
       console.error(error);
-      setErrorMessage("Error al iniciar sesión. Comprueba tus credenciales.");
+      setErrorMessage(t('auth.loginFailed'));
     } finally {
       clearTimeout(wakeUpTimer);
       setIsLoading(false);
@@ -73,8 +75,8 @@ export default function LoginScreen() {
             <Text style={styles.brandMarkText}>S</Text>
           </LinearGradient>
           <Text style={styles.eyebrow}>SKATEMAP / EXPLORE MORE</Text>
-          <Text style={styles.title}>Bienvenido de nuevo</Text>
-          <Text style={styles.subtitle}>Encuentra los mejores spots de la ciudad</Text>
+          <Text style={styles.title}>{t('auth.welcomeBack')}</Text>
+          <Text style={styles.subtitle}>{t('auth.tagline')}</Text>
 
           {errorMessage && !isLoading && (
             <View style={styles.errorBox}>
@@ -85,22 +87,22 @@ export default function LoginScreen() {
           {isWakingUp && (
             <View style={styles.loadingBox}>
               <ActivityIndicator size="small" color="#66E3E7" />
-              <Text style={styles.loadingText}>Levantando el servidor...</Text>
-              <Text style={styles.loadingSubText}>(suele tardar entre 1 y 2 minutos)</Text>
+              <Text style={styles.loadingText}>{t('auth.wakingUp')}</Text>
+              <Text style={styles.loadingSubText}>{t('auth.wakingUpHint')}</Text>
             </View>
           )}
 
-          <Text style={styles.label}>Usuario</Text>
+          <Text style={styles.label}>{t('auth.username')}</Text>
           <TextInput
             style={styles.input}
-            placeholder="user123"
+            placeholder={t('auth.usernamePlaceholder')}
             placeholderTextColor="#888"
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
           />
 
-          <Text style={styles.label}>Contraseña</Text>
+          <Text style={styles.label}>{t('auth.password')}</Text>
           <TextInput
             style={styles.input}
             placeholder="••••••••"
@@ -112,21 +114,21 @@ export default function LoginScreen() {
 
           <TouchableOpacity onPress={handleLogin} disabled={isLoading} activeOpacity={0.88}>
             <LinearGradient colors={['#2EC4B6', '#168AAD']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.button}>
-              {isLoading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Iniciar Sesión</Text>}
+              {isLoading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>{t('auth.loginButton')}</Text>}
             </LinearGradient>
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>¿No tienes cuenta? </Text>
+            <Text style={styles.footerText}>{t('auth.noAccount')} </Text>
             <TouchableOpacity onPress={() => router.push('/register')}>
               <LinearGradient colors={['#66E3E7', '#2EC4B6']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.linkPill}>
-                <Text style={styles.link}>Regístrate aquí</Text>
+                <Text style={styles.link}>{t('auth.registerHere')}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
 
           <TouchableOpacity style={styles.guestButton} onPress={() => router.replace('/(tabs)')}>
-            <Text style={styles.guestButtonText}>← Volver al mapa sin cuenta</Text>
+            <Text style={styles.guestButtonText}>{t('auth.backToMap')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import '../Auth.css'; 
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import '../Auth.css';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -24,7 +27,7 @@ export default function LoginPage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setError('');
     setIsLoading(true);
     setIsWakingUp(false); // Nos aseguramos de que empiece oculto
@@ -38,7 +41,7 @@ export default function LoginPage() {
       await login(formData.username, formData.password);
       navigate('/map');
     } catch (err) {
-      setError('Credenciales incorrectas. Inténtalo de nuevo.');
+      setError(t('auth.wrongCredentials'));
     } finally {
       clearTimeout(wakeUpTimer);
       setIsLoading(false);
@@ -48,30 +51,31 @@ export default function LoginPage() {
 
   return (
     <div className="auth-container">
+      <LanguageSwitcher variant="floating" />
       <div className="auth-card">
         <p className="auth-eyebrow">SKATEMAP / EXPLORE MORE</p>
-        <h1 className="auth-title">Bienvenido de nuevo</h1>
-        <p className="auth-subtitle">Encuentra los mejores spots de la ciudad</p>
+        <h1 className="auth-title">{t('auth.welcomeBack')}</h1>
+        <p className="auth-subtitle">{t('auth.tagline')}</p>
 
         {/* Mensaje de Error */}
         {error && !isLoading && <div className="error-message">{error}</div>}
 
         {isWakingUp && (
           <div className="loading-message">
-            <div className="spinner"></div> 
-            <p className="loading-text">Levantando el servidor...</p>
-            <p className="loading-subtext">(suele tardar entre 1 y 2 minutos)</p>
+            <div className="spinner"></div>
+            <p className="loading-text">{t('auth.wakingUp')}</p>
+            <p className="loading-subtext">{t('auth.wakingUpHint')}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Usuario</label>
+            <label className="form-label">{t('auth.username')}</label>
             <input
               type="text"
               name="username"
               className="form-input"
-              placeholder="Ej: skater123"
+              placeholder={t('auth.usernamePlaceholder')}
               value={formData.username}
               onChange={handleChange}
               required
@@ -79,7 +83,7 @@ export default function LoginPage() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Contraseña</label>
+            <label className="form-label">{t('auth.password')}</label>
             <input
               type="password"
               name="password"
@@ -92,15 +96,15 @@ export default function LoginPage() {
           </div>
 
           <button type="submit" className="auth-button" disabled={isLoading}>
-            {isLoading ? 'Entrando...' : 'Iniciar Sesión'}
+            {isLoading ? t('auth.loggingIn') : t('auth.loginButton')}
           </button>
         </form>
 
         <div className="auth-footer">
-          ¿No tienes cuenta?{' '}
-          <Link to="/register" className="auth-link">Regístrate aquí</Link>
+          {t('auth.noAccount')}{' '}
+          <Link to="/register" className="auth-link">{t('auth.registerHere')}</Link>
         </div>
-        <Link to="/map" className="auth-guest">← Volver al mapa sin cuenta</Link>
+        <Link to="/map" className="auth-guest">{t('auth.backToMap')}</Link>
       </div>
     </div>
   );
