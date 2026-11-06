@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F7F6F2;--ink:#0B0B0B;--acc:#00B140;--map:#EBE9E4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;height:844px;overflow:hidden;font-family:Archivo,system-ui,sans-serif;color:var(--ink);background:var(--map);position:relative}
+.map{position:absolute;inset:0;background:
+ linear-gradient(28deg,transparent 47%,#fff 47%,#fff 49.5%,transparent 49.5%),
+ linear-gradient(-62deg,transparent 30%,#fff 30%,#fff 32%,transparent 32%),
+ linear-gradient(0deg,transparent 20%,#d6e6c8 20%,#d6e6c8 30%,transparent 30%),var(--map)}
+.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:#3FA9F5;border:3px solid #fff;box-shadow:0 0 0 10px rgba(63,169,245,.18)}
+.cl{position:absolute;padding:4px 9px;border-radius:12px;background:#1d2b3a;color:#fff;font:700 13px Archivo}
+.blk{position:absolute;top:52px;height:44px;padding:0 14px;display:flex;align-items:center;background:var(--ink);color:var(--paper);font:700 14px Silkscreen}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:560px;background:var(--paper);border-top:2px solid var(--ink)}
+.photo{height:190px;background:linear-gradient(160deg,#87a3b4 0%,#c9c2b4 38%,#a59b8b 39%,#7c7568 70%,#5d564c 100%)}
+.body{padding:14px 20px}
+h1{font:700 40px/0.95 Silkscreen;text-transform:uppercase}
+.sub{font-size:13px;font-weight:700;margin-top:6px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);margin-top:14px}
+.f{padding:8px 0}.f+.f{border-left:2px solid var(--ink);padding-left:10px}
+.f b{font:700 24px Silkscreen}.f span{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.acts{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;height:50px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+.pri{background:var(--acc);color:var(--ink)}.sec{border:2px solid var(--ink)}
+.cm{margin-top:14px;font-size:13px;font-weight:700}
+</style></head><body>
+<div class="map"></div>
+<div class="pin" style="left:186px;top:200px"></div>
+<div class="cl" style="left:60px;top:150px">+12</div>
+<div class="blk" style="left:16px">FILTERS 2</div>
+<div class="blk" style="right:16px">ANDRII</div>
+<div class="sheet">
+ <div class="photo"></div>
+ <div class="body">
+  <h1>MACBA ledges</h1>
+  <div class="sub">Plaça dels Àngels · Street · Ledge</div>
+  <div class="facts">
+   <div class="f"><b>4.6</b><span>Stars · 23</span></div>
+   <div class="f"><b>1.2</b><span>Km away</span></div>
+   <div class="f"><b>ADV</b><span>Level</span></div>
+  </div>
+  <div class="acts"><div class="btn pri">Directions</div><div class="btn sec">Rate spot</div></div>
+  <div class="cm">marta_sk8 — waxed, security after 9pm</div>
+ </div>
+</div>
+</body></html>

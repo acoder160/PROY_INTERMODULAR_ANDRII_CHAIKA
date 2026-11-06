@@ -5,7 +5,9 @@
     "login": "Iniciar sesión",
     "user": "Usuario",
     "language": "Idioma",
-    "languageAuto": "Automático (idioma del teléfono)"
+    "languageAuto": "Automático (idioma del teléfono)",
+    "openSettings": "Abrir ajustes",
+    "retry": "Reintentar"
   },
   "map": {
     "filters": "Filtros",
@@ -22,7 +24,8 @@
     "offlineMode": "Modo Offline (Mostrando mapa guardado)",
     "geoUnsupported": "Tu navegador no soporta geolocalización",
     "geoDenied": "Permiso de ubicación denegado. Actívalo en el navegador.",
-    "geoFailed": "No se pudo obtener tu ubicación."
+    "geoFailed": "No se pudo obtener tu ubicación.",
+    "logoutConfirm": "¿Cerrar sesión en SkateMap?"
   },
   "filters": {
     "title": "Filtrar spots",
@@ -36,7 +39,8 @@
     "minStars": "Estrellas mínimas",
     "allStars": "Todas",
     "starsOrMore": "{{n}} ⭐️ o más",
-    "applyResults": "Ver resultados"
+    "applyResults": "Ver resultados",
+    "reset": "Restablecer"
   },
   "popup": {
     "loading": "Cargando...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "Hubo un error al enviar. Por favor, revisa tu conexión.",
     "averageRating": "Puntuación media: {{value}}/5",
     "thanks": "¡Gracias por tu valoración! 🛹",
-    "noImage": "Sin imagen"
+    "noImage": "Sin imagen",
+    "commentsFailed": "No se pudieron cargar los comentarios."
   },
   "auth": {
     "welcomeBack": "Bienvenido de nuevo",
@@ -109,7 +114,7 @@
     "cameraDenied": "⚠️ Permiso de cámara denegado",
     "waitingGps": "⚠️ Esperando GPS...",
     "processingPhoto": "📸 Procesando foto...",
-    "tapCircle": "📍 Toca dentro del círculo azul para ubicar 👇",
+    "tapCircle": "📍 Toca dentro del círculo para ubicarlo 👇",
     "gettingLocation": "📍 Obteniendo tu ubicación actual...",
     "gpsDenied": "⚠️ Permiso de GPS denegado",
     "locationError": "⚠️ Error buscando ubicación"
@@ -144,7 +149,12 @@
     "description": "Descripción...",
     "type": "Tipo",
     "level": "Nivel",
-    "save": "Guardar spot"
+    "save": "Guardar spot",
+    "nameRequired": "Ponle un nombre al spot.",
+    "discardTitle": "¿Descartar este spot?",
+    "discardMessage": "Se perderá la foto que has hecho.",
+    "discard": "Descartar",
+    "keepEditing": "Seguir editando"
   },
   "camera": {
     "takePhoto": "Haz una foto del spot 🛹"

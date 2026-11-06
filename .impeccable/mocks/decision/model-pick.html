@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--print:#F4F4F1;--rebate:#121212;--stamp:#FF7A1A;--kodak:#F2C500;--map:#EBE9E4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;height:844px;overflow:hidden;font-family:Archivo,system-ui,sans-serif;color:#121212;background:var(--map);position:relative}
+.map{position:absolute;inset:0;background:
+ linear-gradient(28deg,transparent 47%,#fff 47%,#fff 49.5%,transparent 49.5%),
+ linear-gradient(-62deg,transparent 30%,#fff 30%,#fff 32%,transparent 32%),
+ linear-gradient(0deg,transparent 20%,#d6e6c8 20%,#d6e6c8 30%,transparent 30%),var(--map)}
+.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:#3FA9F5;border:3px solid #fff;box-shadow:0 0 0 10px rgba(63,169,245,.18)}
+.cl{position:absolute;padding:4px 9px;border-radius:12px;background:#1d2b3a;color:#fff;font:700 13px Archivo}
+.top{position:absolute;top:52px;height:44px;padding:0 14px;display:flex;align-items:center;gap:8px;background:var(--rebate);color:#fff;font-weight:800;font-size:15px;border-radius:3px}
+.top .n{color:var(--stamp);font-family:"Share Tech Mono"}
+.print{position:absolute;left:18px;right:18px;bottom:112px;background:var(--print);padding:12px 12px 16px;border-radius:2px;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.photo{position:relative;height:250px;background:linear-gradient(160deg,#87a3b4 0%,#c9c2b4 38%,#a59b8b 39%,#7c7568 70%,#5d564c 100%)}
+.ds{position:absolute;right:10px;bottom:8px;font:24px "Share Tech Mono";color:var(--stamp);letter-spacing:.04em;text-shadow:0 0 1px #ff9d55}
+h1{font-size:22px;font-weight:800;margin-top:14px}
+.meta{display:flex;gap:14px;margin-top:6px;font-size:14px;font-weight:700}
+.meta span b{font-family:"Share Tech Mono";font-size:18px}
+.acts{display:flex;gap:10px;margin-top:14px}
+.btn{flex:1;height:48px;display:flex;align-items:center;justify-content:center;font-weight:800;border-radius:3px}
+.pri{background:var(--rebate);color:#fff}.sec{background:var(--kodak)}
+.strip{position:absolute;left:0;right:0;bottom:0;height:96px;background:var(--rebate);display:flex;align-items:center;justify-content:space-around;padding:0 24px}
+.strip::before,.strip::after{content:"";position:absolute;left:0;right:0;height:8px;background:repeating-linear-gradient(90deg,transparent 0 10px,#3a3a3a 10px 20px)}
+.strip::before{top:6px}.strip::after{bottom:6px}
+.c{width:52px;height:52px;border-radius:50%;border:2px solid #fff;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+.add{width:auto;padding:0 20px;border-radius:26px;background:var(--stamp);border-color:var(--stamp);color:#121212}
+</style></head><body>
+<div class="map"></div>
+<div class="pin" style="left:186px;top:200px"></div>
+<div class="cl" style="left:60px;top:150px">+12</div>
+<div class="top" style="left:16px">Filters <span class="n">2</span></div>
+<div class="top" style="right:16px">andrii</div>
+<div class="print">
+ <div class="photo"><div class="ds">★4.6 '26 10 29</div></div>
+ <h1>MACBA ledges</h1>
+ <div class="meta"><span><b>1.2</b> km</span><span>Ledge</span><span>Advanced</span><span>23 votes</span></div>
+ <div class="acts"><div class="btn pri">Directions</div><div class="btn sec">Rate spot</div></div>
+</div>
+<div class="strip"><div class="c">⟳</div><div class="c add">＋ Add spot</div><div class="c">◎</div></div>
+</body></html>

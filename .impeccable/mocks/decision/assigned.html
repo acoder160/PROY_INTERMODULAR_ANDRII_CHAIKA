@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Big+Shoulders+Stencil+Display:wght@800&display=swap" rel="stylesheet">
+<style>
+:root{--concrete:#DCDDD8;--concrete-dk:#B8B9B3;--pool:#A9D3E3;--tile:#1D4E9E;--ink:#16181A;--red:#D2342B;--map:#EBE9E4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;height:844px;overflow:hidden;font-family:Archivo,system-ui,sans-serif;color:var(--ink);background:var(--map);position:relative}
+.map{position:absolute;inset:0;background:
+ linear-gradient(28deg,transparent 47%,#fff 47%,#fff 49.5%,transparent 49.5%),
+ linear-gradient(-62deg,transparent 30%,#fff 30%,#fff 32%,transparent 32%),
+ linear-gradient(90deg,transparent 62%,#f6f4ef 62%,#f6f4ef 65%,transparent 65%),
+ linear-gradient(0deg,transparent 20%,#d6e6c8 20%,#d6e6c8 30%,transparent 30%),var(--map)}
+.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:#3FA9F5;border:3px solid #fff;box-shadow:0 0 0 10px rgba(63,169,245,.18)}
+.cl{position:absolute;padding:4px 9px;border-radius:12px;background:#1d2b3a;color:#fff;font:700 13px Archivo}
+.slab{position:absolute;top:52px;height:46px;padding:0 16px;display:flex;align-items:center;gap:8px;background:var(--concrete);font-weight:800;font-size:15px;border-radius:4px;overflow:hidden}
+.slab::after{content:"";position:absolute;left:0;right:0;bottom:0;height:6px;background:
+ repeating-linear-gradient(90deg,var(--tile) 0 9px,#E9EEF4 9px 10px)}
+.slab .n{background:var(--ink);color:var(--concrete);font:800 13px Archivo;padding:2px 6px;border-radius:3px}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:560px;background:var(--pool)}
+.coping{height:12px;background:var(--concrete-dk);border-radius:6px 6px 0 0;border-bottom:2px solid #8f908a}
+.band{height:12px;background:
+ repeating-linear-gradient(90deg,var(--tile) 0 11px,#E9EEF4 11px 12px),var(--tile);border-bottom:1px solid #E9EEF4}
+.photo{height:196px;background:
+ linear-gradient(170deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.25)),
+ linear-gradient(160deg,#87a3b4 0%,#c9c2b4 38%,#a59b8b 39%,#7c7568 70%,#5d564c 100%)}
+.body{padding:16px 20px 0}
+h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.where{font-size:13px;font-weight:500;margin-top:2px;color:#26394a}
+.markers{display:flex;margin-top:16px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.mk{flex:1;padding:8px 0 6px;text-align:center}
+.mk+.mk{border-left:2px solid var(--ink)}
+.mk b{display:block;font:800 46px/1 "Big Shoulders Stencil Display",Archivo;letter-spacing:.01em}
+.mk span{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.stamp{margin-top:14px;display:inline-flex;align-items:center;gap:8px;border:2px solid var(--red);color:var(--red);padding:4px 10px;font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase;border-radius:3px}
+.stamp b{font:800 22px/1 "Big Shoulders Stencil Display"}
+.actions{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;height:50px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;border-radius:4px}
+.pri{background:var(--tile);color:#fff}
+.sec{background:var(--concrete);color:var(--ink)}
+.cm{margin-top:14px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;border-top:1px solid rgba(22,24,26,.25);padding-top:12px}
+</style></head><body>
+<div class="map"></div>
+<div class="pin" style="left:186px;top:200px"></div>
+<div class="cl" style="left:60px;top:150px">+12</div>
+<div class="cl" style="left:290px;top:236px">+4</div>
+<div class="slab" style="left:16px">Filters <span class="n">2</span></div>
+<div class="slab" style="right:16px">andrii</div>
+<div class="sheet">
+ <div class="coping"></div><div class="band"></div>
+ <div class="photo"></div>
+ <div class="body">
+  <h1>MACBA ledges</h1>
+  <div class="where">Plaça dels Àngels · Street · Ledge</div>
+  <div class="markers">
+   <div class="mk"><b>4.6</b><span>Stars · 23</span></div>
+   <div class="mk"><b>1.2</b><span>Km away</span></div>
+   <div class="mk"><b>ADV</b><span>Level</span></div>
+  </div>
+  <div class="stamp">Your vote <b>5</b></div>
+  <div class="actions"><div class="btn pri">Directions</div><div class="btn sec">Comments · 8</div></div>
+  <div class="cm"><span>marta_sk8 — waxed, security after 9pm</span><span>★★★★★</span></div>
+ </div>
+</div>
+</body></html>

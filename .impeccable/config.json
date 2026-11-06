@@ -1,0 +1,20 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font",
+        "value": "big shoulders display",
+        "createdAt": "2026-11-06T20:09:59.628Z",
+        "reason": "Claude: DESIGN.md typography declares BigShouldersDisplay_700Bold/900Black; this is the same family's CSS name"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "roboto",
+        "createdAt": "2026-11-06T20:09:59.742Z",
+        "reason": "Claude: DESIGN.md body font is 'system (system-ui on iOS, Roboto on Android)'"
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--char:#1E2124;--char2:#2A2E32;--white:#FFFFFF;--volt:#C6FF00;--grey:#A6ACB2;--map:#EBE9E4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;height:844px;overflow:hidden;font-family:Barlow,system-ui,sans-serif;color:var(--white);background:var(--map);position:relative}
+.map{position:absolute;inset:0;background:
+ linear-gradient(28deg,transparent 47%,#fff 47%,#fff 49.5%,transparent 49.5%),
+ linear-gradient(-62deg,transparent 30%,#fff 30%,#fff 32%,transparent 32%),
+ linear-gradient(0deg,transparent 20%,#d6e6c8 20%,#d6e6c8 30%,transparent 30%),var(--map)}
+.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:#3FA9F5;border:3px solid #fff;box-shadow:0 0 0 10px rgba(63,169,245,.18)}
+.cl{position:absolute;padding:4px 9px;border-radius:12px;background:#1d2b3a;color:#fff;font:700 13px Barlow}
+.blk{position:absolute;top:52px;height:46px;padding:0 16px;display:flex;align-items:center;gap:10px;background:var(--char);border-radius:8px;font-weight:700;font-size:15px}
+.blk .n{background:var(--volt);color:var(--char);border-radius:4px;padding:0 7px;font-weight:800}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:540px;background:var(--char);border-radius:16px 16px 0 0;overflow:hidden}
+.photo{height:210px;background:linear-gradient(160deg,#87a3b4 0%,#c9c2b4 38%,#a59b8b 39%,#7c7568 70%,#5d564c 100%)}
+.head{padding:16px 20px 0}
+.kick{font:800 12px "Barlow Condensed";letter-spacing:.14em;color:var(--volt);text-transform:uppercase}
+h1{font:800 36px/1 "Barlow Condensed";text-transform:uppercase;margin-top:2px}
+.where{font-size:13px;font-weight:600;color:var(--grey);margin-top:4px}
+.spec{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 20px 0}
+.s{background:var(--char2);border-radius:8px;padding:10px 12px}
+.s b{display:block;font:800 30px/1 "Barlow Condensed";color:var(--volt)}
+.s span{font-size:12px;font-weight:600;color:var(--grey)}
+.acts{display:flex;gap:10px;padding:16px 20px 0}
+.btn{flex:1;height:50px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;border-radius:8px}
+.pri{background:var(--volt);color:var(--char)}.sec{background:var(--char2)}
+.vote{margin:12px 20px 0;font-size:13px;font-weight:600;color:var(--grey)}
+.vote b{color:var(--white)}
+</style></head><body>
+<div class="map"></div>
+<div class="pin" style="left:186px;top:220px"></div>
+<div class="cl" style="left:60px;top:180px">+12</div>
+<div class="cl" style="left:290px;top:250px">+4</div>
+<div class="blk" style="left:16px">Filters <span class="n">2</span></div>
+<div class="blk" style="right:16px">andrii</div>
+<div class="sheet">
+ <div class="photo"></div>
+ <div class="head"><div class="kick">Street · Ledge</div><h1>MACBA ledges</h1><div class="where">Plaça dels Àngels · Barcelona</div></div>
+ <div class="spec">
+  <div class="s"><b>4.6</b><span>★ 23 votes</span></div>
+  <div class="s"><b>1.2km</b><span>away</span></div>
+  <div class="s"><b>ADV</b><span>level</span></div>
+ </div>
+ <div class="acts"><div class="btn pri">Directions</div><div class="btn sec">Comments · 8</div></div>
+ <div class="vote">Your vote <b>★★★★★</b></div>
+</div>
+</body></html>

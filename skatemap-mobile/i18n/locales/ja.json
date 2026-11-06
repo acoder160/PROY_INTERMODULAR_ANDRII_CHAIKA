@@ -5,7 +5,9 @@
     "login": "ログイン",
     "user": "ユーザー",
     "language": "言語",
-    "languageAuto": "自動（端末の言語）"
+    "languageAuto": "自動（端末の言語）",
+    "openSettings": "設定を開く",
+    "retry": "再試行"
   },
   "map": {
     "filters": "フィルター",
@@ -22,7 +24,8 @@
     "offlineMode": "オフラインモード（保存済みの地図を表示中）",
     "geoUnsupported": "お使いのブラウザは位置情報に対応していません",
     "geoDenied": "位置情報の許可が拒否されました。ブラウザで有効にしてください。",
-    "geoFailed": "現在地を取得できませんでした。"
+    "geoFailed": "現在地を取得できませんでした。",
+    "logoutConfirm": "SkateMapからログアウトしますか？"
   },
   "filters": {
     "title": "スポットを絞り込む",
@@ -36,7 +39,8 @@
     "minStars": "最低の星の数",
     "allStars": "すべて",
     "starsOrMore": "{{n}} ⭐️ 以上",
-    "applyResults": "結果を見る"
+    "applyResults": "結果を見る",
+    "reset": "リセット"
   },
   "popup": {
     "loading": "読み込み中...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "送信中にエラーが発生しました。接続を確認してください。",
     "averageRating": "平均評価：{{value}}/5",
     "thanks": "評価ありがとうございます！🛹",
-    "noImage": "画像なし"
+    "noImage": "画像なし",
+    "commentsFailed": "コメントを読み込めませんでした。"
   },
   "auth": {
     "welcomeBack": "おかえりなさい",
@@ -109,7 +114,7 @@
     "cameraDenied": "⚠️ カメラの許可が拒否されました",
     "waitingGps": "⚠️ GPSを待機中...",
     "processingPhoto": "📸 写真を処理中...",
-    "tapCircle": "📍 青い円の中をタップして場所を指定してください 👇",
+    "tapCircle": "📍 円の中をタップして場所を指定してください 👇",
     "gettingLocation": "📍 現在地を取得中...",
     "gpsDenied": "⚠️ GPSの許可が拒否されました",
     "locationError": "⚠️ 位置情報の検索でエラーが発生しました"
@@ -144,7 +149,12 @@
     "description": "説明...",
     "type": "種類",
     "level": "レベル",
-    "save": "スポットを保存"
+    "save": "スポットを保存",
+    "nameRequired": "スポットに名前を付けてください。",
+    "discardTitle": "このスポットを破棄しますか？",
+    "discardMessage": "撮影した写真は失われます。",
+    "discard": "破棄",
+    "keepEditing": "編集を続ける"
   },
   "camera": {
     "takePhoto": "スポットの写真を撮ってください 🛹"

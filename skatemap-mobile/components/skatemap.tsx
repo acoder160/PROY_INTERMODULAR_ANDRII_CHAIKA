@@ -1,8 +1,11 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, type ComponentRef } from 'react';
 import { WebView } from 'react-native-webview';
 import { StyleSheet, View, Linking, Image, Dimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { CARTO_API_KEY } from '../constants/api';
+import { Palette, spotTypePaint } from '../constants/theme';
+import { cleanLabel } from '../utils/text';
+
 
 function serializeForInlineScript(value: unknown): string {
   return (JSON.stringify(value) ?? 'null')
@@ -20,6 +23,8 @@ interface SkateMapProps {
   isAddingMode?: boolean;
   onMapClick?: (lat: number, lng: number) => void;
   onSpotClick?: (spotId: number) => void; 
+  /** Short notice for map-side problems while placing a spot (too far, no GPS). */
+  onNotice?: (message: string) => void;
 }
 
 export default function SkateMap({ 
@@ -27,16 +32,17 @@ export default function SkateMap({
   userLocation,
   isAddingMode = false,
   onMapClick,
-  onSpotClick
+  onSpotClick,
+  onNotice = (message: string) => alert(message)
 }: SkateMapProps) {
-  const { t, i18n } = useTranslation();
-  const webviewRef = useRef<WebView>(null);
+  const { t } = useTranslation();
+  const webviewRef = useRef<ComponentRef<typeof WebView>>(null);
   const mapReadyRef = useRef(false);
   const windowHeight = Dimensions.get('window').height;
 
   const strings = {
-    rate: t('webview.rate'),
-    route: t('webview.route'),
+    rate: cleanLabel(t('webview.rate')),
+    route: cleanLabel(t('webview.route')),
     unnamed: t('webview.unnamed'),
     noDescription: t('webview.noDescription'),
     noImage: t('popup.noImage'),
@@ -66,13 +72,14 @@ export default function SkateMap({
     }
   }, [stringsJson]);
 
+  // Iconos propios de cada tipo de spot
   const ICONS = {
-    STREET: Image.resolveAssetSource(require('../assets/images/icon_street.png')).uri,
-    PARK: Image.resolveAssetSource(require('../assets/images/icon_park.png')).uri,
-    SKATEPARK: Image.resolveAssetSource(require('../assets/images/icon_park.png')).uri,
-    RAMPS: Image.resolveAssetSource(require('../assets/images/icon_ramps.png')).uri,
-    RAIL: Image.resolveAssetSource(require('../assets/images/icon_rail.png')).uri,
-    LEDGE: Image.resolveAssetSource(require('../assets/images/icon_ledge.png')).uri,
+    STREET: Image.resolveAssetSource(require('../assets/images/icon_street.png'))?.uri ?? '',
+    PARK: Image.resolveAssetSource(require('../assets/images/icon_park.png'))?.uri ?? '',
+    SKATEPARK: Image.resolveAssetSource(require('../assets/images/icon_park.png'))?.uri ?? '',
+    RAMPS: Image.resolveAssetSource(require('../assets/images/icon_ramps.png'))?.uri ?? '',
+    RAIL: Image.resolveAssetSource(require('../assets/images/icon_rail.png'))?.uri ?? '',
+    LEDGE: Image.resolveAssetSource(require('../assets/images/icon_ledge.png'))?.uri ?? '',
   };
 
   // Sincronizar spots
@@ -117,23 +124,37 @@ export default function SkateMap({
     <!DOCTYPE html>
     <html>
       <head>
+        <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
         <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&display=swap" />
         <style>
-          html, body { padding: 0; margin: 0; height: 100vh; min-height: 1px; width: 100%; background-color: #e5e5e5; }
-          #map { height: 100vh; min-height: 1px; width: 100%; }
-          
+          :root {
+            --asphalt: ${Palette.asphalt};
+            --concrete: ${Palette.concrete};
+            --sheet: ${Palette.sheet};
+            --ink-muted: ${Palette.inkMuted};
+            --hairline: ${Palette.hairline};
+            --pink: ${Palette.pink};
+            --display: 'Big Shoulders Display', system-ui, sans-serif;
+          }
+          html, body { padding: 0; margin: 0; height: 100vh; min-height: 1px; width: 100%; background-color: var(--concrete); }
+          #map { height: 100vh; min-height: 1px; width: 100%; background-color: var(--concrete); }
+          body { -webkit-tap-highlight-color: transparent; }
+
+          /* Usuario: punto asfalto con anillo blanco y pulso */
           .blue-dot { display: flex; justify-content: center; align-items: center; }
           .blue-dot-inner {
-            background-color: #007AFF; 
-            width: 18px; height: 18px; 
-            border-radius: 50%; 
-            border: 3px solid white; 
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            background-color: var(--asphalt);
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            border: 3px solid var(--sheet);
+            box-shadow: 0 2px 3px rgba(0,0,0,0.35);
             position: relative;
           }
           .blue-dot-inner::after {
@@ -141,58 +162,108 @@ export default function SkateMap({
             position: absolute;
             top: -3px; left: -3px; right: -3px; bottom: -3px;
             border-radius: 50%;
-            border: 2px solid rgba(0, 122, 255, 0.55);
+            border: 2px solid var(--asphalt);
             animation: dot-pulse 2.2s ease-out infinite;
           }
           @keyframes dot-pulse {
-            0% { transform: scale(1); opacity: 0.9; }
+            0% { transform: scale(1); opacity: 0.8; }
             100% { transform: scale(2.8); opacity: 0; }
           }
           .user-radius { animation: radius-in 0.6s ease-out; }
           @keyframes radius-in { from { opacity: 0; } to { opacity: 1; } }
 
-          .leaflet-popup-content-wrapper { border-radius: 12px; overflow: hidden; padding: 0; }
+          /* Spots: iconos propios por tipo; la marca del spot nuevo usa .paint-marker */
+          .paint-marker { display: flex; align-items: center; justify-content: center; }
+          .spot-icon { background: transparent; border: 0; }
+          .spot-icon-img {
+            display: block;
+            width: 45px; height: 45px;
+            transform-origin: 50% 100%;
+            transition: transform 0.12s ease;
+          }
+          .spot-icon.is-selected .spot-icon-img { transform: scale(1.2); }
+          .proposed-dot {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: var(--pink);
+            border: 3px dashed var(--asphalt);
+          }
+
+          /* Popup: hoja blanca, contorno de tinta */
+          .leaflet-popup-content-wrapper {
+            border-radius: 16px;
+            overflow: hidden;
+            padding: 0;
+            border: 2px solid var(--asphalt);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+          }
+          .leaflet-popup-tip { background: var(--sheet); border: 2px solid var(--asphalt); box-shadow: none; }
+          .leaflet-popup-tip-container { margin-top: -2px; }
           .leaflet-popup-content { margin: 0; }
-          .popup-card { width: 220px; font-family: sans-serif; }
-          .popup-image { width: 100%; height: 120px; object-fit: cover; background-color: #ddd; }
-          .popup-info { padding: 12px; }
-          .popup-title { margin: 0 0 6px 0; font-size: 16px; color: #1a1a1a; font-weight: bold; }
-          .popup-badges { margin-bottom: 8px; display: flex; gap: 6px; }
-          .badge-type { background: #2EC4B6; color: white; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; }
-          .badge-diff { background: #FF9F1C; color: white; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; }
-          
-          .popup-desc { margin: 0 0 10px 0; font-size: 12px; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-          .popup-rating { display: flex; align-items: center; margin-bottom: 8px; }
-          .star-icon { color: #FFD700; font-size: 14px; letter-spacing: 2px; }
-          
-          .btn-container { display: flex; gap: 8px; margin-top: 10px; }
-          .btn-container { gap: 8px; margin-top: 12px; }
+          .leaflet-container a.leaflet-popup-close-button {
+            top: 8px; right: 8px;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--asphalt);
+            border: 2px solid var(--sheet);
+            color: var(--sheet);
+            font: 700 20px/28px system-ui, sans-serif;
+            text-align: center;
+          }
+          .popup-card { width: 240px; font-family: system-ui, Roboto, sans-serif; color: var(--asphalt); }
+          .popup-image { display: block; width: 100%; height: 112px; object-fit: cover; background-color: var(--concrete); }
+          .popup-image-empty { display: flex; align-items: center; justify-content: center; }
+          .popup-info { padding: 12px 14px 14px; }
+          .popup-title {
+            margin: 0 0 8px 0;
+            font: 900 24px/26px var(--display);
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            overflow-wrap: anywhere;
+          }
+          .popup-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+          .type-chip {
+            padding: 3px 9px;
+            border: 2px solid var(--asphalt);
+            border-radius: 10px;
+            font: 700 15px/1.1 var(--display);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--asphalt);
+          }
+          .diff { display: inline-flex; align-items: center; gap: 6px; font: 700 15px/1 var(--display); letter-spacing: 0.8px; text-transform: uppercase; }
+          .diff-marks { display: inline-flex; gap: 3px; }
+          .diff-marks i { display: inline-block; width: 6px; height: 14px; background: var(--asphalt); transform: skewX(-18deg); }
+          .diff-marks i.off { background: transparent; border: 1.5px solid var(--asphalt); box-sizing: border-box; }
+          .popup-rating { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+          .popup-rating svg { display: block; }
+          .popup-rating-num { font: 900 18px/1 var(--display); }
+          .popup-desc {
+            margin: 0;
+            font-size: 14px; line-height: 19px;
+            color: var(--ink-muted);
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+          }
+
+          .btn-container { display: flex; gap: 8px; margin-top: 12px; }
           .details-btn, .directions-btn {
             flex: 1;
-            border: none;
-            padding: 10px 8px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 12px;
-            letter-spacing: 0.4px;
+            min-height: 48px;
+            padding: 6px 8px;
+            border: 2px solid var(--asphalt);
+            border-radius: 24px;
+            font: 900 18px/1 var(--display);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--asphalt);
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.12s ease, box-shadow 0.12s ease;
+            transition: transform 0.12s ease;
           }
           .details-btn:active, .directions-btn:active { transform: scale(0.96); }
-          .details-btn {
-            color: #FFFFFF;
-            background: linear-gradient(135deg, #2EC4B6 0%, #168AAD 55%, #105A68 100%);
-            box-shadow: 0 4px 10px rgba(22, 138, 173, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-          }
-          .directions-btn {
-            color: #7EE8EC;
-            background: linear-gradient(135deg, #2A3442 0%, #161D28 100%);
-            border: 1px solid rgba(126, 232, 236, 0.45);
-            box-shadow: 0 4px 10px rgba(10, 20, 30, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-          }
+          .details-btn { background: var(--sheet); }
+          .directions-btn { background: var(--pink); }
+
+          /* Clusters "+N": asfalto, anillo blanco */
           .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
             background: transparent !important;
             border: 0 !important;
@@ -205,14 +276,14 @@ export default function SkateMap({
             display: flex !important;
             align-items: center;
             justify-content: center;
-            border: 3px solid white;
+            box-sizing: border-box;
+            border: 3px solid var(--sheet);
             border-radius: 50%;
-            background: linear-gradient(135deg, #2EC4B6, #168AAD);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
-            color: white;
-            font-size: 14px;
-            font-weight: 800;
-            line-height: 1 !important;
+            background: var(--asphalt);
+            box-shadow: 0 2px 3px rgba(0, 0, 0, 0.35);
+            color: var(--sheet);
+            font: 900 17px/1 var(--display) !important;
+            letter-spacing: 0.4px;
           }
           .spot-cluster-label {
             display: flex;
@@ -239,7 +310,35 @@ export default function SkateMap({
           var tileUrl = ${CARTO_API_KEY
             ? `'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(CARTO_API_KEY)}'`
             : "'https://tile.openstreetmap.org/{z}/{x}/{y}.png'"};
-            
+
+          // PRERENDER: capa de tiles que también carga una franja de N tiles fuera de la pantalla
+          // (como PaddedTileLayer en la web), así al alejar o arrastrar ya hay mapa en los bordes.
+          var PaddedTileLayer = L.TileLayer.extend({
+            _getTiledPixelBounds: function(center) {
+              var bounds = L.TileLayer.prototype._getTiledPixelBounds.call(this, center);
+              var pad = this.getTileSize().x * (this.options.preloadTiles || 0);
+              return L.bounds(bounds.min.subtract([pad, pad]), bounds.max.add([pad, pad]));
+            }
+          });
+
+          // SUBCAPA de baja resolución: tiles de 2 niveles menos estirados a 1024px. Cada uno cubre
+          // 4x más superficie, así que al alejar el borde se rellena al instante (algo borroso) mientras
+          // llegan los tiles nítidos encima. Son pocas imágenes pequeñas: casi no gasta datos.
+          new PaddedTileLayer(tileUrl, {
+            tileSize: 1024,
+            zoomOffset: -2,
+            minZoom: 2,
+            maxZoom: 19,
+            maxNativeZoom: 18,
+            subdomains: 'abcd',
+            preloadTiles: 1,
+            keepBuffer: 4,
+            updateWhenIdle: false,
+            updateWhenZooming: true,
+            updateInterval: 100,
+            zIndex: 0
+          }).addTo(map);
+
           L.tileLayer(tileUrl, {
             maxZoom: 19,
             maxNativeZoom: 18, // a zoom máximo se escala el tile en vez de pedir otros nuevos (menos carga)
@@ -250,6 +349,8 @@ export default function SkateMap({
             updateWhenZooming: true,
             updateInterval: 100,
             keepBuffer: 3,
+            // Sin franja extra aquí: la subcapa ya cubre los bordes al alejar y cuesta la mitad de datos
+            zIndex: 1,
             attribution: ${CARTO_API_KEY
               ? "'© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors © <a href=\"https://carto.com/attributions\">CARTO</a>'"
               : "'© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'"}
@@ -393,7 +494,9 @@ export default function SkateMap({
           });
           var allSpotsData = [];
 
+          var SPOT_PAINT = ${JSON.stringify(spotTypePaint)};
           var SPOT_ICONS = ${JSON.stringify(ICONS)};
+          var DIFFICULTY_LEVEL = { BEGINNER: 1, INTERMEDIATE: 2, ADVANCED: 3 };
           window.I18N = ${stringsJson};
           var spotIcons = {};
           var singleSpotClusterIcon = L.divIcon({
@@ -414,10 +517,17 @@ export default function SkateMap({
             });
           }
 
-          function getSpotIcon(spotType, iconUrl) {
+          function paintFor(spotType) {
+            return SPOT_PAINT[spotType] || SPOT_PAINT.STREET;
+          }
+
+          // Iconos PNG propios; el div exterior lo posiciona Leaflet, la imagen interior puede escalarse al seleccionar
+          function getSpotIcon(spotType) {
             if (!spotIcons[spotType]) {
-              spotIcons[spotType] = L.icon({
-                iconUrl: iconUrl,
+              var iconUrl = SPOT_ICONS[spotType] || SPOT_ICONS.STREET;
+              spotIcons[spotType] = L.divIcon({
+                className: 'spot-icon',
+                html: '<img class="spot-icon-img" src="' + iconUrl + '" alt="" />',
                 iconSize: [45, 45],
                 iconAnchor: [22, 45],
                 popupAnchor: [0, -40]
@@ -426,6 +536,19 @@ export default function SkateMap({
             return spotIcons[spotType];
           }
 
+          var STAR_PATH = 'M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z';
+          function starsSvg(value) {
+            var out = '';
+            for (var i = 1; i <= 5; i++) {
+              var filled = i <= value;
+              out += '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="' + STAR_PATH + '" fill="' +
+                (filled ? 'var(--asphalt)' : 'none') + '" stroke="var(--asphalt)" stroke-width="2" stroke-linejoin="round"/></svg>';
+            }
+            return out;
+          }
+
+          var CAMERA_SVG = '<svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="var(--ink-muted)" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+
           function createSpotMarker(spot, showAsPlusOneBubble, lngOffset) {
             if(spot.latitude === null || spot.latitude === undefined ||
                spot.longitude === null || spot.longitude === undefined) {
@@ -433,48 +556,58 @@ export default function SkateMap({
             }
                 
             var spotType = (spot.spotType || spot.type || 'STREET').toUpperCase();
-            var iconUrl = SPOT_ICONS[spotType] || SPOT_ICONS['STREET'];
-            var icon = getSpotIcon(spotType, iconUrl);
-
-            var noImageUrl = 'https://via.placeholder.com/220x120?text=' + encodeURIComponent(window.I18N.noImage);
-            var imageUrl = spot.mediaUrl ? escapeHtml(spot.mediaUrl) : noImageUrl;
+            var icon = getSpotIcon(spotType);
             var diff = (spot.difficultyLevel || 'INTERMEDIATE').toUpperCase();
-                
+            var level = DIFFICULTY_LEVEL[diff] || 2;
             var rating = spot.surfaceRating || 0;
-            var fullStars = '★'.repeat(Math.round(rating));
-            var emptyStars = '☆'.repeat(5 - Math.round(rating));
-                
-            // El HTML del popup se construye solo al abrirlo (no para cada marcador en cada movimiento)
-            var buildPopup = function() { return \`
-              <div class="popup-card">
-                <img src="\${imageUrl}" class="popup-image" onerror="this.onerror=null;this.src=window.I18N ? 'https://via.placeholder.com/220x120?text=' + encodeURIComponent(window.I18N.noImage) : ''" />
-                <div class="popup-info">
-                  <h3 class="popup-title">\${escapeHtml(spot.name || window.I18N.unnamed)}</h3>
-                  <div class="popup-rating">
-                    <span class="star-icon">\${fullStars}\${emptyStars}</span>
-                    <span style="font-size: 11px; color: #666; margin-left: 4px;">(\${rating.toFixed(1)})</span>
-                  </div>
-                  <div class="popup-badges">
-                    <span class="badge-type">\${escapeHtml(window.I18N.types[spotType] || spotType)}</span>
-                    <span class="badge-diff">\${escapeHtml(window.I18N.difficulty[diff] || diff)}</span>
-                  </div>
-                  <p class="popup-desc">\${escapeHtml(spot.description || window.I18N.noDescription)}</p>
-                  <div class="btn-container">
-                    <button class="details-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDetails', spotId: \${Number(spot.id) || 0} }))">\${escapeHtml(window.I18N.rate)}</button>
-                    <button class="directions-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'openDirections', lat: \${Number(spot.latitude)}, lng: \${Number(spot.longitude)} }))">\${escapeHtml(window.I18N.route)}</button>
-                  </div>
-                </div>
-              </div>
-            \`; };
 
-            return L.marker([spot.latitude, spot.longitude + (lngOffset || 0)], {
+            // El HTML del popup se construye solo al abrirlo (no para cada marcador en cada movimiento)
+            var buildPopup = function() {
+              var emptyImage = '<div class="popup-image popup-image-empty" role="img" aria-label="' + escapeHtml(window.I18N.noImage) + '">' + CAMERA_SVG + '</div>';
+              var image = spot.mediaUrl
+                ? '<img src="' + escapeHtml(spot.mediaUrl) + '" class="popup-image" alt="" onerror="this.outerHTML=window.__emptyImage" />'
+                : emptyImage;
+              window.__emptyImage = emptyImage;
+              var marks = '';
+              for (var i = 1; i <= 3; i++) marks += '<i class="' + (i <= level ? '' : 'off') + '"></i>';
+              var diffLabel = escapeHtml(window.I18N.difficulty[diff] || diff);
+
+              return '<div class="popup-card">' + image +
+                '<div class="popup-info">' +
+                  '<h3 class="popup-title">' + escapeHtml(spot.name || window.I18N.unnamed) + '</h3>' +
+                  '<div class="popup-facts">' +
+                    '<span class="type-chip" style="background:' + paintFor(spotType) + '">' + escapeHtml(window.I18N.types[spotType] || spotType) + '</span>' +
+                    '<span class="diff" aria-label="' + diffLabel + '"><span class="diff-marks">' + marks + '</span>' + diffLabel + '</span>' +
+                  '</div>' +
+                  '<div class="popup-rating" aria-label="' + rating.toFixed(1) + ' / 5">' +
+                    starsSvg(Math.round(rating)) + '<span class="popup-rating-num">' + rating.toFixed(1) + '</span>' +
+                  '</div>' +
+                  '<p class="popup-desc">' + escapeHtml(spot.description || window.I18N.noDescription) + '</p>' +
+                  '<div class="btn-container">' +
+                    '<button class="details-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: \\'openDetails\\', spotId: ' + (Number(spot.id) || 0) + ' }))">' + escapeHtml(window.I18N.rate) + '</button>' +
+                    '<button class="directions-btn" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: \\'openDirections\\', lat: ' + Number(spot.latitude) + ', lng: ' + Number(spot.longitude) + ' }))">' + escapeHtml(window.I18N.route) + '</button>' +
+                  '</div>' +
+                '</div>' +
+              '</div>';
+            };
+
+            var marker = L.marker([spot.latitude, spot.longitude + (lngOffset || 0)], {
               icon: showAsPlusOneBubble ? singleSpotClusterIcon : icon
-            }).bindPopup(buildPopup);
+            }).bindPopup(buildPopup, { maxWidth: 260, minWidth: 240, autoPanPaddingTopLeft: L.point(16, 96), autoPanPaddingBottomRight: L.point(16, 120) });
+            marker.spotId = spot.id;
+            return marker;
           }
 
+          // Spot seleccionado (popup abierto): sobrevive a los redibujados y lleva la ruta pintada
+          var selectedSpotId = null;
+          var selectedLatLng = null;
+          var isRerendering = false;
+
           function renderVisibleSpots() {
+            isRerendering = true;
             individualSpotsLayer.clearLayers();
             clusteredSpotsLayer.clearLayers();
+            isRerendering = false;
             var bounds = map.getBounds();
             var currentZoom = map.getZoom();
 
@@ -528,7 +661,68 @@ export default function SkateMap({
               });
             }
             targetLayer.addTo(map);
+
+            if (selectedSpotId !== null) {
+              var selectedMarker = null;
+              if (!useClusterLayer) {
+                markers.forEach(function(marker) {
+                  if (marker.spotId === selectedSpotId && selectedLatLng &&
+                      marker.getLatLng().distanceTo(selectedLatLng) < 1) {
+                    selectedMarker = marker;
+                  }
+                });
+              }
+              if (selectedMarker) {
+                selectedMarker.openPopup();
+              } else {
+                // El spot se ha agrupado o ha salido de pantalla: se suelta la selección
+                selectedSpotId = null;
+                selectedLatLng = null;
+                clearRoute();
+              }
+            }
           }
+
+          var routeCasing = null;
+          var routeLine = null;
+
+          function clearRoute() {
+            if (routeCasing) { map.removeLayer(routeCasing); routeCasing = null; }
+            if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
+          }
+
+          // Ruta pintada: puntos rosas redondos sobre una línea de tinta, del usuario al spot
+          function drawRoute() {
+            clearRoute();
+            if (!userLatLng || !selectedLatLng) return;
+            var points = [userLatLng, selectedLatLng];
+            var style = { dashArray: '2 12', lineCap: 'round', lineJoin: 'round', interactive: false };
+            routeCasing = L.polyline(points, L.extend({ color: '${Palette.asphalt}', weight: 9 }, style)).addTo(map);
+            routeLine = L.polyline(points, L.extend({ color: '${Palette.pink}', weight: 6 }, style)).addTo(map);
+          }
+
+          function setSelectedClass(marker, isSelected) {
+            var el = marker && marker.getElement && marker.getElement();
+            if (el) el.classList.toggle('is-selected', isSelected);
+          }
+
+          map.on('popupopen', function(e) {
+            var marker = e.popup && e.popup._source;
+            if (!marker || marker.spotId === undefined) return;
+            selectedSpotId = marker.spotId;
+            selectedLatLng = marker.getLatLng();
+            setSelectedClass(marker, true);
+            drawRoute();
+          });
+
+          map.on('popupclose', function(e) {
+            var marker = e.popup && e.popup._source;
+            setSelectedClass(marker, false);
+            if (isRerendering) return;
+            selectedSpotId = null;
+            selectedLatLng = null;
+            clearRoute();
+          });
 
           window.renderSpots = function(spotsData) {
             allSpotsData = spotsData || [];
@@ -569,9 +763,9 @@ export default function SkateMap({
             radiusTimer = setTimeout(function() {
               if (!userLatLng || locationCircle) return;
               locationCircle = L.circle(userLatLng, {
-                color: '#3FA9F5',
-                fillColor: '#3FA9F5',
-                fillOpacity: 0.12,
+                color: '${Palette.asphalt}',
+                fillColor: '${Palette.asphalt}',
+                fillOpacity: 0.06,
                 radius: 200, // 200 metros
                 weight: 1.5,
                 dashArray: '4 6',
@@ -594,6 +788,7 @@ export default function SkateMap({
             }
 
             hideRadius();
+            if (selectedLatLng) drawRoute();
 
             // Si ya estamos ahí (p. ej. al afinar la posición) solo movemos el punto, sin volver a hacer zoom
             var distance = map.getCenter().distanceTo(userLatLng);
@@ -634,7 +829,10 @@ export default function SkateMap({
               if (window.newSpotMarker) {
                 map.removeLayer(window.newSpotMarker);
               }
-              window.newSpotMarker = L.marker(e.latlng, { opacity: 0.7 }).addTo(map);
+              window.newSpotMarker = L.marker(e.latlng, {
+                icon: L.divIcon({ className: 'paint-marker', html: '<div class="proposed-dot"></div>', iconSize: [44, 44], iconAnchor: [22, 22] }),
+                interactive: false
+              }).addTo(map);
               
               window.ReactNativeWebView.postMessage(JSON.stringify({ 
                 type: 'locationSelected', 
@@ -704,9 +902,9 @@ export default function SkateMap({
             mapReadyRef.current = true;
           } else if (data.type === 'error') {
              if (data.code === 'tooFar') {
-               alert(t('errors.tooFar', { meters: Number(data.meters) || 0 }));
+               onNotice(t('errors.tooFar', { meters: Number(data.meters) || 0 }));
              } else if (data.code === 'gpsWaiting') {
-               alert(t('errors.gpsWaiting'));
+               onNotice(t('errors.gpsWaiting'));
              }
           } 
           else if (data.type === 'locationSelected' &&
@@ -731,6 +929,6 @@ export default function SkateMap({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#e5e5e5' },
+  container: { flex: 1, backgroundColor: Palette.concrete },
   map: { width: '100%', flex: 1 },
 });

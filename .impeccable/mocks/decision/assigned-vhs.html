@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{--vcr:#1A2BC4;--tape:#0E0E10;--label:#F5F5F0;--rec:#E8231E;--grey:#C8CCD6;--map:#EBE9E4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;height:844px;overflow:hidden;font-family:Archivo,system-ui,sans-serif;color:var(--tape);background:var(--map);position:relative}
+.map{position:absolute;inset:0;background:
+ linear-gradient(28deg,transparent 47%,#fff 47%,#fff 49.5%,transparent 49.5%),
+ linear-gradient(-62deg,transparent 30%,#fff 30%,#fff 32%,transparent 32%),
+ linear-gradient(0deg,transparent 20%,#d6e6c8 20%,#d6e6c8 30%,transparent 30%),var(--map)}
+.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:#3FA9F5;border:3px solid #fff;box-shadow:0 0 0 10px rgba(63,169,245,.18)}
+.cl{position:absolute;padding:4px 9px;border-radius:12px;background:#1d2b3a;color:#fff;font:700 13px Archivo}
+.blk{position:absolute;top:52px;height:46px;padding:0 14px;display:flex;align-items:center;gap:10px;background:var(--vcr);color:#fff;font-weight:800;font-size:15px}
+.blk .osd{font:22px VT323;letter-spacing:.04em}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:560px;background:var(--label);border-top:1px solid var(--tape)}
+.photo{position:relative;height:230px;background:linear-gradient(160deg,#87a3b4 0%,#c9c2b4 38%,#a59b8b 39%,#7c7568 70%,#5d564c 100%)}
+.rec{position:absolute;top:12px;left:14px;font:24px VT323;color:#fff;letter-spacing:.06em}
+.rec i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--rec);margin-right:6px;vertical-align:1px}
+.lt{position:absolute;left:0;bottom:18px;background:var(--tape);color:#fff;padding:8px 16px 8px 20px}
+.lt h1{font-size:22px;font-weight:800;letter-spacing:.02em;text-transform:uppercase}
+.lt p{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+.osdline{display:flex;border-bottom:1px solid var(--tape)}
+.o{flex:1;padding:10px 0 8px 20px;border-right:1px solid var(--tape)}
+.o:last-child{border-right:0}
+.o b{display:block;font:40px/1 VT323;letter-spacing:.02em}
+.o span{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.vote{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--tape);font-weight:800;font-size:14px}
+.vote em{font:24px VT323;font-style:normal;color:var(--rec)}
+.acts{display:flex;gap:10px;padding:16px 20px 0}
+.btn{flex:1;height:50px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+.pri{background:var(--vcr);color:#fff}.sec{border:1px solid var(--tape)}
+.cm{margin:14px 20px 0;font-size:13px;font-weight:700}
+</style></head><body>
+<div class="map"></div>
+<div class="pin" style="left:186px;top:200px"></div>
+<div class="cl" style="left:60px;top:150px">+12</div>
+<div class="cl" style="left:290px;top:236px">+4</div>
+<div class="blk" style="left:16px">Filters <span class="osd">[2]</span></div>
+<div class="blk" style="right:16px">andrii</div>
+<div class="sheet">
+ <div class="photo">
+  <div class="rec"><i></i>PLAY ► 00:23</div>
+  <div class="lt"><h1>MACBA ledges</h1><p>Barcelona · Street · Ledge</p></div>
+ </div>
+ <div class="osdline">
+  <div class="o"><b>★4.6</b><span>23 votes</span></div>
+  <div class="o"><b>1.2KM</b><span>Away</span></div>
+  <div class="o"><b>ADV</b><span>Level</span></div>
+ </div>
+ <div class="vote">Your vote <em>●REC ★★★★★</em></div>
+ <div class="acts"><div class="btn pri">Directions</div><div class="btn sec">Comments · 8</div></div>
+ <div class="cm">marta_sk8 — waxed, security after 9pm</div>
+</div>
+</body></html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;height:844px;overflow:hidden;font-family:Roboto,system-ui,sans-serif;color:#1F1F1F;background:#EBE9E4;position:relative}
+.map{position:absolute;inset:0;background:
+ linear-gradient(28deg,transparent 47%,#fff 47%,#fff 49.5%,transparent 49.5%),
+ linear-gradient(-62deg,transparent 30%,#fff 30%,#fff 32%,transparent 32%),
+ linear-gradient(0deg,transparent 20%,#d6e6c8 20%,#d6e6c8 30%,transparent 30%),#EBE9E4}
+.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:#3FA9F5;border:3px solid #fff;box-shadow:0 0 0 10px rgba(63,169,245,.18)}
+.cl{position:absolute;padding:4px 9px;border-radius:12px;background:#1d2b3a;color:#fff;font:700 13px Roboto}
+.bar{position:absolute;top:52px;left:16px;right:16px;height:48px;border-radius:24px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 20px;font-size:15px;color:#5f6368}
+.av{width:34px;height:34px;border-radius:50%;background:#1A73E8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.chips{position:absolute;top:112px;left:16px;display:flex;gap:8px}
+.chip{background:#fff;border-radius:16px;padding:7px 14px;font-size:13px;font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.chip.on{background:#E8F0FE;color:#1A73E8}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:470px;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -4px 16px rgba(0,0,0,.12);padding:10px 20px}
+.grab{width:36px;height:4px;border-radius:2px;background:#dadce0;margin:0 auto 14px}
+h1{font-size:22px;font-weight:500}
+.r{margin-top:4px;font-size:14px;color:#5f6368}.r b{color:#1F1F1F}.r i{color:#F4B400;font-style:normal}
+.acts{display:flex;gap:8px;margin-top:14px}
+.b{height:40px;padding:0 18px;border-radius:20px;display:flex;align-items:center;font-weight:500;font-size:14px;border:1px solid #dadce0;color:#1A73E8}
+.b.p{background:#1A73E8;color:#fff;border-color:#1A73E8}
+.photo{margin-top:16px;height:180px;border-radius:12px;background:linear-gradient(160deg,#87a3b4 0%,#c9c2b4 38%,#a59b8b 39%,#7c7568 70%,#5d564c 100%)}
+.cm{margin-top:14px;font-size:14px;color:#3c4043}
+.fab{position:absolute;right:16px;bottom:486px;width:56px;height:56px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:#1A73E8;font-size:22px}
+</style></head><body>
+<div class="map"></div>
+<div class="pin" style="left:186px;top:220px"></div>
+<div class="cl" style="left:60px;top:190px">+12</div>
+<div class="bar">Filters <div class="av">A</div></div>
+<div class="chips"><div class="chip on">Ledge</div><div class="chip">Under 5 km</div><div class="chip">4★+</div></div>
+<div class="fab">◎</div>
+<div class="sheet">
+ <div class="grab"></div>
+ <h1>MACBA ledges</h1>
+ <div class="r"><b>4.6</b> <i>★★★★★</i> (23) · Ledge · Advanced · 1.2 km</div>
+ <div class="acts"><div class="b p">Directions</div><div class="b">Rate</div><div class="b">Comments</div></div>
+ <div class="photo"></div>
+ <div class="cm">marta_sk8 — waxed, security after 9pm</div>
+</div>
+</body></html>

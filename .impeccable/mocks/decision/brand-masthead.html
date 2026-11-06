@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=League+Gothic&display=swap" rel="stylesheet">
+<style>
+:root{--page:#FFFFFF;--ink:#0D0D0D;--red:#E10600;--grey:#D9D9D9;--map:#EBE9E4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;height:844px;overflow:hidden;font-family:Archivo,system-ui,sans-serif;color:var(--ink);background:var(--map);position:relative}
+.map{position:absolute;inset:0;background:
+ linear-gradient(28deg,transparent 47%,#fff 47%,#fff 49.5%,transparent 49.5%),
+ linear-gradient(-62deg,transparent 30%,#fff 30%,#fff 32%,transparent 32%),
+ linear-gradient(0deg,transparent 20%,#d6e6c8 20%,#d6e6c8 30%,transparent 30%),var(--map)}
+.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:#3FA9F5;border:3px solid #fff;box-shadow:0 0 0 10px rgba(63,169,245,.18)}
+.cl{position:absolute;padding:4px 9px;border-radius:12px;background:#1d2b3a;color:#fff;font:700 13px Archivo}
+.blk{position:absolute;top:52px;height:46px;padding:0 16px;display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;font-weight:800;font-size:15px}
+.blk .n{background:var(--red);padding:1px 7px}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:560px;background:var(--page)}
+.mast{height:40px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font:26px/1 "League Gothic";letter-spacing:.04em;text-transform:uppercase}
+.mast span{font:800 11px Archivo;letter-spacing:.12em}
+.photo{height:210px;background:linear-gradient(160deg,#87a3b4 0%,#c9c2b4 38%,#a59b8b 39%,#7c7568 70%,#5d564c 100%)}
+.head{padding:12px 20px 0}
+h1{font:62px/0.88 "League Gothic",Archivo;text-transform:uppercase}
+.where{font-size:13px;font-weight:700;margin-top:4px}
+.cap{display:flex;gap:16px;margin:12px 20px 0;padding:10px 0;border-top:3px solid var(--ink);border-bottom:1px solid var(--grey);font-size:14px;font-weight:700}
+.cap b{font:28px/1 "League Gothic";margin-right:4px}
+.acts{display:flex;gap:10px;padding:14px 20px 0}
+.btn{flex:1;height:50px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.04em}
+.pri{background:var(--red);color:#fff}.sec{background:var(--ink);color:#fff}
+.vote{margin:12px 20px 0;font-size:13px;font-weight:700}
+.vote em{font-style:normal;color:var(--red)}
+</style></head><body>
+<div class="map"></div>
+<div class="pin" style="left:186px;top:200px"></div>
+<div class="cl" style="left:60px;top:160px">+12</div>
+<div class="cl" style="left:290px;top:230px">+4</div>
+<div class="blk" style="left:16px">Filters <span class="n">2</span></div>
+<div class="blk" style="right:16px">andrii</div>
+<div class="sheet">
+ <div class="mast">SkateMap <span>Spot check · Barcelona</span></div>
+ <div class="photo"></div>
+ <div class="head"><h1>MACBA ledges</h1><div class="where">Plaça dels Àngels · Street · Ledge</div></div>
+ <div class="cap"><span><b>4.6</b>★ 23 votes</span><span><b>1.2</b>km</span><span><b>ADV</b>level</span></div>
+ <div class="acts"><div class="btn pri">Directions</div><div class="btn sec">Comments · 8</div></div>
+ <div class="vote">Your vote: <em>★★★★★</em></div>
+</div>
+</body></html>

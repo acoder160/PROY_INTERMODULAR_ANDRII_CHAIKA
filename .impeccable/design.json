@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-29T00:00:00Z",
+  "title": "Design System: SkateMap",
+  "extensions": {
+    "colorMeta": {
+      "asphalt": { "role": "neutral", "displayName": "Asphalt", "canonical": "#1C1C1C", "tonalRamp": ["#0B0B0B", "#141414", "#1C1C1C", "#2A2A2A", "#4A4A46", "#8A8A85", "#C8C8C3", "#EDEDEA"] },
+      "concrete": { "role": "neutral", "displayName": "Concrete", "canonical": "#C9C9C4", "tonalRamp": ["#3A3A37", "#5A5A56", "#7C7C77", "#A0A09B", "#C9C9C4", "#D7D7D2", "#E5E5E1", "#F3F3F1"] },
+      "paint-pink": { "role": "primary", "displayName": "Locate Pink", "canonical": "#FF4FA3", "tonalRamp": ["#4D0A2A", "#80124A", "#B31E6F", "#E03A8C", "#FF4FA3", "#FF7DBC", "#FFB0D6", "#FFE0EF"] },
+      "paint-orange": { "role": "secondary", "displayName": "Safety Orange (Street)", "canonical": "#FF7A00", "tonalRamp": ["#4D2400", "#803D00", "#B35400", "#E66C00", "#FF7A00", "#FF9E40", "#FFC48A", "#FFE9D1"] },
+      "paint-yellow": { "role": "secondary", "displayName": "Survey Yellow (Rail)", "canonical": "#FFD400", "tonalRamp": ["#4D3F00", "#806A00", "#B39500", "#E6BF00", "#FFD400", "#FFE04D", "#FFEC99", "#FFF8D6"] },
+      "paint-blue": { "role": "secondary", "displayName": "Utility Blue (Ramps)", "canonical": "#2F6BFF", "tonalRamp": ["#0A1B4D", "#102D80", "#1A47B3", "#2459E6", "#2F6BFF", "#6A94FF", "#A5BFFF", "#DCE6FF"] },
+      "paint-green": { "role": "secondary", "displayName": "Park Green (Park)", "canonical": "#18A558", "tonalRamp": ["#05301A", "#0A5230", "#0F7A3E", "#14924E", "#18A558", "#4FC084", "#95DAB2", "#D6F2E1"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Spot name on the sheet and auth titles; uppercase stencil caps." },
+      "distance": { "displayName": "Distance", "purpose": "The huge distance figure on the spot sheet." },
+      "title": { "displayName": "Title", "purpose": "Accordion headers and top-bar pills." },
+      "label": { "displayName": "Label", "purpose": "Chips, difficulty text, choice pills, form labels." },
+      "body": { "displayName": "Body", "purpose": "Descriptions, comments, notices in the system face." }
+    },
+    "shadows": [
+      { "name": "float-control", "value": "0 3px 6px rgba(0,0,0,0.25)", "purpose": "Floating map FABs and Add button only; Android elevation 4." },
+      { "name": "marker", "value": "0 2px 3px rgba(0,0,0,0.35)", "purpose": "Leaflet paint dots and clusters." },
+      { "name": "popup", "value": "0 4px 12px rgba(0,0,0,0.3)", "purpose": "Leaflet popup card." }
+    ],
+    "motion": [
+      { "name": "fab-spin", "value": "900ms linear loop", "purpose": "Reload FAB while busy." },
+      { "name": "dot-pulse", "value": "2.2s ease-out infinite", "purpose": "User location ring." },
+      { "name": "press-scale", "value": "0.12s ease, scale 0.96", "purpose": "WebView popup buttons." }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Pink, outlined, full-pill action; the one go action per view.",
+      "html": "<button class=\"ds-btn-primary\">ROLL THERE</button>",
+      "css": ".ds-btn-primary{background:#FF4FA3;color:#1C1C1C;border:2px solid #1C1C1C;border-radius:26px;min-height:52px;width:100%;font:900 22px/1 'Big Shoulders Display',Impact,sans-serif;letter-spacing:1px;text-transform:uppercase;cursor:pointer}.ds-btn-primary:hover{filter:brightness(0.95)}.ds-btn-primary:focus-visible{outline:3px solid #1C1C1C;outline-offset:2px}.ds-btn-primary:active{opacity:.8}"
+    },
+    {
+      "name": "Top-bar Pill",
+      "kind": "nav",
+      "refersTo": "pill-on-dark",
+      "description": "Filters and account pills on the asphalt bar.",
+      "html": "<div class=\"ds-bar\"><button class=\"ds-pill\">FILTERS</button></div>",
+      "css": ".ds-bar{background:#1C1C1C;padding:12px 16px}.ds-pill{background:transparent;color:#fff;border:2px solid #fff;border-radius:24px;min-height:48px;padding:0 16px;font:700 20px/1 'Big Shoulders Display',Impact,sans-serif;letter-spacing:.8px;text-transform:uppercase;cursor:pointer}.ds-pill:focus-visible{outline:3px solid #FF4FA3;outline-offset:2px}.ds-pill:active{opacity:.8}"
+    },
+    {
+      "name": "Choice Pill",
+      "kind": "chip",
+      "refersTo": "choice-pill-selected",
+      "description": "Single-choice filter pill; selected inverts to asphalt fill.",
+      "html": "<button class=\"ds-choice\"><i class=\"ds-dot\"></i>STREET</button><button class=\"ds-choice ds-on\">PARK</button>",
+      "css": ".ds-choice{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#1C1C1C;border:2px solid #1C1C1C;border-radius:24px;min-height:48px;padding:0 16px;font:700 18px/1 'Big Shoulders Display',Impact,sans-serif;letter-spacing:.6px;text-transform:uppercase;cursor:pointer}.ds-choice.ds-on{background:#1C1C1C;color:#fff}.ds-dot{width:14px;height:14px;border-radius:50%;border:2px solid #1C1C1C;background:#FF7A00}.ds-choice:focus-visible{outline:3px solid #FF4FA3;outline-offset:2px}"
+    },
+    {
+      "name": "Type Chip and Difficulty",
+      "kind": "chip",
+      "refersTo": "type-chip",
+      "description": "Paint-filled spot type chip plus 1-3 slanted marks and text.",
+      "html": "<span class=\"ds-type\">RAMPS</span> <span class=\"ds-diff\"><i></i><i></i><i class=\"off\"></i>INTERMEDIATE</span>",
+      "css": ".ds-type{display:inline-block;background:#2F6BFF;color:#1C1C1C;border:2px solid #1C1C1C;border-radius:10px;padding:4px 10px;font:700 16px/1 'Big Shoulders Display',Impact,sans-serif;letter-spacing:.8px;text-transform:uppercase}.ds-diff{display:inline-flex;align-items:center;gap:8px;color:#1C1C1C;font:700 16px/1 'Big Shoulders Display',Impact,sans-serif;letter-spacing:.8px;text-transform:uppercase}.ds-diff i{display:inline-block;width:7px;height:16px;background:#1C1C1C;transform:skewX(-18deg);margin-right:3px}.ds-diff i.off{background:transparent;border:1.5px solid #1C1C1C}"
+    },
+    {
+      "name": "Map FAB",
+      "kind": "button",
+      "refersTo": "map-fab",
+      "description": "Floating white outlined square over the map.",
+      "html": "<button class=\"ds-fab\" aria-label=\"Locate\"><svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\" fill=\"#1C1C1C\"><path d=\"M12 2 4 21l8-4 8 4z\"/></svg></button>",
+      "css": ".ds-fab{width:56px;height:56px;border-radius:16px;background:#fff;border:2px solid #1C1C1C;box-shadow:0 3px 6px rgba(0,0,0,.25);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.ds-fab:focus-visible{outline:3px solid #FF4FA3;outline-offset:2px}.ds-fab:active{opacity:.8}"
+    },
+    {
+      "name": "Spot Sheet Header",
+      "kind": "card",
+      "refersTo": "sheet",
+      "description": "Name in stencil caps, five-paint strip, huge distance.",
+      "html": "<div class=\"ds-sheet\"><h3>KENNEDY LEDGES</h3><div class=\"ds-strip\"><b style=\"background:#FF7A00\"></b><b style=\"background:#FFD400\"></b><b style=\"background:#2F6BFF\"></b><b style=\"background:#18A558\"></b><b style=\"background:#FF4FA3\"></b></div><div class=\"ds-dist\">1.2 km</div></div>",
+      "css": ".ds-sheet{background:#fff;border-radius:28px 28px 0 0;padding:20px;color:#1C1C1C}.ds-sheet h3{margin:0;font:900 36px/38px 'Big Shoulders Display',Impact,sans-serif;text-transform:uppercase;letter-spacing:.4px}.ds-strip{display:flex;height:6px;border-radius:3px;overflow:hidden;margin:10px 0}.ds-strip b{flex:1}.ds-dist{font:900 48px/50px 'Big Shoulders Display',Impact,sans-serif}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "White field with 2px outline; on the asphalt auth card the border is white.",
+      "html": "<input class=\"ds-input\" placeholder=\"Email\">",
+      "css": ".ds-input{background:#fff;color:#1C1C1C;border:2px solid #1C1C1C;border-radius:14px;min-height:48px;padding:12px 14px;font:16px system-ui,sans-serif}.ds-input:focus-visible{outline:3px solid #FF4FA3;outline-offset:2px}"
+    },
+    {
+      "name": "Painted Route",
+      "kind": "custom",
+      "description": "Dashed round-dot pink line with the user dot.",
+      "html": "<svg width=\"220\" height=\"40\"><rect width=\"220\" height=\"40\" fill=\"#C9C9C4\"/><line x1=\"20\" y1=\"20\" x2=\"200\" y2=\"20\" stroke=\"#FF4FA3\" stroke-width=\"6\" stroke-dasharray=\"2 12\" stroke-linecap=\"round\"/><circle cx=\"20\" cy=\"20\" r=\"9\" fill=\"#1C1C1C\" stroke=\"#fff\" stroke-width=\"3\"/></svg>",
+      "css": ""
+    }
+  ],
+  "narrative": {
+    "northStar": "Locate Paint",
+    "overview": "The app is the pavement. Spots are marked the way crews mark the street, in flat utility locate paint, and the route to a spot is a dashed painted line on the ground. The shell is asphalt-black, the map ground is concrete grey, sheets are white, and type is stencil-cut condensed caps.",
+    "keyCharacteristics": [
+      "Asphalt shell, concrete ground, white sheets.",
+      "Five flat paints, one per spot type; pink also means \"go\".",
+      "2px outlines on every control; pill and sheet radii.",
+      "Condensed uppercase display face for headings, buttons, labels; system face for reading text.",
+      "48px minimum targets; legible in direct sun."
+    ],
+    "rules": [
+      { "name": "The Colour-Is-Type Rule", "body": "Orange, yellow, blue, green and white mean a spot type and nothing else.", "section": "colors" },
+      { "name": "The One Go Rule", "body": "Pink is the primary action and the route. One pink action per view.", "section": "colors" },
+      { "name": "The Not-Hue-Alone Rule", "body": "Type and difficulty always carry a text label; difficulty is marks plus text.", "section": "colors" },
+      { "name": "The Stencil Rule", "body": "Display face is always uppercase and used only for names, numbers, buttons and labels.", "section": "typography" },
+      { "name": "The Flat-Fields Rule", "body": "Fills are solid. Shadows are only for objects floating over the map, never for sheet content.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do colour spots only with the five paints through spotTypePaint, with a text label alongside.",
+      "Do outline every control and chip in 2px (white on asphalt, ink on light).",
+      "Do keep every target at least 48px and ink-on-paint text for contrast.",
+      "Do render the route as a dashed pink line and keep pink for the single primary action.",
+      "Do design for long strings, RTL and non-Latin fallback: let labels wrap or shrink instead of truncating the type chip."
+    ],
+    "donts": [
+      "Don't use gradients, glows, or blur in new surfaces.",
+      "Don't use the paints for decoration or non-type state.",
+      "Don't signal difficulty by colour.",
+      "Don't set paragraphs in the display face.",
+      "Don't reintroduce the old navy and teal palette; the web client keeps its own look and is out of scope."
+    ]
+  }
+}

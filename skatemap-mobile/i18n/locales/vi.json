@@ -5,7 +5,9 @@
     "login": "Đăng nhập",
     "user": "Người dùng",
     "language": "Ngôn ngữ",
-    "languageAuto": "Tự động (ngôn ngữ điện thoại)"
+    "languageAuto": "Tự động (ngôn ngữ điện thoại)",
+    "openSettings": "Mở cài đặt",
+    "retry": "Thử lại"
   },
   "map": {
     "filters": "Bộ lọc",
@@ -22,7 +24,8 @@
     "offlineMode": "Chế độ ngoại tuyến (đang hiển thị bản đồ đã lưu)",
     "geoUnsupported": "Trình duyệt của bạn không hỗ trợ định vị",
     "geoDenied": "Quyền vị trí bị từ chối. Hãy bật trong trình duyệt.",
-    "geoFailed": "Không thể lấy vị trí của bạn."
+    "geoFailed": "Không thể lấy vị trí của bạn.",
+    "logoutConfirm": "Đăng xuất khỏi SkateMap?"
   },
   "filters": {
     "title": "Lọc spot",
@@ -36,7 +39,8 @@
     "minStars": "Số sao tối thiểu",
     "allStars": "Tất cả",
     "starsOrMore": "{{n}} ⭐️ trở lên",
-    "applyResults": "Xem kết quả"
+    "applyResults": "Xem kết quả",
+    "reset": "Đặt lại"
   },
   "popup": {
     "loading": "Đang tải...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "Đã xảy ra lỗi khi gửi. Vui lòng kiểm tra kết nối.",
     "averageRating": "Điểm trung bình: {{value}}/5",
     "thanks": "Cảm ơn bạn đã đánh giá! 🛹",
-    "noImage": "Không có ảnh"
+    "noImage": "Không có ảnh",
+    "commentsFailed": "Không thể tải bình luận."
   },
   "auth": {
     "welcomeBack": "Chào mừng trở lại",
@@ -109,7 +114,7 @@
     "cameraDenied": "⚠️ Quyền camera bị từ chối",
     "waitingGps": "⚠️ Đang chờ GPS...",
     "processingPhoto": "📸 Đang xử lý ảnh...",
-    "tapCircle": "📍 Chạm vào bên trong vòng tròn xanh để chọn vị trí 👇",
+    "tapCircle": "📍 Chạm vào trong vòng tròn để đặt vị trí 👇",
     "gettingLocation": "📍 Đang lấy vị trí hiện tại của bạn...",
     "gpsDenied": "⚠️ Quyền GPS bị từ chối",
     "locationError": "⚠️ Lỗi khi tìm vị trí"
@@ -144,7 +149,12 @@
     "description": "Mô tả...",
     "type": "Loại",
     "level": "Cấp độ",
-    "save": "Lưu spot"
+    "save": "Lưu spot",
+    "nameRequired": "Hãy đặt tên cho spot.",
+    "discardTitle": "Bỏ spot này?",
+    "discardMessage": "Ảnh bạn đã chụp sẽ bị mất.",
+    "discard": "Bỏ",
+    "keepEditing": "Tiếp tục chỉnh sửa"
   },
   "camera": {
     "takePhoto": "Hãy chụp ảnh spot 🛹"

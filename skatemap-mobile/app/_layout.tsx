@@ -4,15 +4,29 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
+import {
+  useFonts,
+  BigShouldersDisplay_700Bold,
+  BigShouldersDisplay_900Black,
+} from '@expo-google-fonts/big-shoulders-display';
 
 import '../i18n';
 import { AuthProvider } from '../context/AuthContext';
 
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
 export default function RootLayout() {
-  
+  const [fontsLoaded, fontError] = useFonts({
+    BigShouldersDisplay_700Bold,
+    BigShouldersDisplay_900Black,
+  });
+  const fontsReady = fontsLoaded || !!fontError;
+
   useEffect(() => {
-    SplashScreen.hideAsync().catch(() => {});
-  }, []);
+    if (fontsReady) SplashScreen.hideAsync().catch(() => {});
+  }, [fontsReady]);
+
+  if (!fontsReady) return null;
 
   return (
     <AuthProvider>

@@ -5,7 +5,9 @@
     "login": "تسجيل الدخول",
     "user": "المستخدم",
     "language": "اللغة",
-    "languageAuto": "تلقائي (لغة الهاتف)"
+    "languageAuto": "تلقائي (لغة الهاتف)",
+    "openSettings": "فتح الإعدادات",
+    "retry": "إعادة المحاولة"
   },
   "map": {
     "filters": "الفلاتر",
@@ -22,7 +24,8 @@
     "offlineMode": "وضع عدم الاتصال (عرض الخريطة المحفوظة)",
     "geoUnsupported": "متصفحك لا يدعم تحديد الموقع",
     "geoDenied": "تم رفض إذن الموقع. فعّله من المتصفح.",
-    "geoFailed": "تعذّر تحديد موقعك."
+    "geoFailed": "تعذّر تحديد موقعك.",
+    "logoutConfirm": "تسجيل الخروج من SkateMap؟"
   },
   "filters": {
     "title": "تصفية الأماكن",
@@ -36,7 +39,8 @@
     "minStars": "الحد الأدنى للنجوم",
     "allStars": "الكل",
     "starsOrMore": "{{n}} ⭐️ فأكثر",
-    "applyResults": "عرض النتائج"
+    "applyResults": "عرض النتائج",
+    "reset": "إعادة الضبط"
   },
   "popup": {
     "loading": "جارٍ التحميل...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "حدث خطأ أثناء الإرسال. يرجى التحقق من اتصالك.",
     "averageRating": "متوسط التقييم: {{value}}/5",
     "thanks": "شكرًا على تقييمك! 🛹",
-    "noImage": "لا توجد صورة"
+    "noImage": "لا توجد صورة",
+    "commentsFailed": "تعذّر تحميل التعليقات."
   },
   "auth": {
     "welcomeBack": "مرحبًا بعودتك",
@@ -109,7 +114,7 @@
     "cameraDenied": "⚠️ تم رفض إذن الكاميرا",
     "waitingGps": "⚠️ بانتظار GPS...",
     "processingPhoto": "📸 جارٍ معالجة الصورة...",
-    "tapCircle": "📍 اضغط داخل الدائرة الزرقاء لتحديد المكان 👇",
+    "tapCircle": "📍 اضغط داخل الدائرة لتحديد المكان 👇",
     "gettingLocation": "📍 جارٍ تحديد موقعك الحالي...",
     "gpsDenied": "⚠️ تم رفض إذن GPS",
     "locationError": "⚠️ خطأ في البحث عن الموقع"
@@ -144,7 +149,12 @@
     "description": "الوصف...",
     "type": "النوع",
     "level": "المستوى",
-    "save": "حفظ المكان"
+    "save": "حفظ المكان",
+    "nameRequired": "أعطِ المكان اسمًا.",
+    "discardTitle": "هل تريد تجاهل هذا المكان؟",
+    "discardMessage": "ستفقد الصورة التي التقطتها.",
+    "discard": "تجاهل",
+    "keepEditing": "متابعة التعديل"
   },
   "camera": {
     "takePhoto": "التقط صورة للمكان 🛹"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking, useWindowDimensions } from 'react-native';
 import api from '../../utils/api';
+import { cleanLabel } from '../../utils/text';
 import { useAuth } from '../../context/AuthContext';
 import SkateMap from '../../components/skatemap';
 import SpotFormModal from '../../components/SpotFormModal';
@@ -8,21 +9,23 @@ import CameraOverlay from '../../components/CameraOverlay';
 import { uploadImageToCloudinary } from '../../utils/cloudinary';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCameraPermissions } from 'expo-camera';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Palette, DisplayFont, MIN_TARGET } from '../../constants/theme';
 import { useLocation } from '../../hooks/useLocation';
 import { useSpots } from '../../hooks/useSpots';
 import SpotDetailsModal from '../../components/SpotDetailsModal';
-import FilterModal from '../../components/FilterModal';
+import FilterModal, { DEFAULT_FILTERS, type FilterState } from '../../components/FilterModal';
+import LanguageModal from '../../components/LanguageModal';
 import { useTranslation } from 'react-i18next';
 import MapFab from '../../components/MapFab';
-
-// Tiempo del GIF para completar un ciclo natural
-const GIF_CYCLE_DURATION_MS = 2000; 
 
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { user, token, logout } = useAuth(); 
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
   
   const { userLocation, handleRecenter } = useLocation();
   
@@ -48,20 +51,19 @@ export default function HomeScreen() {
 
   // Estados para los filtros
   const [filterModalVisible, setFilterModalVisible] = useState(false);
-  const [filters, setFilters] = useState({ minRating: 0, spotType: 'ALL', maxDistance: 0 });
+  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [languageModalVisible, setLanguageModalVisible] = useState(false);
+
+  const [formError, setFormError] = useState<string | null>(null);
 
   // Lógica para recargar spots (ahora funciona también sin token para invitados)
   const handleReloadSpots = async () => {
     if (isRefreshing) return;
 
     setIsRefreshing(true);
-    
+
     try {
-      const fetchPromise = fetchSpots();
-      const animationPromise = new Promise(resolve => setTimeout(resolve, GIF_CYCLE_DURATION_MS));
-      
-      await Promise.all([fetchPromise, animationPromise]);
-      
+      await fetchSpots();
     } catch (error) {
       console.error("Error recargando spots:", error);
     } finally {
@@ -94,13 +96,21 @@ export default function HomeScreen() {
     }
 
     if (isAddingMode) {
-      setIsAddingMode(false); setNewSpotLocation(null); setCapturedPhoto(null); setStatusMessage(null); return;
+      handleCloseForm();
+      return;
     }
 
     setStatusMessage(t('status.preparingCamera'));
     if (!permission?.granted) {
       const { granted } = await requestPermission();
-      if (!granted) { setStatusMessage(t('status.cameraDenied')); setTimeout(() => setStatusMessage(null), 3000); return; }
+      if (!granted) {
+        setStatusMessage(null);
+        Alert.alert(cleanLabel(t('status.cameraDenied')), undefined, [
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('common.openSettings'), onPress: () => { Linking.openSettings().catch(() => {}); } },
+        ]);
+        return;
+      }
     }
     
     let loc = userLocation;
@@ -112,6 +122,38 @@ export default function HomeScreen() {
 
     setStatusMessage(null);
     setShowCamera(true); 
+  };
+
+  const statusTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (statusTimer.current) clearTimeout(statusTimer.current); }, []);
+
+  // Aviso breve en la píldora de estado (sustituye a los alert() de éxito)
+  const showStatus = (message: string) => {
+    if (statusTimer.current) clearTimeout(statusTimer.current);
+    setStatusMessage(message);
+    statusTimer.current = setTimeout(() => setStatusMessage(null), 3000);
+  };
+
+  const resetAddFlow = () => {
+    setModalVisible(false); setIsAddingMode(false); setNewSpotLocation(null); setCapturedPhoto(null); setStatusMessage(null);
+    setFormError(null);
+    setFormData({ name: '', description: '', spotType: 'STREET', difficultyLevel: 'INTERMEDIATE' });
+  };
+
+  // Cerrar el formulario con una foto hecha la perdería: se pide confirmación
+  const handleCloseForm = () => {
+    if (!capturedPhoto) { resetAddFlow(); return; }
+    Alert.alert(t('form.discardTitle'), t('form.discardMessage'), [
+      { text: t('form.keepEditing'), style: 'cancel' },
+      { text: t('form.discard'), style: 'destructive', onPress: resetAddFlow },
+    ]);
+  };
+
+  const confirmLogout = () => {
+    Alert.alert(t('map.logoutConfirm'), user ?? undefined, [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('map.logout'), style: 'destructive', onPress: logout },
+    ]);
   };
 
   const takePicture = async () => {
@@ -131,16 +173,17 @@ export default function HomeScreen() {
       router.push('/login');
       return;
     }
-    if (!newSpotLocation || !formData.name || !capturedPhoto) { alert(t('errors.missingData')); return; }
-    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) { alert(t('errors.cloudinaryConfig')); return; }
+    setFormError(null);
+    if (!newSpotLocation || !formData.name.trim() || !capturedPhoto) { setFormError(t('errors.missingData')); return; }
+    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) { setFormError(t('errors.cloudinaryConfig')); return; }
 
     setIsUploading(true);
     let finalImageUrl = null;
 
     try {
       finalImageUrl = await uploadImageToCloudinary(capturedPhoto);
-    } catch (error) {
-      alert(t('errors.uploadFailed'));
+    } catch {
+      setFormError(t('errors.uploadFailed'));
       setIsUploading(false); return;
     }
 
@@ -149,18 +192,18 @@ export default function HomeScreen() {
         ...formData, latitude: newSpotLocation.lat, longitude: newSpotLocation.lng, mediaUrl: finalImageUrl
       }, { headers: { Authorization: `Bearer ${token}`, "ngrok-skip-browser-warning": "true" } });
       
-      alert(t('errors.spotCreated'));
-      setModalVisible(false); setIsAddingMode(false); setNewSpotLocation(null); setCapturedPhoto(null); setStatusMessage(null);
-      setFormData({ name: '', description: '', spotType: 'STREET', difficultyLevel: 'INTERMEDIATE' });
+      resetAddFlow();
+      showStatus(cleanLabel(t('errors.spotCreated')));
       fetchSpots();
-    } catch (error: any) { 
+    } catch (error: any) {
       const serverError = error.response?.data?.error; // Captura errores de Bucket4j
       const serverMessage = error.response?.data?.message; // Captura errores de IA o Validación
-      
+
       const finalMsg = serverError || serverMessage || (typeof error.response?.data === 'string' ? error.response?.data : null);
-      
-      alert(finalMsg || t('errors.saveFailed')); 
-    } finally { 
+
+      // El formulario sigue abierto con los datos y la foto: el usuario puede reintentar
+      setFormError(finalMsg || t('errors.saveFailed'));
+    } finally {
       setIsUploading(false); 
     }
   };
@@ -174,6 +217,8 @@ export default function HomeScreen() {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
+
+  const activeFilterCount = (filters.spotType !== 'ALL' ? 1 : 0) + (filters.minRating > 0 ? 1 : 0) + (filters.maxDistance > 0 ? 1 : 0);
 
   const filteredSpots = spots.filter((spot: any) => {
     // Filtro por tipo
@@ -200,6 +245,7 @@ export default function HomeScreen() {
           userLocation={userLocation} 
           isAddingMode={isAddingMode} 
           onMapClick={(lat, lng) => { setNewSpotLocation({lat, lng}); setModalVisible(true); }}
+          onNotice={showStatus}
           onSpotClick={(spotId) => {
              const spot = spots.find((s: any) => s.id === spotId);
              if (spot) setSelectedSpot(spot);
@@ -207,117 +253,133 @@ export default function HomeScreen() {
         />
       </View>
 
-      {/* Filtros e idioma (arriba a la izquierda) */}
-      <View style={styles.topLeftRow}>
-      <TouchableOpacity onPress={() => setFilterModalVisible(true)} activeOpacity={0.88}>
-        <LinearGradient
-          colors={['#1B5A86', '#123B5D', '#0A223B']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.filterButton}
+      {/* Barra superior asfalto: filtros (izquierda) y cuenta (derecha) */}
+      <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
+        <TouchableOpacity
+          onPress={() => setFilterModalVisible(true)}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={activeFilterCount > 0 ? `${t('map.filtersActive')}: ${activeFilterCount}` : t('map.filters')}
+          style={[styles.pill, styles.filterPill]}
         >
-          <Text style={styles.filterBtnText}>
-            {filters.spotType !== 'ALL' || filters.minRating > 0 || filters.maxDistance > 0 ? `⚙️  ${t('map.filtersActive')}` : `⚙️  ${t('map.filters')}`}
-          </Text>
-        </LinearGradient>
-      </TouchableOpacity>
-      </View>
+          <Ionicons name="options" size={20} color={Palette.white} />
+          <Text style={styles.pillText} numberOfLines={1}>{t('map.filters')}</Text>
+          {activeFilterCount > 0 && (
+            <View style={styles.countBadge}><Text style={styles.countBadgeText}>{activeFilterCount}</Text></View>
+          )}
+        </TouchableOpacity>
 
-      {/* Botón Badge de Usuario o Botón Entrar (Arriba a la derecha) */}
-      <LinearGradient
-        colors={['#1B5A86', '#123B5D', '#0A223B']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.userBadge}
-      >
+        <View style={styles.barRight}>
+        <TouchableOpacity
+          onPress={() => setLanguageModalVisible(true)}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.language')}
+          style={styles.globeBtn}
+        >
+          <Ionicons name="globe-outline" size={22} color={Palette.white} />
+        </TouchableOpacity>
+
         {user ? (
-          <>
-            <Text style={styles.userName}>👤 {user}</Text>
-            <View style={styles.separator} />
-            <TouchableOpacity onPress={logout}>
-              <Text style={styles.logoutText}>{t('map.logout')}</Text>
-            </TouchableOpacity>
-          </>
+          <TouchableOpacity
+            onPress={confirmLogout}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={user}
+            accessibilityHint={t('map.logout')}
+            style={[styles.pill, styles.userPill, styles.accountGroup]}
+          >
+            <Ionicons name="person" size={18} color={Palette.ink} />
+            <Text style={[styles.pillText, styles.userPillText]} numberOfLines={1}>{user}</Text>
+            <Ionicons name="log-out-outline" size={20} color={Palette.ink} />
+          </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={() => router.push('/login')}>
-            <Text style={styles.loginText} numberOfLines={1}>👤 {t('map.enter')}</Text>
+          <TouchableOpacity
+            onPress={() => router.push('/login')}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={t('map.enter')}
+            style={[styles.pill, styles.userPill, styles.accountGroup]}
+          >
+            <Ionicons name="person" size={18} color={Palette.ink} />
+            <Text style={[styles.pillText, styles.userPillText]} numberOfLines={1}>{t('map.enter')}</Text>
           </TouchableOpacity>
         )}
-      </LinearGradient>
-
-      {/* AVISO DE MODO OFFLINE */}
-      {isOffline && (
-        <View style={styles.offlineBadge}>
-          <Text style={styles.offlineText}>⚠️ {t('map.offlineMode')}</Text>
         </View>
-      )}
+      </View>
+
+      {/* Avisos: modo offline */}
+      <View pointerEvents="none" style={[styles.notices, { top: insets.top + 8 + 56 + 12 }]}>
+        {isOffline && (
+          <View style={styles.offlineBadge}>
+            <Ionicons name="cloud-offline" size={16} color={Palette.ink} />
+            <Text style={styles.offlineText}>{t('map.offlineMode')}</Text>
+          </View>
+        )}
+      </View>
 
       {(statusMessage || (isAddingMode && !newSpotLocation)) && (
-        <View style={styles.addingNotice}>
-          <Text style={styles.addingNoticeText}>{statusMessage || t('status.tapCircle')}</Text>
+        <View style={[styles.addingNotice, { bottom: insets.bottom + 108 }]} accessibilityLiveRegion="polite">
+          <Text style={styles.addingNoticeText}>{cleanLabel(statusMessage || t('status.tapCircle'))}</Text>
         </View>
       )}
 
-      {/* Botón Reload Animado (Abajo a la izquierda) */}
+      {/* Recargar (abajo a la izquierda) */}
       <MapFab
         icon="refresh"
         label={t('map.reloadSpots')}
         onPress={handleReloadSpots}
         spinning={isRefreshing}
-        iconOffsetY={2}
-        style={{ left: 20 }}
+        style={{ left: 20, bottom: insets.bottom + 32 }}
       />
 
-      {/* Botón de Centrado GPS (Abajo a la derecha) */}
+      {/* Centrar GPS (abajo a la derecha) */}
       <MapFab
         icon="locate"
         label={t('map.centerOnMe')}
         onPress={() => handleRecenter(false, setStatusMessage)}
-        style={{ right: 20 }}
+        style={{ right: 20, bottom: insets.bottom + 32 }}
       />
 
-      {/* Botón Añadir Spot (Centro abajo) */}
-      <TouchableOpacity 
-        style={[styles.fab, isAddingMode ? styles.fabClose : styles.fabAdd]} 
+      {/* Añadir spot (centro abajo): la acción principal, pintura rosa */}
+      <TouchableOpacity
+        style={[
+          styles.fab,
+          isAddingMode ? styles.fabClose : styles.fabAdd,
+          // Nunca encima de los botones laterales: 20px de margen + 56px de botón + 10px de aire a cada lado
+          { bottom: insets.bottom + 32, maxWidth: windowWidth - 2 * (20 + 56 + 10) },
+        ]}
         onPress={startAddingProcess}
         activeOpacity={0.85}
+        accessibilityRole="button"
         accessibilityLabel={isAddingMode ? t('map.cancelAddSpot') : t('map.addSpot')}
       >
-        {isAddingMode ? (
-          <Text style={styles.fabIcon}>✕</Text>
-        ) : (
-          <LinearGradient
-            pointerEvents="none"
-            colors={['#219E9A', '#167C80', '#105A68']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.fabGradient}
-          >
-            <View style={styles.fabBubbles}>
-              <View style={styles.fabBubbleLarge} />
-              <View style={styles.fabBubbleSmall} />
-            </View>
-            <Text style={styles.fabIcon}>＋</Text>
-            <Text style={styles.fabText}>{t('map.addSpot')}</Text>
-          </LinearGradient>
+        <Ionicons name={isAddingMode ? 'close' : 'add'} size={28} color={isAddingMode ? Palette.white : Palette.ink} />
+        {!isAddingMode && (
+          <Text style={styles.fabText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+            {t('map.addSpot')}
+          </Text>
         )}
       </TouchableOpacity>
 
       {/* MODALES */}
       <SpotFormModal 
         visible={modalVisible}
-        onClose={() => { setModalVisible(false); setIsAddingMode(false); setCapturedPhoto(null); setStatusMessage(null); }}
+        onClose={handleCloseForm}
         onSave={handleSaveSpot}
         formData={formData}
         setFormData={setFormData}
         capturedPhoto={capturedPhoto}
         isUploading={isUploading}
+        errorMessage={formError}
       />
 
-      <SpotDetailsModal 
-        visible={!!selectedSpot} 
+      <SpotDetailsModal
+        key={selectedSpot?.id ?? 'none'}
+        visible={!!selectedSpot}
         spot={selectedSpot} 
         token={token}
+        userLocation={userLocation}
         onClose={() => setSelectedSpot(null)} 
         onSpotUpdated={() => { fetchSpots(); }}
       />
@@ -327,7 +389,11 @@ export default function HomeScreen() {
         onClose={() => setFilterModalVisible(false)}
         filters={filters}
         setFilters={setFilters}
+        resultCount={filteredSpots.length}
+        hasLocation={!!userLocation}
       />
+
+      <LanguageModal visible={languageModalVisible} onClose={() => setLanguageModalVisible(false)} />
 
       {showCamera && (
         <CameraOverlay cameraRef={cameraRef} onCapture={takePicture} onCancel={() => { setShowCamera(false); setStatusMessage(null); }} />
@@ -337,146 +403,114 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: Palette.concrete },
   mapContainer: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, flex: 1, elevation: 0 },
-  
-  // Estilos del botón de filtros
-  topLeftRow: {
+
+  topBar: {
     position: 'absolute',
-    top: 40,
-    left: 20,
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+    backgroundColor: Palette.asphalt,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    zIndex: 10,
+    elevation: 6,
+  },
+  pill: {
+    minHeight: MIN_TARGET,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: Palette.white,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  pillText: {
+    fontFamily: DisplayFont.bold,
+    fontSize: 18,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    color: Palette.white,
+    flexShrink: 1,
+  },
+  countBadge: {
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    paddingHorizontal: 6,
+    backgroundColor: Palette.pink,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  countBadgeText: { fontFamily: DisplayFont.black, fontSize: 15, color: Palette.ink },
+  accountGroup: { flexShrink: 1, flexDirection: 'row', alignItems: 'center', gap: 4 },
+  filterPill: { flexShrink: 1 },
+  barRight: { flexShrink: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  globeBtn: {
+    width: MIN_TARGET,
+    height: MIN_TARGET,
+    borderRadius: MIN_TARGET / 2,
+    borderWidth: 2,
+    borderColor: Palette.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userPill: { backgroundColor: Palette.white, borderColor: Palette.white, flexShrink: 1 },
+  userPillText: { color: Palette.ink, maxWidth: 140 },
+
+  notices: { position: 'absolute', left: 16, right: 16, alignItems: 'center', zIndex: 10 },
+  offlineBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    zIndex: 10,
-  },
-  filterButton: {
-    paddingVertical: 11,
-    paddingHorizontal: 16,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(126, 232, 236, 0.55)',
-    shadowColor: '#66E3E7',
-    shadowOpacity: 0.28,
-    shadowRadius: 8,
-    elevation: 4,
-    zIndex: 10,
-  },
-  filterBtnText: {
-    fontWeight: '800',
-    color: '#F4FEFF',
-    letterSpacing: 0.2
-  },
-
-  // Badge de usuario centrado arriba
-  userBadge: { 
-    position: 'absolute', 
-    top: 40, 
-    right: 20, 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    paddingVertical: 10, 
-    paddingHorizontal: 18, 
-    borderRadius: 16, 
-    borderWidth: 1,
-    borderColor: 'rgba(126, 232, 236, 0.55)',
-    shadowColor: '#66E3E7', 
-    shadowOpacity: 0.28, 
-    shadowRadius: 8, 
-    elevation: 4, 
-    overflow: 'hidden',
-    backgroundColor: '#123B5D',
-    zIndex: 10 
-  },
-  
-  userName: { fontWeight: '800', color: '#FFFFFF', marginRight: 10 },
-  separator: { width: 1, height: 15, backgroundColor: 'rgba(126, 195, 211, 0.35)', marginRight: 10 },
-  logoutText: { color: '#FF8A8A', fontWeight: '800' },
-  loginText: { color: '#FFFFFF', fontWeight: '800', fontSize: 15, textShadowColor: 'rgba(0, 0, 0, 0.45)', textShadowRadius: 3 },
-
-  // Estilos del aviso de Modo Offline
-  offlineBadge: {
-    position: 'absolute',
-    top: 95, 
-    alignSelf: 'center',
-    backgroundColor: '#ff9f1c',
-    paddingVertical: 6,
-    paddingHorizontal: 15,
+    backgroundColor: Palette.yellow,
+    borderWidth: 2,
+    borderColor: Palette.ink,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     borderRadius: 20,
-    zIndex: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 4,
   },
-  offlineText: {
-    color: '#1A1A1A',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
+  offlineText: { color: Palette.ink, fontSize: 14, fontWeight: '700', flexShrink: 1 },
 
-  addingNotice: { position: 'absolute', bottom: 130, alignSelf: 'center', backgroundColor: 'rgba(0,0,0,0.8)', paddingVertical: 8, paddingHorizontal: 20, borderRadius: 20, zIndex: 10 },
-  addingNoticeText: { color: 'white', fontSize: 14, fontWeight: 'bold', textAlign: 'center' },
-  
+  addingNotice: {
+    position: 'absolute',
+    alignSelf: 'center',
+    maxWidth: '88%',
+    backgroundColor: Palette.asphalt,
+    borderWidth: 2,
+    borderColor: Palette.white,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 22,
+    zIndex: 10,
+  },
+  addingNoticeText: { color: Palette.white, fontSize: 15, fontWeight: '700', textAlign: 'center' },
+
   fab: {
     position: 'absolute',
-    bottom: 30,
     alignSelf: 'center',
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
     zIndex: 10,
+    height: 56,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: Palette.ink,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 4,
   },
-  fabIcon: { fontSize: 19, marginRight: 9, color: 'white', fontWeight: 'bold' },
-  fabText: { color: 'white', fontSize: 15, fontWeight: '800', letterSpacing: 0.2 },
-  fabAdd: {
-    backgroundColor: 'transparent',
-    flexDirection: 'row',
-    paddingVertical: 16,
-    paddingHorizontal: 26,
-    borderRadius: 32,
-    overflow: 'hidden',
-    padding: 0,
-  },
-  fabGradient: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 26,
-    borderRadius: 32,
-    overflow: 'hidden',
-  },
-  fabBubbles: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-    borderRadius: 32,
-  },
-  fabBubbleLarge: {
-    position: 'absolute',
-    width: 135,
-    height: 80,
-    borderRadius: 50,
-    right: -42,
-    top: -50,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    transform: [{ rotate: '-18deg' }],
-  },
-  fabBubbleSmall: {
-    position: 'absolute',
-    width: 70,
-    height: 45,
-    borderRadius: 30,
-    left: -20,
-    bottom: -25,
-    backgroundColor: 'rgba(0,0,0,0.07)',
-    transform: [{ rotate: '-18deg' }],
-  },
-  fabClose: {
-    backgroundColor: '#B42318',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.45)',
-  }
+  fabAdd: { backgroundColor: Palette.pink, paddingHorizontal: 16, minWidth: 144 },
+  fabClose: { backgroundColor: Palette.asphalt, width: 56, borderColor: Palette.white },
+  fabText: { fontFamily: DisplayFont.black, fontSize: 22, letterSpacing: 0.8, textTransform: 'uppercase', color: Palette.ink, flexShrink: 1 },
 });

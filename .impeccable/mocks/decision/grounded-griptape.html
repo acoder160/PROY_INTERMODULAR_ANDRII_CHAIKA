@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Anton&display=swap" rel="stylesheet">
+<style>
+:root{--grip:#1B1B1C;--grip2:#2A2A2B;--white:#F4F1EA;--yel:#FFE14D;--red:#E63323;--blue:#2A6BD8;--map:#EBE9E4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;height:844px;overflow:hidden;font-family:Archivo,system-ui,sans-serif;color:var(--white);background:var(--map);position:relative}
+.map{position:absolute;inset:0;background:
+ linear-gradient(28deg,transparent 47%,#fff 47%,#fff 49.5%,transparent 49.5%),
+ linear-gradient(-62deg,transparent 30%,#fff 30%,#fff 32%,transparent 32%),
+ linear-gradient(0deg,transparent 20%,#d6e6c8 20%,#d6e6c8 30%,transparent 30%),var(--map)}
+.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:#3FA9F5;border:3px solid #fff;box-shadow:0 0 0 10px rgba(63,169,245,.18)}
+.cl{position:absolute;padding:4px 9px;border-radius:12px;background:#1d2b3a;color:#fff;font:700 13px Archivo}
+.ply{height:7px;background:linear-gradient(180deg,#E9D3A8 0 14%,var(--red) 14% 28%,#E9D3A8 28% 43%,var(--blue) 43% 57%,#E9D3A8 57% 71%,var(--yel) 71% 86%,#E9D3A8 86%)}
+.slab{position:absolute;top:52px;height:48px;background:var(--grip);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.slab div{flex:1;display:flex;align-items:center;gap:10px;padding:0 16px;font-weight:800;font-size:15px}
+.slab .n{background:var(--yel);color:var(--grip);font:16px Anton;padding:0 7px;border-radius:3px}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:540px;background:var(--grip);border-radius:18px 18px 0 0;overflow:hidden}
+.photo{height:200px;background:linear-gradient(160deg,#87a3b4 0%,#c9c2b4 38%,#a59b8b 39%,#7c7568 70%,#5d564c 100%)}
+.head{padding:14px 20px 10px}
+h1{font:44px/0.95 Anton,Archivo;text-transform:uppercase;letter-spacing:.01em}
+.where{font-size:13px;font-weight:700;margin-top:6px;color:#CFCBC2}
+.facts{display:flex;gap:8px;padding:6px 20px 0}
+.f{flex:1;background:var(--grip2);border-radius:8px;padding:10px 12px}
+.f b{display:block;font:32px/1 Anton;color:var(--yel)}
+.f span{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#CFCBC2}
+.vote{margin:14px 20px 0;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px}
+.vote em{font:20px Anton;font-style:normal;background:var(--red);color:var(--white);padding:2px 10px;border-radius:4px}
+.acts{display:flex;gap:10px;padding:16px 20px 0}
+.btn{flex:1;height:50px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;border-radius:10px}
+.pri{background:var(--yel);color:var(--grip)}.sec{border:2px solid var(--white)}
+</style></head><body>
+<div class="map"></div>
+<div class="pin" style="left:186px;top:220px"></div>
+<div class="cl" style="left:60px;top:180px">+12</div>
+<div class="cl" style="left:290px;top:250px">+4</div>
+<div class="slab" style="left:16px"><div>Filters <span class="n">2</span></div><div class="ply" style="flex:none"></div></div>
+<div class="slab" style="right:16px"><div>andrii</div><div class="ply" style="flex:none"></div></div>
+<div class="sheet">
+ <div class="photo"></div>
+ <div class="ply"></div>
+ <div class="head"><h1>MACBA ledges</h1><div class="where">Plaça dels Àngels · Barcelona · Ledge</div></div>
+ <div class="facts">
+  <div class="f"><b>4.6★</b><span>23 votes</span></div>
+  <div class="f"><b>1.2 KM</b><span>Away</span></div>
+  <div class="f"><b>ADV</b><span>Level</span></div>
+ </div>
+ <div class="vote">Your vote <em>★ 5</em></div>
+ <div class="acts"><div class="btn pri">Directions</div><div class="btn sec">Comments · 8</div></div>
+</div>
+</body></html>

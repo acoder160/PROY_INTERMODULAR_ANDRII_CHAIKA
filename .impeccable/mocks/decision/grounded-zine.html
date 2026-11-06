@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Courier+Prime:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F2F2F0;--toner:#111111;--pink:#FF2E88;--grey:#8A8A8A;--map:#EBE9E4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:390px;height:844px;overflow:hidden;font-family:Archivo,system-ui,sans-serif;color:var(--toner);background:var(--map);position:relative}
+.map{position:absolute;inset:0;background:
+ linear-gradient(28deg,transparent 47%,#fff 47%,#fff 49.5%,transparent 49.5%),
+ linear-gradient(-62deg,transparent 30%,#fff 30%,#fff 32%,transparent 32%),
+ linear-gradient(0deg,transparent 20%,#d6e6c8 20%,#d6e6c8 30%,transparent 30%),var(--map)}
+.pin{position:absolute;width:18px;height:18px;border-radius:50%;background:#3FA9F5;border:3px solid #fff;box-shadow:0 0 0 10px rgba(63,169,245,.18)}
+.cl{position:absolute;padding:4px 9px;border-radius:12px;background:#1d2b3a;color:#fff;font:700 13px Archivo}
+.lbl{position:absolute;top:52px;height:46px;padding:0 16px;display:flex;align-items:center;gap:10px;background:var(--toner);color:var(--paper);font-weight:900;font-size:15px;text-transform:uppercase;letter-spacing:.04em;border:3px solid var(--paper);outline:2px solid var(--toner);border-radius:6px}
+.lbl .n{background:var(--pink);color:var(--toner);padding:0 7px;border-radius:3px}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:540px;background:var(--paper);border-top:3px solid var(--toner)}
+.photo{height:200px;margin:14px 20px 0;border:3px solid var(--toner);background:linear-gradient(160deg,#87a3b4 0%,#c9c2b4 38%,#a59b8b 39%,#7c7568 70%,#5d564c 100%)}
+.head{padding:12px 20px 0}
+h1{font:900 34px/0.95 Archivo;text-transform:uppercase;letter-spacing:-.01em}
+.where{font:700 13px "Courier Prime";margin-top:6px}
+.facts{display:flex;gap:10px;padding:14px 20px 0}
+.st{flex:1;background:#fff;border:3px solid var(--toner);border-radius:8px;padding:8px 10px}
+.st:nth-child(2){transform:rotate(1.5deg)}.st:nth-child(3){transform:rotate(-1.5deg)}
+.st b{display:block;font:900 28px/1 Archivo}
+.st span{font:700 11px "Courier Prime";text-transform:uppercase}
+.vote{margin:14px 20px 0;display:flex;justify-content:space-between;align-items:center;font:700 14px "Courier Prime"}
+.vote em{font:900 18px Archivo;font-style:normal;background:var(--pink);border:3px solid var(--toner);padding:2px 12px;border-radius:20px;transform:rotate(-3deg)}
+.acts{display:flex;gap:10px;padding:14px 20px 0}
+.btn{flex:1;height:50px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;text-transform:uppercase;border-radius:6px}
+.pri{background:var(--toner);color:var(--paper)}.sec{border:3px solid var(--toner)}
+</style></head><body>
+<div class="map"></div>
+<div class="pin" style="left:186px;top:220px"></div>
+<div class="cl" style="left:60px;top:180px">+12</div>
+<div class="cl" style="left:290px;top:250px">+4</div>
+<div class="lbl" style="left:16px">Filters <span class="n">2</span></div>
+<div class="lbl" style="right:16px">andrii</div>
+<div class="sheet">
+ <div class="photo"></div>
+ <div class="head"><h1>MACBA ledges</h1><div class="where">Plaça dels Àngels · Barcelona · Ledge</div></div>
+ <div class="facts">
+  <div class="st"><b>4.6★</b><span>23 votes</span></div>
+  <div class="st"><b>1.2km</b><span>Away</span></div>
+  <div class="st"><b>ADV</b><span>Level</span></div>
+ </div>
+ <div class="vote">Your vote <em>★ 5</em></div>
+ <div class="acts"><div class="btn pri">Directions</div><div class="btn sec">Comments · 8</div></div>
+</div>
+</body></html>

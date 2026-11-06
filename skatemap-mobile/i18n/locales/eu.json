@@ -5,7 +5,9 @@
     "login": "Hasi saioa",
     "user": "Erabiltzailea",
     "language": "Hizkuntza",
-    "languageAuto": "Automatikoa (telefonoaren hizkuntza)"
+    "languageAuto": "Automatikoa (telefonoaren hizkuntza)",
+    "openSettings": "Ireki ezarpenak",
+    "retry": "Saiatu berriro"
   },
   "map": {
     "filters": "Iragazkiak",
@@ -22,7 +24,8 @@
     "offlineMode": "Lineaz kanpoko modua (gordetako mapa erakusten)",
     "geoUnsupported": "Zure nabigatzaileak ez du geokokapena onartzen",
     "geoDenied": "Kokapen-baimena ukatu da. Gaitu ezazu nabigatzailean.",
-    "geoFailed": "Ezin izan da zure kokapena lortu."
+    "geoFailed": "Ezin izan da zure kokapena lortu.",
+    "logoutConfirm": "SkateMap-etik irten?"
   },
   "filters": {
     "title": "Iragazi spotak",
@@ -36,7 +39,8 @@
     "minStars": "Gutxieneko izarrak",
     "allStars": "Denak",
     "starsOrMore": "{{n}} ⭐️ edo gehiago",
-    "applyResults": "Ikusi emaitzak"
+    "applyResults": "Ikusi emaitzak",
+    "reset": "Berrezarri"
   },
   "popup": {
     "loading": "Kargatzen...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "Errore bat gertatu da bidaltzean. Egiaztatu konexioa.",
     "averageRating": "Batez besteko nota: {{value}}/5",
     "thanks": "Eskerrik asko zure balorazioagatik! 🛹",
-    "noImage": "Irudirik gabe"
+    "noImage": "Irudirik gabe",
+    "commentsFailed": "Ezin izan dira iruzkinak kargatu."
   },
   "auth": {
     "welcomeBack": "Ongi etorri berriro",
@@ -109,7 +114,7 @@
     "cameraDenied": "⚠️ Kamera-baimena ukatu da",
     "waitingGps": "⚠️ GPSaren zain...",
     "processingPhoto": "📸 Argazkia prozesatzen...",
-    "tapCircle": "📍 Sakatu zirkulu urdinaren barruan kokatzeko 👇",
+    "tapCircle": "📍 Sakatu zirkuluaren barruan kokatzeko 👇",
     "gettingLocation": "📍 Zure oraingo kokapena lortzen...",
     "gpsDenied": "⚠️ GPS baimena ukatu da",
     "locationError": "⚠️ Errorea kokapena bilatzean"
@@ -144,7 +149,12 @@
     "description": "Deskribapena...",
     "type": "Mota",
     "level": "Maila",
-    "save": "Gorde spota"
+    "save": "Gorde spota",
+    "nameRequired": "Jarri izen bat spotari.",
+    "discardTitle": "Spot hau baztertu?",
+    "discardMessage": "Atera duzun argazkia galduko da.",
+    "discard": "Baztertu",
+    "keepEditing": "Editatzen jarraitu"
   },
   "camera": {
     "takePhoto": "Egin spotaren argazki bat 🛹"
