@@ -15,6 +15,9 @@ import skatemap.entity.User;
 import skatemap.repository.UserRepository;
 import skatemap.security.JwtUtil;
 import skatemap.security.UserDetailsServiceImpl;
+import skatemap.security.ClientIpResolver;
+import skatemap.service.GoogleAuthService;
+import skatemap.service.GoogleBrowserFlowService;
 import skatemap.service.RateLimitingService;
 import skatemap.service.RefreshTokenService;
 
@@ -32,7 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "cors.allowed.origins=http://localhost:5173",
         "skatemap.app.jwtSecret=test-secret-test-secret-test-secret-test-secret",
         "skatemap.app.jwtExpirationMs=900000",
-        "skatemap.app.refreshExpirationMs=86400000"
+        "skatemap.app.refreshExpirationMs=86400000",
+        "app.rate-limit.enabled=false"
 })
 class AuthControllerRefreshIntegrationTest {
 
@@ -62,6 +66,15 @@ class AuthControllerRefreshIntegrationTest {
 
     @MockBean
     private RateLimitingService rateLimitingService;
+
+    @MockBean
+    private ClientIpResolver clientIpResolver;
+
+    @MockBean
+    private GoogleAuthService googleAuthService;
+
+    @MockBean
+    private GoogleBrowserFlowService googleBrowserFlowService;
 
     @Test
     void loginSetsRefreshCookieForWebClient() throws Exception {
@@ -196,6 +209,32 @@ class AuthControllerRefreshIntegrationTest {
                         .content("{\"refreshToken\":\"invalid\"}"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("skatemap_refresh=")));
+    }
+
+    @Test
+    void googleCallbackServesReturnPageInsteadOfRedirect() throws Exception {
+        when(googleBrowserFlowService.handleCallback("g-code", "state", null))
+                .thenReturn("skatemapmobile://auth/google?code=one-time");
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                        .get("/api/auth/google/callback").param("code", "g-code").param("state", "state"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(header().string("Cache-Control", "no-store"))
+                .andExpect(header().string("Referrer-Policy", "no-referrer"))
+                .andExpect(header().exists("Content-Security-Policy"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "href=\"skatemapmobile://auth/google?code=one-time\"")));
+    }
+
+    @Test
+    void googleCallbackWithBadStateIsRejected() throws Exception {
+        when(googleBrowserFlowService.handleCallback(any(), any(), any()))
+                .thenThrow(new GoogleBrowserFlowService.BrowserFlowException("Invalid or expired state"));
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                        .get("/api/auth/google/callback").param("code", "g-code").param("state", "forged"))
+                .andExpect(status().isBadRequest());
     }
 
     private User user(String username) {

@@ -50,6 +50,18 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Login con Google: el backend verifica el ID token y devuelve la misma sesión que /auth/login
+    const loginWithGoogle = async (idToken) => {
+        const response = await api.post('/auth/google', { idToken });
+        setAccessToken(response.data.token);
+        setUser({
+            id: response.data.id,
+            username: response.data.username,
+            email: response.data.email,
+        });
+        return true;
+    };
+
     const logout = async () => {
         clearAccessToken();
         setUser(null);
@@ -63,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, loginWithGoogle, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );

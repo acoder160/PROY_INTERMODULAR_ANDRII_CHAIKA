@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../api/axiosConfig';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 import '../Auth.css';
 
 export default function RegisterPage() {
@@ -120,6 +121,8 @@ export default function RegisterPage() {
             {isLoading ? t('auth.registering') : t('auth.createAccount')}
           </button>
         </form>
+
+        <GoogleSignInButton />
 
         <div className="auth-footer">
           {t('auth.haveAccount')}{' '}

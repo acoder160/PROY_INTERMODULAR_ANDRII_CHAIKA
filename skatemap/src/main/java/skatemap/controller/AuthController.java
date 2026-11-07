@@ -9,7 +9,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import skatemap.dto.GoogleLoginRequest;
 import skatemap.dto.JwtResponse;
+import skatemap.service.GoogleAuthService;
+import skatemap.service.GoogleBrowserFlowService;
+import skatemap.dto.GoogleExchangeRequest;
+import java.net.URI;
+import org.springframework.http.HttpStatus;
 import skatemap.dto.LoginRequest;
 import skatemap.dto.RegisterRequest;
 import skatemap.dto.RefreshTokenRequest;
@@ -23,6 +29,8 @@ import skatemap.service.RefreshTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import skatemap.security.AppReturnPage;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -43,6 +51,12 @@ public class AuthController {
     @Autowired
     RefreshTokenService refreshTokenService;
 
+    @Autowired
+    GoogleAuthService googleAuthService;
+
+    @Autowired
+    GoogleBrowserFlowService googleBrowserFlowService;
+
     // LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(
@@ -56,6 +70,79 @@ public class AuthController {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+        return issueSession(user, jwt, clientType);
+    }
+
+    // LOGIN CON GOOGLE: el cliente manda el ID token de Google; si es válido, sesión normal de SkateMap
+    @PostMapping("/google")
+    public ResponseEntity<?> authenticateWithGoogle(
+            @Valid @RequestBody GoogleLoginRequest googleRequest,
+            @RequestHeader(value = "X-Client-Type", required = false) String clientType) {
+        if (!googleAuthService.isConfigured()) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body("Error: Google sign-in is not configured on the server");
+        }
+        try {
+            User user = googleAuthService.authenticate(googleRequest.getIdToken());
+            return issueSession(user, jwtUtil.generateJwtToken(user.getUsername()), clientType);
+        } catch (GoogleAuthService.InvalidGoogleTokenException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error: " + e.getMessage());
+        }
+    }
+
+    // LOGIN CON GOOGLE POR NAVEGADOR (Expo Go): 1) la app abre esta URL en el navegador del sistema
+    @GetMapping("/google/start")
+    public ResponseEntity<?> startGoogleBrowserFlow(
+            @RequestParam("redirect") String appRedirect,
+            @RequestParam("challenge") String challenge) {
+        if (!googleBrowserFlowService.isConfigured()) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body("Error: Google browser sign-in is not configured on the server");
+        }
+        try {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(googleBrowserFlowService.buildGoogleAuthUrl(appRedirect, challenge)))
+                    .build();
+        } catch (GoogleBrowserFlowService.BrowserFlowException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    // 2) Google comes back here; a small page hands the one-time code back to the app
+    @GetMapping("/google/callback")
+    public ResponseEntity<?> googleBrowserCallback(
+            @RequestParam(value = "code", required = false) String code,
+            @RequestParam(value = "state", required = false) String state,
+            @RequestParam(value = "error", required = false) String error) {
+        try {
+            String appLink = googleBrowserFlowService.handleCallback(code, state, error);
+            return ResponseEntity.ok()
+                    .contentType(new MediaType(MediaType.TEXT_HTML, java.nio.charset.StandardCharsets.UTF_8))
+                    .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                    .header("Referrer-Policy", "no-referrer")
+                    .header("Content-Security-Policy", AppReturnPage.CONTENT_SECURITY_POLICY)
+                    .body(AppReturnPage.render(appLink));
+        } catch (GoogleBrowserFlowService.BrowserFlowException e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    // 3) La app canjea el código (con su verificador PKCE) por la sesión normal
+    @PostMapping("/google/exchange")
+    public ResponseEntity<?> exchangeGoogleBrowserCode(
+            @Valid @RequestBody GoogleExchangeRequest exchangeRequest,
+            @RequestHeader(value = "X-Client-Type", required = false) String clientType) {
+        try {
+            Long userId = googleBrowserFlowService.exchange(exchangeRequest.getCode(), exchangeRequest.getVerifier());
+            User user = userRepository.findById(userId).orElseThrow();
+            return issueSession(user, jwtUtil.generateJwtToken(user.getUsername()), clientType);
+        } catch (GoogleBrowserFlowService.BrowserFlowException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error: " + e.getMessage());
+        }
+    }
+
+    /** Respuesta de login común: access token + refresh (cookie en la web, en el cuerpo para la app). */
+    private ResponseEntity<?> issueSession(User user, String jwt, String clientType) {
         RefreshTokenService.IssuedRefreshToken refreshToken = refreshTokenService.createSession(user);
 
         ResponseEntity.BodyBuilder response = ResponseEntity.ok();

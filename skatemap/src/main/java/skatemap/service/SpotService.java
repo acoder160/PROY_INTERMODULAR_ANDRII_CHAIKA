@@ -4,14 +4,16 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import skatemap.exception.ApiException;
 import skatemap.dto.CommentDto;
 import skatemap.dto.RatingDto;
 import skatemap.dto.SpotDto;
 import skatemap.entity.Comment;
-import skatemap.entity.Rating;
 import skatemap.entity.Spot;
 import skatemap.entity.User;
 import skatemap.repository.CommentRepository;
@@ -20,7 +22,8 @@ import skatemap.repository.SpotRepository;
 import skatemap.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,32 +34,39 @@ public class SpotService {
     private final RatingRepository ratingRepository;
     private final CommentRepository commentRepository;
 
-    // Inyectamos el servicio de IA
     private final AiModerationService aiModerationService;
+    private final SpotListCache spotListCache;
 
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+
+    @Value("${cloudinary.cloud-name:}")
+    private String cloudinaryCloudName;
 
     public SpotService(SpotRepository spotRepository,
                        UserRepository userRepository,
                        RatingRepository ratingRepository,
                        CommentRepository commentRepository,
-                       AiModerationService aiModerationService) {
+                       AiModerationService aiModerationService,
+                       SpotListCache spotListCache) {
         this.spotRepository = spotRepository;
         this.userRepository = userRepository;
         this.ratingRepository = ratingRepository;
         this.commentRepository = commentRepository;
         this.aiModerationService = aiModerationService;
+        this.spotListCache = spotListCache;
     }
 
     public SpotDto createSpot(SpotDto spotDto, String username) {
-        // ANÁLISIS IA ANTES DE CREAR EL SPOT
+        // Moderate before anything is stored
         String textToAnalyze = spotDto.getName() + " - " + spotDto.getDescription();
         if (!aiModerationService.isContentAllowed(textToAnalyze)) {
-            throw new IllegalArgumentException("El contenido del spot incumple las normas de la comunidad (Spam, contenido inapropiado o texto sin sentido).");
+            throw ApiException.contentRejected("This spot breaks the community rules (spam, inappropriate content or nonsense text).");
         }
 
+        requireOwnCloudinaryUrl(spotDto.getMediaUrl());
+
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> ApiException.notFound("User"));
 
         Spot spot = new Spot();
         spot.setName(spotDto.getName());
@@ -69,7 +79,9 @@ public class SpotService {
         Point point = geometryFactory.createPoint(new Coordinate(spotDto.getLongitude(), spotDto.getLatitude()));
         spot.setLocation(point);
 
-        return mapToDto(spotRepository.save(spot));
+        SpotDto created = mapToDto(spotRepository.save(spot));
+        spotListCache.invalidate();
+        return created;
     }
 
     public List<SpotDto> findSpotsNearby(double lat, double lng, double distanceMeters) {
@@ -77,43 +89,19 @@ public class SpotService {
                 .stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
+    /** Served from memory; see {@link SpotListCache}. */
     public List<SpotDto> getAllSpots() {
-        return spotRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
-    }
-
-    // VALORACIONES (RATINGS)
-
-    @Transactional
-    public void addRating(Long spotId, int value, String username) {
-        Spot spot = spotRepository.findById(spotId).orElseThrow(() -> new RuntimeException("Spot no encontrado"));
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User no encontrado"));
-
-        Optional<Rating> existingRating = ratingRepository.findBySpotAndUser(spot, user);
-
-        if (existingRating.isPresent()) {
-            throw new RuntimeException("El usuario ya ha valorado este spot");
-        }
-
-        Rating rating = new Rating();
-        rating.setSpot(spot);
-        rating.setUser(user);
-        rating.setValue(value);
-        ratingRepository.save(rating);
-
-        Double newAverage = ratingRepository.getAverageRating(spotId);
-        spot.setSurfaceRating(newAverage != null ? newAverage : 0.0);
-        spotRepository.save(spot);
+        return spotListCache.get(() -> spotRepository.findAll().stream().map(this::mapToDto).toList());
     }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteSpot(Long spotId, String username) {
-        // 1. Borramos comentarios y valoraciones para evitar errores de integridad (Foreign Key)
+        // Comments and ratings first, because of the foreign keys
         commentRepository.deleteBySpotId(spotId);
         ratingRepository.deleteBySpotId(spotId);
-
-        // 2. Borramos el spot
         spotRepository.deleteById(spotId);
+        spotListCache.invalidate();
     }
 
     public RatingDto getUserRating(Long spotId, String username) {
@@ -133,11 +121,11 @@ public class SpotService {
 
     public void addComment(Long spotId, String content, String username) {
         if (!aiModerationService.isContentAllowed(content)) {
-            throw new IllegalArgumentException("El comentario incumple las normas de la comunidad.");
+            throw ApiException.contentRejected("This comment breaks the community rules (spam, inappropriate content or nonsense text).");
         }
 
-        Spot spot = spotRepository.findById(spotId).orElseThrow(() -> new RuntimeException("Spot no encontrado"));
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User no encontrado"));
+        Spot spot = spotRepository.findById(spotId).orElseThrow(() -> ApiException.notFound("Spot"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> ApiException.notFound("User"));
 
         Comment comment = new Comment();
         comment.setSpot(spot);
@@ -146,22 +134,36 @@ public class SpotService {
         commentRepository.save(comment);
     }
 
+    /**
+     * Two queries in total, whatever the number of comments: comments with their authors, and every
+     * rating of the spot (to show each author's stars next to their comment).
+     */
     public List<CommentDto> getCommentsBySpot(Long spotId) {
+        Map<Long, Integer> ratingByUser = new HashMap<>();
+        for (RatingRepository.UserRating r : ratingRepository.findUserRatingsBySpotId(spotId)) {
+            ratingByUser.put(r.getUserId(), r.getValue());
+        }
         return commentRepository.findBySpotIdOrderByCreatedAtDesc(spotId).stream()
                 .map(c -> {
                     CommentDto dto = new CommentDto();
                     dto.setId(c.getId());
-
                     dto.setContent(c.getContent());
-
                     dto.setUsername(c.getUser().getUsername());
                     dto.setCreatedAt(c.getCreatedAt());
-
-                    ratingRepository.findBySpotAndUser(c.getSpot(), c.getUser())
-                            .ifPresent(r -> dto.setRating(r.getValue()));
-
+                    dto.setRating(ratingByUser.get(c.getUser().getId()));
                     return dto;
                 }).collect(Collectors.toList());
+    }
+
+    /** Only images uploaded to our own Cloudinary account may be attached to a spot. */
+    private void requireOwnCloudinaryUrl(String mediaUrl) {
+        if (mediaUrl == null || mediaUrl.isBlank()) return;
+        String prefix = cloudinaryCloudName == null || cloudinaryCloudName.isBlank()
+                ? "https://res.cloudinary.com/"
+                : "https://res.cloudinary.com/" + cloudinaryCloudName + "/";
+        if (!mediaUrl.startsWith(prefix)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "mediaUrl: only images uploaded through the app are allowed");
+        }
     }
 
     // --- HELPER ---

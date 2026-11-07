@@ -4,6 +4,7 @@ import { Palette, DisplayFont, Radius, MIN_TARGET } from '../constants/theme';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
+import GoogleAuthButton from '../components/GoogleAuthButton';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen() {
@@ -48,9 +49,10 @@ export default function LoginScreen() {
         response.data.refreshToken
       );
       router.replace('/(tabs)');
-    } catch (error) {
-      console.error(error);
-      setErrorMessage(t('auth.loginFailed'));
+    } catch (error: any) {
+      // Un login fallido es un estado esperado: log, no pantalla roja de LogBox
+      console.log('Login fallido:', error?.response?.status ?? error?.message, error?.response?.data ?? '');
+      setErrorMessage(error?.response ? t('auth.loginFailed') : t('popup.sendErrorConnection'));
     } finally {
       clearTimeout(wakeUpTimer);
       setIsLoading(false);
@@ -114,6 +116,8 @@ export default function LoginScreen() {
               {isLoading ? <ActivityIndicator color={Palette.ink} /> : <Text style={styles.buttonText}>{t('auth.loginButton')}</Text>}
             </View>
           </TouchableOpacity>
+
+          <GoogleAuthButton />
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>{t('auth.noAccount')} </Text>

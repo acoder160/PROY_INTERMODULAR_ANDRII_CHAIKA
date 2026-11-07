@@ -94,7 +94,12 @@
     "accountCreated": "Account creato con successo. Ora puoi accedere.",
     "loginRequiredTitle": "Accesso richiesto",
     "loginRequiredAdd": "Devi accedere per aggiungere un nuovo spot alla mappa.",
-    "loginRequiredRate": "Devi accedere per valutare e commentare questo spot."
+    "loginRequiredRate": "Devi accedere per valutare e commentare questo spot.",
+    "usernameTaken": "Questo nome utente è già in uso.",
+    "emailTaken": "Questa email è già registrata.",
+    "emailInvalid": "Controlla l’indirizzo email.",
+    "continueWithGoogle": "Continua con Google",
+    "googleFailed": "Accesso con Google non riuscito. Riprova."
   },
   "admin": {
     "title": "Pannello di amministrazione",

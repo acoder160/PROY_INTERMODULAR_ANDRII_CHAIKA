@@ -94,7 +94,12 @@
     "accountCreated": "账号创建成功，现在可以登录了。",
     "loginRequiredTitle": "需要登录",
     "loginRequiredAdd": "您需要登录后才能向地图添加新地点。",
-    "loginRequiredRate": "您需要登录后才能为该地点评分和评论。"
+    "loginRequiredRate": "您需要登录后才能为该地点评分和评论。",
+    "usernameTaken": "该用户名已被占用。",
+    "emailTaken": "该邮箱已注册。",
+    "emailInvalid": "请检查邮箱地址。",
+    "continueWithGoogle": "使用 Google 继续",
+    "googleFailed": "Google 登录失败，请重试。"
   },
   "admin": {
     "title": "管理面板",

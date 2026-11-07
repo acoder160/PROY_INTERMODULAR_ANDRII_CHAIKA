@@ -1,5 +1,6 @@
 package skatemap.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,20 +20,15 @@ public class CommentController {
         this.spotService = spotService;
     }
 
-    // GUARDAR COMENTARIO
     @PostMapping("/{spotId}")
-    public ResponseEntity<?> addComment(@PathVariable Long spotId, @RequestBody CommentDto commentDto) {
+    public ResponseEntity<Void> addComment(@PathVariable Long spotId, @Valid @RequestBody CommentDto commentDto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        // Llamamos al servicio
         spotService.addComment(spotId, commentDto.getContent(), auth.getName());
-
         return ResponseEntity.ok().build();
     }
 
-    // LEER COMENTARIOS
     @GetMapping("/spot/{spotId}")
     public ResponseEntity<List<CommentDto>> getComments(@PathVariable Long spotId) {
-        return ResponseEntity.ok(spotService.getCommentsBySpot(spotId));
+        return SpotController.revalidate(spotService.getCommentsBySpot(spotId));
     }
 }

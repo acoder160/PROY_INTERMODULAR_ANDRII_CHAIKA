@@ -102,6 +102,7 @@ api.interceptors.response.use(
       !originalRequest ||
       originalRequest._retry ||
       url.includes('/auth/login') ||
+      url.includes('/auth/google') ||
       url.includes('/auth/refresh') ||
       url.includes('/auth/logout')
     ) {

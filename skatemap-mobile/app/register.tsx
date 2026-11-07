@@ -4,6 +4,7 @@ import { Palette, DisplayFont, Radius, MIN_TARGET } from '../constants/theme';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
+import GoogleAuthButton from '../components/GoogleAuthButton';
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
@@ -21,8 +22,16 @@ export default function RegisterScreen() {
   const handleRegister = async () => {
     setErrorMessage(null);
 
-    if (!username || !email || !password) {
+    // La autocorrección del teclado suele dejar un espacio al final del email: el servidor lo rechaza
+    const cleanUsername = username.trim();
+    const cleanEmail = email.trim();
+
+    if (!cleanUsername || !cleanEmail || !password) {
       setErrorMessage(t('auth.fillAll'));
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setErrorMessage(t('auth.emailInvalid'));
       return;
     }
 
@@ -36,16 +45,26 @@ export default function RegisterScreen() {
 
     try {
       await api.post('/auth/register',
-        { username, email, password },
+        { username: cleanUsername, email: cleanEmail, password },
       );
 
       Alert.alert(t('auth.welcomeTitle'), t('auth.accountCreated'), [
         { text: t('common.ok'), onPress: () => router.replace('/login') }
       ]);
-      
-    } catch (error) {
-      console.error(error);
-      setErrorMessage(t('auth.registerFailed'));
+
+    } catch (error: any) {
+      // Mostramos la causa real en vez de un mensaje genérico
+      const status = error?.response?.status;
+      const body = typeof error?.response?.data === 'string' ? error.response.data : '';
+      // Validation errors come back as { message, errors: { field: reason } }
+      const fieldErrors = error?.response?.data?.errors ?? {};
+      console.log('Registration failed:', status ?? error?.message, body || fieldErrors);
+      if (!error?.response) setErrorMessage(t('popup.sendErrorConnection'));
+      else if (/username/i.test(body)) setErrorMessage(t('auth.usernameTaken'));
+      else if (/email/i.test(body)) setErrorMessage(t('auth.emailTaken'));
+      else if (fieldErrors.password || fieldErrors.username) setErrorMessage(fieldErrors.password || fieldErrors.username);
+      else if (status === 400) setErrorMessage(t('auth.emailInvalid'));
+      else setErrorMessage(t('auth.registerFailed'));
     } finally {
       // Paramos el cronómetro y limpiamos estados
       clearTimeout(wakeUpTimer);
@@ -93,8 +112,11 @@ export default function RegisterScreen() {
             placeholder={t('auth.registerUsernamePlaceholder')}
             placeholderTextColor={Palette.inkMuted}
             value={username} 
-            onChangeText={setUsername} 
-            autoCapitalize="none" 
+            onChangeText={setUsername}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="username-new"
+            textContentType="username"
           />
 
           <Text style={styles.label}>{t('auth.email')}</Text>
@@ -104,8 +126,11 @@ export default function RegisterScreen() {
             placeholderTextColor={Palette.inkMuted} 
             value={email} 
             onChangeText={setEmail} 
-            autoCapitalize="none" 
-            keyboardType="email-address" 
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="email-address"
+            autoComplete="email"
+            textContentType="emailAddress"
           />
 
           <Text style={styles.label}>{t('auth.password')}</Text>
@@ -113,9 +138,11 @@ export default function RegisterScreen() {
             style={styles.input} 
             placeholder="••••••••"
             placeholderTextColor={Palette.inkMuted}
-            secureTextEntry 
-            value={password} 
-            onChangeText={setPassword} 
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+            autoComplete="new-password"
+            textContentType="newPassword"
           />
 
           <TouchableOpacity onPress={handleRegister} disabled={isLoading} activeOpacity={0.88}>
@@ -123,6 +150,8 @@ export default function RegisterScreen() {
               {isLoading ? <ActivityIndicator color={Palette.ink} /> : <Text style={styles.buttonText}>{t('auth.createAccount')}</Text>}
             </View>
           </TouchableOpacity>
+
+          <GoogleAuthButton />
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>{t('auth.haveAccount')} </Text>

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 import '../Auth.css';
 
 export default function LoginPage() {
@@ -99,6 +100,8 @@ export default function LoginPage() {
             {isLoading ? t('auth.loggingIn') : t('auth.loginButton')}
           </button>
         </form>
+
+        <GoogleSignInButton />
 
         <div className="auth-footer">
           {t('auth.noAccount')}{' '}

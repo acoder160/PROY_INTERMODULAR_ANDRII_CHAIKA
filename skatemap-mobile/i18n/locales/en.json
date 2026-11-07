@@ -94,7 +94,12 @@
     "accountCreated": "Account created successfully. You can now log in.",
     "loginRequiredTitle": "Login required",
     "loginRequiredAdd": "You need to log in to add a new spot to the map.",
-    "loginRequiredRate": "You need to log in to rate and comment on this spot."
+    "loginRequiredRate": "You need to log in to rate and comment on this spot.",
+    "usernameTaken": "This username is already taken.",
+    "emailTaken": "This email is already registered.",
+    "emailInvalid": "Check the email address.",
+    "continueWithGoogle": "Continue with Google",
+    "googleFailed": "Google sign-in failed. Try again."
   },
   "admin": {
     "title": "Admin panel",

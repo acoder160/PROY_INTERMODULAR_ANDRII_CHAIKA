@@ -8,15 +8,24 @@ import skatemap.entity.Rating;
 import skatemap.entity.Spot;
 import skatemap.entity.User;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Long> {
 
-    // Buscar si este usuario ya votó este spot
+    /** Who gave which rating on a spot, as a projection (no entities, no lazy loading). */
+    interface UserRating {
+        Long getUserId();
+        Integer getValue();
+    }
+
     Optional<Rating> findBySpotAndUser(Spot spot, User user);
 
-    // Calcular la media de estrellas directamente en SQL
+    @Query("SELECT r.user.id AS userId, r.value AS value FROM Rating r WHERE r.spot.id = :spotId")
+    List<UserRating> findUserRatingsBySpotId(@Param("spotId") Long spotId);
+
+    // Average stars computed in SQL
     @Query("SELECT AVG(r.value) FROM Rating r WHERE r.spot.id = :spotId")
     Double getAverageRating(@Param("spotId") Long spotId);
 

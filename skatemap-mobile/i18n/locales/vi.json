@@ -94,7 +94,12 @@
     "accountCreated": "Tạo tài khoản thành công. Bây giờ bạn có thể đăng nhập.",
     "loginRequiredTitle": "Cần đăng nhập",
     "loginRequiredAdd": "Bạn cần đăng nhập để thêm spot mới vào bản đồ.",
-    "loginRequiredRate": "Bạn cần đăng nhập để đánh giá và bình luận về spot này."
+    "loginRequiredRate": "Bạn cần đăng nhập để đánh giá và bình luận về spot này.",
+    "usernameTaken": "Tên người dùng này đã có người dùng.",
+    "emailTaken": "Email này đã được đăng ký.",
+    "emailInvalid": "Hãy kiểm tra địa chỉ email.",
+    "continueWithGoogle": "Tiếp tục với Google",
+    "googleFailed": "Đăng nhập bằng Google thất bại. Hãy thử lại."
   },
   "admin": {
     "title": "Bảng quản trị",

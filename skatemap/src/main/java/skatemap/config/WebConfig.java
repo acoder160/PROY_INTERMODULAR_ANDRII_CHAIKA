@@ -1,6 +1,9 @@
 package skatemap.config;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.ShallowEtagHeaderFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import skatemap.security.RateLimitInterceptor;
@@ -16,8 +19,21 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // Aplicamos el interceptor a los endpoints de creación
+        // RateLimitInterceptor decides per path which limit applies
         registry.addInterceptor(rateLimitInterceptor)
-                .addPathPatterns("/api/spots/**");
+                .addPathPatterns("/api/auth/**", "/api/spots/**", "/api/spots", "/api/comments/**", "/api/cloudinary/**");
+    }
+
+    /**
+     * ETag on the public read endpoints: when the data hasn't changed, clients that send
+     * If-None-Match get an empty 304 instead of the whole spot list again.
+     */
+    @Bean
+    public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {
+        FilterRegistrationBean<ShallowEtagHeaderFilter> registration =
+                new FilterRegistrationBean<>(new ShallowEtagHeaderFilter());
+        registration.addUrlPatterns("/api/spots", "/api/spots/*", "/api/comments/spot/*");
+        registration.setName("etagFilter");
+        return registration;
     }
 }

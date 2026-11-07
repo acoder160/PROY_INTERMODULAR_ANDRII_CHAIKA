@@ -180,6 +180,19 @@
   border: 1px solid rgba(231, 76, 60, 0.3);
 }
 
+/* Login con Google */
+.auth-divider {
+  height: 1px;
+  margin: 1.4rem 0 1.1rem;
+  background: rgba(126, 195, 211, 0.25);
+}
+
+.google-button {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
 .auth-footer {
   margin-top: 1.5rem;
   color: #8fafbc;

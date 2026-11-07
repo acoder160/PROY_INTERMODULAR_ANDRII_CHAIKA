@@ -1,20 +1,25 @@
 package skatemap.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDateTime;
 
 public class CommentDto {
 
     private Long id;
+
+    @NotBlank
+    @Size(max = 1000)
     private String content;
     private String username;
     private LocalDateTime createdAt;
 
     private Integer rating;
 
-    // Constructor vacío (Necesario para que Spring lea el JSON)
+    // Jackson needs the no-args constructor
     public CommentDto() {}
 
-    // Constructor con todos los argumentos
     public CommentDto(Long id, String content, String username, LocalDateTime createdAt) {
         this.id = id;
         this.content = content;
@@ -22,7 +27,6 @@ public class CommentDto {
         this.createdAt = createdAt;
     }
 
-    // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

@@ -94,7 +94,12 @@
     "accountCreated": "アカウントを作成しました。ログインできます。",
     "loginRequiredTitle": "ログインが必要です",
     "loginRequiredAdd": "地図に新しいスポットを追加するにはログインが必要です。",
-    "loginRequiredRate": "このスポットを評価・コメントするにはログインが必要です。"
+    "loginRequiredRate": "このスポットを評価・コメントするにはログインが必要です。",
+    "usernameTaken": "このユーザー名は既に使われています。",
+    "emailTaken": "このメールアドレスは既に登録されています。",
+    "emailInvalid": "メールアドレスを確認してください。",
+    "continueWithGoogle": "Google で続行",
+    "googleFailed": "Google でのログインに失敗しました。もう一度お試しください。"
   },
   "admin": {
     "title": "管理パネル",

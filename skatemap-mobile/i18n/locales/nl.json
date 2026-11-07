@@ -94,7 +94,12 @@
     "accountCreated": "Account succesvol aangemaakt. Je kunt nu inloggen.",
     "loginRequiredTitle": "Inloggen vereist",
     "loginRequiredAdd": "Je moet inloggen om een nieuwe spot aan de kaart toe te voegen.",
-    "loginRequiredRate": "Je moet inloggen om deze spot te beoordelen en erop te reageren."
+    "loginRequiredRate": "Je moet inloggen om deze spot te beoordelen en erop te reageren.",
+    "usernameTaken": "Deze gebruikersnaam is al in gebruik.",
+    "emailTaken": "Dit e-mailadres is al geregistreerd.",
+    "emailInvalid": "Controleer het e-mailadres.",
+    "continueWithGoogle": "Doorgaan met Google",
+    "googleFailed": "Inloggen met Google is mislukt. Probeer het opnieuw."
   },
   "admin": {
     "title": "Beheerpaneel",

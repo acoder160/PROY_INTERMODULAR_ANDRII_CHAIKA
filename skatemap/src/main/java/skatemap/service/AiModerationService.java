@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.HttpStatusCodeException;
+import skatemap.exception.ApiException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,7 +25,15 @@ public class AiModerationService {
     @Value("${ai.openai.api.key}")
     private String openaiApiKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    // Timeouts so a hung provider can't hold request threads; on timeout the next provider is tried
+    private final RestTemplate restTemplate = createRestTemplate();
+
+    private static RestTemplate createRestTemplate() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(3_000);
+        factory.setReadTimeout(5_000);
+        return new RestTemplate(factory);
+    }
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
@@ -83,8 +93,8 @@ public class AiModerationService {
         result = callAiApi(GROQ_URL, groqApiKey, "openai/gpt-oss-safeguard-20b", textToAnalyze);
         if (result != null) return result;
 
-        // Si todo falla (No hay internet o claves incorrectas), bloqueamos por seguridad
-        throw new RuntimeException("Servicios de moderación de IA caídos en este momento.");
+        // Every provider failed (no network or bad keys): block rather than publish unmoderated text
+        throw ApiException.unavailable("Moderation is temporarily unavailable. Please try again in a few minutes.");
     }
 
     private Boolean callAiApi(String url, String apiKey, String model, String userText) {

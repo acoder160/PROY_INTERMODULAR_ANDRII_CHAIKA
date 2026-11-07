@@ -94,7 +94,12 @@
     "accountCreated": "Konto zostało utworzone. Możesz się teraz zalogować.",
     "loginRequiredTitle": "Wymagane logowanie",
     "loginRequiredAdd": "Musisz się zalogować, aby dodać nowy spot do mapy.",
-    "loginRequiredRate": "Musisz się zalogować, aby ocenić i skomentować ten spot."
+    "loginRequiredRate": "Musisz się zalogować, aby ocenić i skomentować ten spot.",
+    "usernameTaken": "Ta nazwa użytkownika jest już zajęta.",
+    "emailTaken": "Ten e-mail jest już zarejestrowany.",
+    "emailInvalid": "Sprawdź adres e-mail.",
+    "continueWithGoogle": "Kontynuuj z Google",
+    "googleFailed": "Logowanie przez Google nie powiodło się. Spróbuj ponownie."
   },
   "admin": {
     "title": "Panel administracyjny",

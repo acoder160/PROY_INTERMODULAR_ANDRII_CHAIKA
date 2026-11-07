@@ -2,6 +2,7 @@ package skatemap.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import skatemap.exception.ApiException;
 import skatemap.dto.CommentDto;
 import skatemap.entity.Comment;
 import skatemap.entity.Spot;
@@ -33,16 +34,16 @@ public class CommentService {
     @Transactional
     public CommentDto addComment(Long spotId, String username, String content) {
         if (!aiModerationService.isContentAllowed(content)) {
-            throw new IllegalArgumentException("El comentario incumple las normas de la comunidad (Spam, contenido inapropiado o texto sin sentido).");
+            throw ApiException.contentRejected("This comment breaks the community rules (spam, inappropriate content or nonsense text).");
         }
 
         // 1. Buscar el Spot
         Spot spot = spotRepository.findById(spotId)
-                .orElseThrow(() -> new RuntimeException("Spot no encontrado con id: " + spotId));
+                .orElseThrow(() -> ApiException.notFound("Spot"));
 
         // 2. Buscar el Usuario
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + username));
+                .orElseThrow(() -> ApiException.notFound("User"));
 
         // 3. Crear y guardar el comentario
         Comment comment = new Comment();

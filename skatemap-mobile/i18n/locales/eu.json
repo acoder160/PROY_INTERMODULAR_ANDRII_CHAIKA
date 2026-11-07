@@ -94,7 +94,12 @@
     "accountCreated": "Kontua ondo sortu da. Orain saioa has dezakezu.",
     "loginRequiredTitle": "Saioa hasi behar da",
     "loginRequiredAdd": "Saioa hasi behar duzu mapara spot berri bat gehitzeko.",
-    "loginRequiredRate": "Saioa hasi behar duzu spot hau baloratu eta iruzkintzeko."
+    "loginRequiredRate": "Saioa hasi behar duzu spot hau baloratu eta iruzkintzeko.",
+    "usernameTaken": "Erabiltzaile-izen hori hartuta dago.",
+    "emailTaken": "Email hori erregistratuta dago jada.",
+    "emailInvalid": "Egiaztatu email helbidea.",
+    "continueWithGoogle": "Jarraitu Googlerekin",
+    "googleFailed": "Ezin izan da Googlerekin sartu. Saiatu berriro."
   },
   "admin": {
     "title": "Administrazio panela",

@@ -94,7 +94,12 @@
     "accountCreated": "Konto erfolgreich erstellt. Du kannst dich jetzt anmelden.",
     "loginRequiredTitle": "Anmeldung erforderlich",
     "loginRequiredAdd": "Du musst dich anmelden, um einen neuen Spot zur Karte hinzuzufügen.",
-    "loginRequiredRate": "Du musst dich anmelden, um diesen Spot zu bewerten und zu kommentieren."
+    "loginRequiredRate": "Du musst dich anmelden, um diesen Spot zu bewerten und zu kommentieren.",
+    "usernameTaken": "Dieser Benutzername ist bereits vergeben.",
+    "emailTaken": "Diese E-Mail ist bereits registriert.",
+    "emailInvalid": "Überprüfe die E-Mail-Adresse.",
+    "continueWithGoogle": "Weiter mit Google",
+    "googleFailed": "Anmeldung mit Google fehlgeschlagen. Versuch es erneut."
   },
   "admin": {
     "title": "Administrationsbereich",

@@ -1,5 +1,6 @@
 package skatemap.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import skatemap.entity.Comment;
@@ -9,11 +10,10 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    // Busca todos los comentarios asociados a un ID de spot
-    // Ordenados por fecha descendente (los más nuevos primero)
+    /** Newest first, with the author loaded in the same query. */
+    @EntityGraph(attributePaths = "user")
     List<Comment> findBySpotIdOrderByCreatedAtDesc(Long spotId);
 
-    // Contar cuántos comentarios tiene un spot
     long countBySpotId(Long spotId);
 
     @org.springframework.data.jpa.repository.Modifying

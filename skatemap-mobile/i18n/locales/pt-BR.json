@@ -94,7 +94,12 @@
     "accountCreated": "Conta criada com sucesso. Agora você pode entrar.",
     "loginRequiredTitle": "Login necessário",
     "loginRequiredAdd": "Você precisa entrar para adicionar um novo spot ao mapa.",
-    "loginRequiredRate": "Você precisa entrar para avaliar e comentar este spot."
+    "loginRequiredRate": "Você precisa entrar para avaliar e comentar este spot.",
+    "usernameTaken": "Esse nome de usuário já está em uso.",
+    "emailTaken": "Esse e-mail já está cadastrado.",
+    "emailInvalid": "Confira o endereço de e-mail.",
+    "continueWithGoogle": "Continuar com o Google",
+    "googleFailed": "Não foi possível entrar com o Google. Tente de novo."
   },
   "admin": {
     "title": "Painel de administração",

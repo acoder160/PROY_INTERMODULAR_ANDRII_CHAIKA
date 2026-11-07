@@ -94,7 +94,12 @@
     "accountCreated": "Akun berhasil dibuat. Sekarang Anda dapat masuk.",
     "loginRequiredTitle": "Perlu masuk",
     "loginRequiredAdd": "Anda perlu masuk untuk menambahkan spot baru ke peta.",
-    "loginRequiredRate": "Anda perlu masuk untuk menilai dan mengomentari spot ini."
+    "loginRequiredRate": "Anda perlu masuk untuk menilai dan mengomentari spot ini.",
+    "usernameTaken": "Nama pengguna ini sudah dipakai.",
+    "emailTaken": "Email ini sudah terdaftar.",
+    "emailInvalid": "Periksa alamat email.",
+    "continueWithGoogle": "Lanjutkan dengan Google",
+    "googleFailed": "Gagal masuk dengan Google. Coba lagi."
   },
   "admin": {
     "title": "Panel admin",

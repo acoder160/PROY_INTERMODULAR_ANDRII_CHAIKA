@@ -1,6 +1,10 @@
 package skatemap.controller;
 
+import jakarta.validation.Valid;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import skatemap.exception.ApiException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,9 +27,12 @@ public class SpotController {
         this.spotService = spotService;
     }
 
-    // CREAR SPOT (Requiere Login)
+    /** Max search radius for /nearby, so one request can't scan the whole table. */
+    static final double MAX_NEARBY_METERS = 50_000;
+
+    // Requires login
     @PostMapping
-    public ResponseEntity<SpotDto> createSpot(@RequestBody SpotDto spotDto) {
+    public ResponseEntity<SpotDto> createSpot(@Valid @RequestBody SpotDto spotDto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
 
@@ -33,30 +40,31 @@ public class SpotController {
         return ResponseEntity.ok(newSpot);
     }
 
-    // BUSCAR CERCANOS
     @GetMapping("/nearby")
     public ResponseEntity<List<SpotDto>> getNearbySpots(
             @RequestParam double lat,
             @RequestParam double lng,
             @RequestParam(defaultValue = "5000") double dist) {
-
-        List<SpotDto> spots = spotService.findSpotsNearby(lat, lng, dist);
-        return ResponseEntity.ok(spots);
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180 || !(dist > 0)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid coordinates or distance");
+        }
+        List<SpotDto> spots = spotService.findSpotsNearby(lat, lng, Math.min(dist, MAX_NEARBY_METERS));
+        return revalidate(spots);
     }
 
-    // LISTAR TODOS
+    // Every spot; served from memory (SpotListCache) with an ETag
     @GetMapping
     public ResponseEntity<List<SpotDto>> getAllSpots() {
-        return ResponseEntity.ok(spotService.getAllSpots());
+        return revalidate(spotService.getAllSpots());
     }
 
-    // VER COMENTARIOS DE UN SPOT
+    // Comments of a spot
     @GetMapping("/{spotId}/comments")
     public ResponseEntity<List<CommentDto>> getComments(@PathVariable Long spotId) {
-        return ResponseEntity.ok(spotService.getCommentsBySpot(spotId));
+        return revalidate(spotService.getCommentsBySpot(spotId));
     }
 
-    // VERIFICAR SI YA HE VOTADO
+    // Rating the current user gave to this spot
     @GetMapping("/{spotId}/my-rating")
     public ResponseEntity<RatingDto> getMyRating(@PathVariable Long spotId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -64,18 +72,20 @@ public class SpotController {
 
         return ResponseEntity.ok(spotService.getUserRating(spotId, username));
     }
-    // BORRAR SPOT (Solo administradores)
+    // Admins only
     @DeleteMapping("/{spotId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteSpot(@PathVariable Long spotId) {
+    public ResponseEntity<Void> deleteSpot(@PathVariable Long spotId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+        spotService.deleteSpot(spotId, auth.getName());
+        return ResponseEntity.ok().build();
+    }
 
-        try {
-            spotService.deleteSpot(spotId, username);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(403).body(e.getMessage()); // 403 Forbidden
-        }
+    /**
+     * Public data that changes rarely: clients may keep it but must check with the server before
+     * reusing it. With the ETag filter an unchanged list costs a 304 with no body.
+     */
+    static <T> ResponseEntity<T> revalidate(T body) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noCache().cachePublic()).body(body);
     }
 }

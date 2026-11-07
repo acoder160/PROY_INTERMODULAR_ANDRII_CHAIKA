@@ -61,6 +61,9 @@
       "eas": {
         "projectId": "302b223f-8db5-4795-a8e1-4c4185991aa5"
       }
+    },
+    "ios": {
+      "bundleIdentifier": "com.acoder160.skatemapmobile"
     }
   }
 }

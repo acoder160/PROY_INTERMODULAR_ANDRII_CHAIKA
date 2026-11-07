@@ -94,7 +94,12 @@
     "accountCreated": "Hesap başarıyla oluşturuldu. Artık giriş yapabilirsiniz.",
     "loginRequiredTitle": "Giriş gerekli",
     "loginRequiredAdd": "Haritaya yeni bir spot eklemek için giriş yapmalısınız.",
-    "loginRequiredRate": "Bu spotu değerlendirmek ve yorum yapmak için giriş yapmalısınız."
+    "loginRequiredRate": "Bu spotu değerlendirmek ve yorum yapmak için giriş yapmalısınız.",
+    "usernameTaken": "Bu kullanıcı adı zaten alınmış.",
+    "emailTaken": "Bu e-posta zaten kayıtlı.",
+    "emailInvalid": "E-posta adresini kontrol et.",
+    "continueWithGoogle": "Google ile devam et",
+    "googleFailed": "Google ile giriş başarısız. Tekrar dene."
   },
   "admin": {
     "title": "Yönetim paneli",

@@ -3,6 +3,8 @@ package skatemap.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -20,7 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Activa las protecciones por método (@PreAuthorize)
+@EnableMethodSecurity // enables @PreAuthorize
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
@@ -58,31 +60,31 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // ACTIVAR CORS
                 .cors(Customizer.withDefaults())
 
-                // DESACTIVAR CSRF (Necesario para APIs REST)
+                // No CSRF tokens: the API authenticates with a Bearer header. The only cookie (refresh
+                // token) is read just by /api/auth/refresh and /logout, and CORS stops other origins
+                // from reading the new access token
                 .csrf(csrf -> csrf.disable())
 
-                // Sin estado / Stateless
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // REGLAS DE AUTORIZACION BLINDADAS
+                // Missing/expired token -> 401 (not the default 403), so clients know to refresh it
+                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/auth/**").permitAll();
-                    // Permitimos ver los spots y leer los comentarios al público sin token
+                    // Spots and comments are readable without an account
                     auth.requestMatchers(HttpMethod.GET, "/api/spots/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll();
-                    auth.requestMatchers("/uploads/**").permitAll();
                     auth.requestMatchers("/error").permitAll();
                     if (swaggerEnabled) {
                         auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
                     }
-                    // El resto de peticiones (POST/PUT/DELETE, votar, comentar, subir fotos) requieren JWT
+                    // Everything else (create, rate, comment, upload) needs a JWT
                     auth.anyRequest().authenticated();
                 });
 
-        // FILTROS
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
