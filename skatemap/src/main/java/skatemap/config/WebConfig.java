@@ -30,8 +30,10 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Bean
     public FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {
-        FilterRegistrationBean<ShallowEtagHeaderFilter> registration =
-                new FilterRegistrationBean<>(new ShallowEtagHeaderFilter());
+        ShallowEtagHeaderFilter filter = new ShallowEtagHeaderFilter();
+        // Weak ETag (W/"..."): Tomcat refuses to gzip responses carrying a strong one
+        filter.setWriteWeakETag(true);
+        FilterRegistrationBean<ShallowEtagHeaderFilter> registration = new FilterRegistrationBean<>(filter);
         registration.addUrlPatterns("/api/spots", "/api/spots/*", "/api/comments/spot/*");
         registration.setName("etagFilter");
         return registration;
