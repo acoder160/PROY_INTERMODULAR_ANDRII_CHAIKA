@@ -1,0 +1,68 @@
+# Production stack for one VM: PostgreSQL/PostGIS + Spring Boot API + Caddy (HTTPS).
+#   cd deploy && docker compose up -d --build
+# Settings and secrets come from deploy/.env (copy .env.example; never commit it).
+
+services:
+  db:
+    build: ./db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: skatemap
+      POSTGRES_USER: skatemap
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in deploy/.env}
+    command: >
+      postgres
+      -c shared_buffers=${PG_SHARED_BUFFERS:-1GB}
+      -c effective_cache_size=${PG_EFFECTIVE_CACHE_SIZE:-4GB}
+      -c max_connections=100
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # No published ports: only the app container can reach the database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skatemap -d skatemap"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: ../skatemap
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/skatemap
+      SPRING_DATASOURCE_USERNAME: skatemap
+      # Caddy replaces X-Forwarded-For with the real client address
+      CLIENT_IP_HEADER: ${CLIENT_IP_HEADER:-X-Forwarded-For}
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-30}
+      GOOGLE_REDIRECT_URI: https://${API_DOMAIN}/api/auth/google/callback
+      GOOGLE_ALLOW_EXPO_GO: "false"
+      SWAGGER_ENABLED: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: ${APP_MEM_LIMIT:-4g}
+    # Only on the VM's loopback, for checks over SSH; the public goes through Caddy
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  caddy:
+    image: caddy:2.10
+    restart: unless-stopped
+    environment:
+      API_DOMAIN: ${API_DOMAIN:?set API_DOMAIN in deploy/.env}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in deploy/.env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
