@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, type ComponentRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Image, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Linking, Share } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Image, Platform, ActivityIndicator, Alert, Linking, Share, Dimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useKeyboardHeight } from '../hooks/useKeyboardHeight';
 import { Ionicons } from '@expo/vector-icons';
 import { Palette, DisplayFont, Radius, MIN_TARGET } from '../constants/theme';
 import GradientFill from '../components/ui/GradientFill';
@@ -17,6 +19,8 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
   const { t } = useTranslation();
   const router = useRouter();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
+  const keyboardHeight = useKeyboardHeight();
   // El estado se reinicia al cambiar de spot: el padre monta este componente con key={spot.id}
   const [commentCount, setCommentCount] = useState<number | string>(0);
   const [editForm, setEditForm] = useState<any | null>(null);
@@ -39,6 +43,21 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
 
   // Referencia al ScrollView para hacer auto-scroll
   const scrollViewRef = useRef<ComponentRef<typeof ScrollView>>(null);
+  const scrollY = useRef(0);
+
+  useEffect(() => {
+    if (!keyboardHeight) return undefined;
+    // Wait a frame: the sheet has just moved up by the keyboard height
+    const timer = setTimeout(() => {
+      const input = TextInput.State.currentlyFocusedInput();
+      input?.measureInWindow((_x, y, _w, h) => {
+        const visibleBottom = Dimensions.get('window').height - keyboardHeight - 16;
+        const hidden = y + h - visibleBottom;
+        if (hidden > 0) scrollViewRef.current?.scrollTo({ y: scrollY.current + hidden, animated: true });
+      });
+    }, 60);
+    return () => clearTimeout(timer);
+  }, [keyboardHeight]);
 
   const spotId = spot?.id;
 
@@ -208,12 +227,17 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
   };
 
   return (
-    <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.overlay}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
-      >
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+      statusBarTranslucent
+      navigationBarTranslucent
+    >
+      {/* The sheet sits right on the keyboard: on Android the system used to resize or pan the
+          modal window instead, leaving a dark band between the keyboard and the sheet */}
+      <View style={[styles.overlay, { paddingTop: insets.top, paddingBottom: keyboardHeight }]}>
         <View style={styles.card}>
           <TouchableOpacity
             style={styles.closeBtn}
@@ -235,7 +259,15 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
             </TouchableOpacity>
           )}
 
-          <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+          <ScrollView
+            ref={scrollViewRef}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            onScroll={(e) => { scrollY.current = e.nativeEvent.contentOffset.y; }}
+            scrollEventThrottle={32}
+            // Clear the gesture bar when the keyboard is down; on top of the keyboard nothing is needed
+            contentContainerStyle={{ paddingBottom: keyboardHeight ? 0 : insets.bottom }}
+          >
             {spot.mediaUrl ? (
               <Image source={{ uri: spot.mediaUrl }} style={styles.image} accessibilityIgnoresInvertColors />
             ) : (
@@ -370,7 +402,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
             </View>
           </ScrollView>
         </View>
-      </KeyboardAvoidingView>
+      </View>
       {editForm && (
         <SpotFormModal
           visible
