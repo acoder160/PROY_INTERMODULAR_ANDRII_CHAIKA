@@ -10,8 +10,6 @@ import AdminPage from './pages/AdminPage';
 import AdminReportsPage from './pages/AdminReportsPage';
 import LegalPage from './pages/LegalPage';
 import ProfilePage from './pages/ProfilePage';
-import FeedPage from './pages/FeedPage';
-import NotificationsPage from './pages/NotificationsPage';
 import SavedPage from './pages/SavedPage';
 
 function App() {
@@ -31,8 +29,9 @@ function App() {
           <Route path="/legal" element={<LegalPage />} />
           {/* Social: profiles are public; feed, notifications and saved spots ask for an account */}
           <Route path="/u/:username" element={<ProfilePage />} />
-          <Route path="/feed" element={<FeedPage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
+          {/* Feed and notifications are windows over the map; the old URLs open them there */}
+          <Route path="/feed" element={<Navigate to="/map?panel=feed" replace />} />
+          <Route path="/notifications" element={<Navigate to="/map?panel=notifications" replace />} />
           <Route path="/saved" element={<SavedPage />} />
           <Route path="*" element={<Navigate to="/map" />} />
         </Routes>

@@ -25,7 +25,12 @@
     "geoUnsupported": "Tarayıcınız konum özelliğini desteklemiyor",
     "geoDenied": "Konum izni reddedildi. Tarayıcıda etkinleştirin.",
     "geoFailed": "Konumunuz alınamadı.",
-    "logoutConfirm": "SkateMap’ten çıkış yapılsın mı?"
+    "logoutConfirm": "SkateMap’ten çıkış yapılsın mı?",
+    "serverWaking": "Sunucu uyandırılıyor. Bir dakika sürebilir.",
+    "loadFailed": "SkateMap'e ulaşılamıyor.",
+    "retry": "Tekrar dene",
+    "noMatches": "Bu filtrelere uyan spot yok.",
+    "resetFilters": "Filtreleri sıfırla"
   },
   "filters": {
     "title": "Spotları filtrele",
@@ -104,7 +109,9 @@
     "demoHint": "Kayıt gerekmez: ortak bir test hesabı.",
     "demoFailed": "Demo şu anda kullanılamıyor. Daha sonra tekrar deneyin.",
     "acceptTerms": "14 yaşında veya daha büyüğüm ve şunları kabul ediyorum:",
-    "acceptRequired": "Lütfen 14 yaşında veya daha büyük olduğunuzu ve kuralları kabul ettiğinizi onaylayın."
+    "acceptRequired": "Lütfen 14 yaşında veya daha büyük olduğunuzu ve kuralları kabul ettiğinizi onaylayın.",
+    "serverUnreachable": "Sunucuya ulaşılamıyor. Uyanıyor olabilir: bir dakika bekleyip tekrar dene.",
+    "tooManyAttempts": "Çok fazla deneme. Biraz bekleyip tekrar dene."
   },
   "admin": {
     "backToMap": "Haritaya dön",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

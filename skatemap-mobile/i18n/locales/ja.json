@@ -25,7 +25,12 @@
     "geoUnsupported": "お使いのブラウザは位置情報に対応していません",
     "geoDenied": "位置情報の許可が拒否されました。ブラウザで有効にしてください。",
     "geoFailed": "現在地を取得できませんでした。",
-    "logoutConfirm": "SkateMapからログアウトしますか？"
+    "logoutConfirm": "SkateMapからログアウトしますか？",
+    "serverWaking": "サーバーを起動しています。1分ほどかかることがあります。",
+    "loadFailed": "SkateMapに接続できません。",
+    "retry": "もう一度試す",
+    "noMatches": "この条件に合うスポットはありません。",
+    "resetFilters": "フィルターをリセット"
   },
   "filters": {
     "title": "スポットを絞り込む",
@@ -104,7 +109,9 @@
     "demoHint": "登録不要：共有のテスト用アカウントです。",
     "demoFailed": "現在デモは利用できません。しばらくしてからもう一度お試しください。",
     "acceptTerms": "14歳以上であり、次に同意します：",
-    "acceptRequired": "14歳以上であり、ルールに同意することを確認してください。"
+    "acceptRequired": "14歳以上であり、ルールに同意することを確認してください。",
+    "serverUnreachable": "サーバーに接続できません。起動中かもしれません。1分ほど待ってからもう一度お試しください。",
+    "tooManyAttempts": "試行回数が多すぎます。少し待ってからもう一度お試しください。"
   },
   "admin": {
     "backToMap": "地図に戻る",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

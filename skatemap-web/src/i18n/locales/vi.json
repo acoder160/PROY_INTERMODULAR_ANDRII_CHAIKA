@@ -25,7 +25,12 @@
     "geoUnsupported": "Trình duyệt của bạn không hỗ trợ định vị",
     "geoDenied": "Quyền vị trí bị từ chối. Hãy bật trong trình duyệt.",
     "geoFailed": "Không thể lấy vị trí của bạn.",
-    "logoutConfirm": "Đăng xuất khỏi SkateMap?"
+    "logoutConfirm": "Đăng xuất khỏi SkateMap?",
+    "serverWaking": "Đang đánh thức máy chủ. Việc này có thể mất một phút.",
+    "loadFailed": "Không kết nối được với SkateMap.",
+    "retry": "Thử lại",
+    "noMatches": "Không có spot nào khớp với bộ lọc.",
+    "resetFilters": "Đặt lại bộ lọc"
   },
   "filters": {
     "title": "Lọc spot",
@@ -104,7 +109,9 @@
     "demoHint": "Không cần đăng ký: một tài khoản thử nghiệm dùng chung.",
     "demoFailed": "Bản demo hiện không khả dụng. Hãy thử lại sau.",
     "acceptTerms": "Tôi từ 14 tuổi trở lên và chấp nhận",
-    "acceptRequired": "Hãy xác nhận bạn từ 14 tuổi trở lên và chấp nhận các quy tắc."
+    "acceptRequired": "Hãy xác nhận bạn từ 14 tuổi trở lên và chấp nhận các quy tắc.",
+    "serverUnreachable": "Không kết nối được máy chủ. Có thể máy chủ đang khởi động: hãy chờ một phút rồi thử lại.",
+    "tooManyAttempts": "Quá nhiều lần thử. Hãy chờ một lát rồi thử lại."
   },
   "admin": {
     "backToMap": "Quay lại bản đồ",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

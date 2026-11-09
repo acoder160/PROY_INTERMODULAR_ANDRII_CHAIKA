@@ -104,7 +104,6 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             return Limit.FAVORITE;
         }
         if (path.equals("/api/ai/suggest-tags")) return Limit.SUGGEST_TAGS;
-        if (path.equals("/api/search")) return Limit.SEARCH;
         if (path.startsWith("/api/spots/") && path.endsWith("/checkin")) return Limit.CHECKIN;
         if (path.startsWith("/api/sessions/") && path.endsWith("/join")) return Limit.SESSION_JOIN;
         if ("POST".equalsIgnoreCase(method) && path.startsWith("/api/spots/") && path.endsWith("/sessions")) {
@@ -145,7 +144,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 
     private static boolean isPerIp(Limit limit) {
         return limit == Limit.LOGIN || limit == Limit.REGISTER || limit == Limit.REFRESH || limit == Limit.GOOGLE
-                || limit == Limit.DEMO_LOGIN || limit == Limit.SEARCH || limit == Limit.WEATHER;
+                || limit == Limit.DEMO_LOGIN || limit == Limit.WEATHER;
     }
 
     private static Limit adminVariant(Limit limit) {

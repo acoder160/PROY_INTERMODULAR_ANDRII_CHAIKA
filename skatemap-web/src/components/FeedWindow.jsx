@@ -3,16 +3,20 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
-import PageBar from '../components/PageBar';
-import Avatar from '../components/Avatar';
-import SpotCard from '../components/SpotCard';
-import { StarRating } from '../components/PaintBits';
+import Sheet from './Sheet';
+import Avatar from './Avatar';
+import SpotCard from './SpotCard';
+import SignInPrompt from './SignInPrompt';
+import { StarRating } from './PaintBits';
 import { timeAgo } from '../utils/social';
 import { formatSessionTime } from '../utils/live';
 import '../Social.css';
 
-/** What the people you follow have been doing: new spots, comments, first ratings. */
-export default function FeedPage() {
+/**
+ * What the people you follow have been doing: new spots, comments, first ratings.
+ * A window over the map, so the visitor never leaves it. Mount it only while it is open: each opening loads fresh.
+ */
+export default function FeedWindow({ onClose }) {
   const { t, i18n } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -42,9 +46,8 @@ export default function FeedPage() {
   };
 
   return (
-    <div className="admin-page social-page">
-      <PageBar title={t('social.feed')} />
-      <main className="social-main">
+    <Sheet open onClose={onClose} title={t('social.feed')} variant="window">
+      <div className="social-main in-window">
         {!authLoading && !user && <SignInPrompt onSignIn={() => navigate('/login')} />}
         {user && !items && !failed && <span className="spinner spinner-ink spinner-center" aria-label={t('popup.loading')} />}
         {failed && <p className="social-empty">{t('social.loadFailed')}</p>}
@@ -65,6 +68,7 @@ export default function FeedPage() {
                 </p>
                 {item.comment && <blockquote className="feed-quote">{item.comment}</blockquote>}
                 {item.session && <p className="feed-session">{formatSessionTime(item.session.startsAt, i18n.language)}</p>}
+                {/* /map?spot=ID replaces the window's ?panel= param, so opening a spot also closes the window */}
                 <SpotCard spot={item.spot} />
               </div>
             </li>
@@ -76,17 +80,7 @@ export default function FeedPage() {
             {loadingMore ? <span className="spinner spinner-ink" aria-label={t('popup.loading')} /> : t('social.loadMore')}
           </button>
         )}
-      </main>
-    </div>
-  );
-}
-
-export function SignInPrompt({ onSignIn }) {
-  const { t } = useTranslation();
-  return (
-    <div className="social-empty">
-      <p>{t('social.signInToSee')}</p>
-      <button type="button" className="btn-primary btn-small" onClick={onSignIn}>{t('map.enter')}</button>
-    </div>
+      </div>
+    </Sheet>
   );
 }

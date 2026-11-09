@@ -77,8 +77,6 @@ public class SecurityConfig {
                     // Spots and comments are readable without an account
                     auth.requestMatchers(HttpMethod.GET, "/api/spots/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll();
-                    // Natural-language search is public like the map (rate-limited per IP)
-                    auth.requestMatchers(HttpMethod.POST, "/api/search").permitAll();
                     // Profiles are public too, except the signed-in user's own account
                     auth.requestMatchers("/api/users/me", "/api/users/me/**").authenticated();
                     auth.requestMatchers(HttpMethod.GET, "/api/users/**").permitAll();

@@ -25,7 +25,12 @@
     "geoUnsupported": "متصفحك لا يدعم تحديد الموقع",
     "geoDenied": "تم رفض إذن الموقع. فعّله من المتصفح.",
     "geoFailed": "تعذّر تحديد موقعك.",
-    "logoutConfirm": "تسجيل الخروج من SkateMap؟"
+    "logoutConfirm": "تسجيل الخروج من SkateMap؟",
+    "serverWaking": "جارٍ تشغيل الخادم. قد يستغرق ذلك دقيقة.",
+    "loadFailed": "تعذّر الاتصال بـ SkateMap.",
+    "retry": "إعادة المحاولة",
+    "noMatches": "لا توجد أماكن مطابقة لهذه التصفية.",
+    "resetFilters": "إعادة ضبط التصفية"
   },
   "filters": {
     "title": "تصفية الأماكن",
@@ -104,7 +109,9 @@
     "demoHint": "بدون تسجيل: حساب تجريبي مشترك.",
     "demoFailed": "النسخة التجريبية غير متاحة حاليًا. حاول لاحقًا.",
     "acceptTerms": "عمري 14 عامًا أو أكثر وأوافق على",
-    "acceptRequired": "يرجى تأكيد أن عمرك 14 عامًا أو أكثر وأنك توافق على القواعد."
+    "acceptRequired": "يرجى تأكيد أن عمرك 14 عامًا أو أكثر وأنك توافق على القواعد.",
+    "serverUnreachable": "تعذّر الاتصال بالخادم. قد يكون قيد التشغيل: انتظر دقيقة ثم حاول مرة أخرى.",
+    "tooManyAttempts": "محاولات كثيرة جدًا. انتظر قليلًا ثم حاول مرة أخرى."
   },
   "admin": {
     "backToMap": "العودة إلى الخريطة",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

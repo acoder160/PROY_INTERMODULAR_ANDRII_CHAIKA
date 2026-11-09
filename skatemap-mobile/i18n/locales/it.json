@@ -25,7 +25,12 @@
     "geoUnsupported": "Il tuo browser non supporta la geolocalizzazione",
     "geoDenied": "Permesso di localizzazione negato. Attivalo nel browser.",
     "geoFailed": "Impossibile ottenere la tua posizione.",
-    "logoutConfirm": "Uscire da SkateMap?"
+    "logoutConfirm": "Uscire da SkateMap?",
+    "serverWaking": "Sto svegliando il server. Può volerci un minuto.",
+    "loadFailed": "Impossibile raggiungere SkateMap.",
+    "retry": "Riprova",
+    "noMatches": "Nessuno spot corrisponde ai filtri.",
+    "resetFilters": "Azzera i filtri"
   },
   "filters": {
     "title": "Filtra spot",
@@ -104,7 +109,9 @@
     "demoHint": "Senza registrazione: un account di prova condiviso.",
     "demoFailed": "La demo non è disponibile al momento. Riprova più tardi.",
     "acceptTerms": "Ho 14 anni o più e accetto le",
-    "acceptRequired": "Conferma di avere almeno 14 anni e di accettare le regole."
+    "acceptRequired": "Conferma di avere almeno 14 anni e di accettare le regole.",
+    "serverUnreachable": "Server non raggiungibile. Potrebbe star ripartendo: aspetta un minuto e riprova.",
+    "tooManyAttempts": "Troppi tentativi. Aspetta un momento e riprova."
   },
   "admin": {
     "backToMap": "Torna alla mappa",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

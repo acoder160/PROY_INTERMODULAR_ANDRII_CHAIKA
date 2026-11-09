@@ -25,7 +25,12 @@
     "geoUnsupported": "Tu navegador no soporta geolocalización",
     "geoDenied": "Permiso de ubicación denegado. Actívalo en el navegador.",
     "geoFailed": "No se pudo obtener tu ubicación.",
-    "logoutConfirm": "¿Cerrar sesión en SkateMap?"
+    "logoutConfirm": "¿Cerrar sesión en SkateMap?",
+    "serverWaking": "Despertando el servidor. Puede tardar un minuto.",
+    "loadFailed": "No se puede conectar con SkateMap.",
+    "retry": "Reintentar",
+    "noMatches": "Ningún spot coincide con los filtros.",
+    "resetFilters": "Quitar filtros"
   },
   "filters": {
     "title": "Filtrar spots",
@@ -104,7 +109,9 @@
     "demoHint": "Sin registro: una cuenta de prueba compartida.",
     "demoFailed": "La demo no está disponible ahora. Inténtalo más tarde.",
     "acceptTerms": "Tengo 14 años o más y acepto las",
-    "acceptRequired": "Confirma que tienes 14 años o más y que aceptas las normas."
+    "acceptRequired": "Confirma que tienes 14 años o más y que aceptas las normas.",
+    "serverUnreachable": "No se puede contactar con el servidor. Puede estar despertando: espera un minuto e inténtalo de nuevo.",
+    "tooManyAttempts": "Demasiados intentos. Espera un momento e inténtalo de nuevo."
   },
   "admin": {
     "backToMap": "Volver al mapa",
@@ -349,18 +356,6 @@
     "message": "«{{name}}» ya está en el mapa, a unos {{meters}} m de aquí.",
     "openExisting": "Abrirlo",
     "createAnyway": "Es distinto, crearlo"
-  },
-  "search": {
-    "placeholder": "Prueba “ledges lisos para principiantes cerca”",
-    "submit": "Buscar spots",
-    "clear": "Borrar búsqueda",
-    "searching": "Buscando…",
-    "results": "{{count}} spots encontrados",
-    "noResults": "Ningún spot coincide. Prueba con otras palabras.",
-    "noAi": "Búsqueda por palabras (IA no disponible)",
-    "failed": "La búsqueda no está disponible ahora.",
-    "chipRating": "{{value}}★ o más",
-    "chipDistance": "a menos de {{km}} km"
   },
   "weather": {
     "label": "Tiempo",

@@ -9,13 +9,14 @@ const DISTANCES = [0, 1, 5, 10];
 const RATINGS = [0, 3, 4];
 
 // Mismas opciones y orden que skatemap-mobile/components/FilterModal.tsx
-export default function FilterSheet({ open, onClose, filters, setFilters, resultCount, hasLocation }) {
+export default function FilterSheet({ open, onClose, filters, setFilters, resultCount, countPending = false, hasLocation }) {
   const { t, i18n } = useTranslation();
   const isDefault =
     filters.spotType === DEFAULT_FILTERS.spotType &&
     filters.maxDistance === DEFAULT_FILTERS.maxDistance &&
     filters.minRating === DEFAULT_FILTERS.minRating;
-  const count = new Intl.NumberFormat(i18n.language).format(resultCount);
+  // No data yet (server waking or unreachable): "0" would read as "no spots exist"
+  const count = countPending ? '…' : new Intl.NumberFormat(i18n.language).format(resultCount);
 
   const footer = (
     <>
@@ -31,7 +32,7 @@ export default function FilterSheet({ open, onClose, filters, setFilters, result
         type="button"
         className="btn-primary btn-grow"
         onClick={onClose}
-        aria-label={`${t('filters.applyResults')}: ${count}`}
+        aria-label={countPending ? t('filters.applyResults') : `${t('filters.applyResults')}: ${count}`}
       >
         <span className="btn-label">{t('filters.applyResults')}</span>
         <span className="count-chip">{count}</span>

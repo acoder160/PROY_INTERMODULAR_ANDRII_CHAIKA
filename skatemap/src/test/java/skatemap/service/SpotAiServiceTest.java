@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import skatemap.dto.SpotDto;
 import skatemap.entity.enums.DifficultyLevel;
 import skatemap.entity.enums.SpotType;
-import skatemap.service.SpotAiService.SearchFilters;
 import skatemap.service.WeatherService.Condition;
 
 import java.util.List;
@@ -20,43 +19,6 @@ class SpotAiServiceTest {
 
     private JsonNode parse(String text) throws Exception {
         return json.readTree(text);
-    }
-
-    @Test
-    void searchFiltersKeepOnlyKnownValuesAndClampNumbers() throws Exception {
-        SearchFilters f = SpotAiService.parseFilters(parse("""
-                {"types":["RAIL","rail","BOWL"],"difficulty":["BEGINNER","god-mode"],
-                 "minRating":9,"distanceKm":5000,
-                 "keywords":["Smooth!","x","drop table spots;--","stairs","extra","more"]}"""));
-        assertThat(f.types()).containsExactly(SpotType.RAIL);
-        assertThat(f.difficulty()).containsExactly(DifficultyLevel.BEGINNER);
-        assertThat(f.minRating()).isEqualTo(5);
-        assertThat(f.distanceKm()).isEqualTo(SpotAiService.MAX_DISTANCE_KM);
-        // Lowercased, punctuation stripped, short words dropped, at most three
-        assertThat(f.keywords()).containsExactly("smooth", "droptablespots", "stairs");
-    }
-
-    @Test
-    void withoutTheAiTheLongestWordsBecomeKeywords() {
-        SearchFilters f = SpotAiService.keywordFilters("the macba ledges please");
-        assertThat(f.keywords()).containsExactly("ledges", "please", "macba");
-        assertThat(f.types()).isEmpty();
-    }
-
-    @Test
-    void filtersApplyAndNearestComesFirst() {
-        SpotDto near = spot(1L, "Smooth ledge", SpotType.LEDGE, DifficultyLevel.BEGINNER, 4.5, 41.3833, 2.1668);
-        SpotDto far = spot(2L, "Smooth ledge far", SpotType.LEDGE, DifficultyLevel.BEGINNER, 5.0, 41.4100, 2.2270);
-        SpotDto rail = spot(3L, "Handrail", SpotType.RAIL, DifficultyLevel.ADVANCED, 5.0, 41.3834, 2.1669);
-        SpotDto badLedge = spot(4L, "Rough ledge", SpotType.LEDGE, DifficultyLevel.BEGINNER, 2.0, 41.3835, 2.1670);
-
-        SearchFilters ledges = new SearchFilters(List.of(SpotType.LEDGE), List.of(), 4, 10, List.of("smooth"));
-        assertThat(SpotAiService.apply(ledges, List.of(far, rail, badLedge, near), 41.3833, 2.1668))
-                .extracting(SpotDto::getId).containsExactly(1L, 2L);
-
-        // The distance itself is filtered in PostGIS before apply(); apply() only orders by it
-        SearchFilters any = new SearchFilters(List.of(), List.of(), 0, 3, List.of());
-        assertThat(SpotAiService.apply(any, List.of(far, near), 41.3833, 2.1668)).extracting(SpotDto::getId).containsExactly(1L, 2L);
     }
 
     @Test

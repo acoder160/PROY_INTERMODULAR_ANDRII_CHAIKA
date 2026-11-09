@@ -142,12 +142,6 @@ provider answers, each feature degrades instead of failing.
     same spot?" (open it, or create anyway with `force=true`). A 409 doesn't use up the create rate
     limit, so "create anyway" isn't punished.
   - The thresholds live in one small class, `DuplicateRules`, and are unit-tested.
-- **Search in plain words.** `POST /api/search` turns "smooth ledges for beginners near me" into
-  `{types, difficulty, minRating, distanceKm, keywords}` using a strict JSON schema (providers that
-  reject schemas are asked again in plain JSON mode). "Near me" runs in PostGIS (`ST_DWithin` on the
-  geography index) and the rest filters the result. Without a model it falls back to keywords.
-  I didn't add a vector database: for this amount of data it would be extra moving parts for the
-  same result.
 - **Weather.** `GET /api/spots/{id}/weather` shows dry / wet / raining from Open-Meteo (no key). The
   answer is cached for 30 minutes per ~1 km cell and filled atomically, so a busy spot costs one call
   per half hour; failures are remembered for two minutes so a provider outage doesn't make every visitor
@@ -293,7 +287,7 @@ Production deployment (one VM, HTTPS, backups): [`deploy/README.md`](deploy/READ
 |---|---|
 | Auth | `POST /api/auth/{login,register,google,refresh,logout,logout-all,demo}`, Google browser flow `/api/auth/google/{start,callback,exchange}` |
 | Spots | `GET /api/spots` (ETag), `GET /api/spots/nearby`, `POST /api/spots` (`409 duplicate_candidate`, `force`), `DELETE /api/spots/{id}` (admin) |
-| AI | `POST /api/ai/suggest-tags`, `POST /api/search`, `GET /api/spots/{id}/weather` |
+| AI | `POST /api/ai/suggest-tags`, `GET /api/spots/{id}/weather` |
 | Live | `GET /api/spots/live`, `GET /api/spots/{id}/live`, `POST/DELETE /api/spots/{id}/checkin`, `GET/POST /api/spots/{id}/sessions`, `POST/DELETE /api/sessions/{id}/join`, STOMP `/ws` → `/topic/live` |
 | Community | `GET /api/spots/{id}/comments?before=`, `POST /api/comments/{spotId}` (with `parentId` for replies), `PATCH/DELETE /api/comments/{id}`, `POST/DELETE /api/comments/{id}/like`, `POST /api/ratings/{spotId}`, `GET /api/ratings/check/{spotId}`, `POST /api/spots/{id}/reports`, `PATCH/DELETE /api/spots/{id}` (author) |
 | Social | `GET/PATCH/DELETE /api/users/me`, `GET /api/users/{username}[/spots\|/followers\|/following]`, `POST/DELETE /api/users/{username}/follow`, `GET /api/feed?before=`, `GET /api/favorites[/spots]` (also `GET /api/users/me/favorites`), `PUT/DELETE /api/favorites/{spotId}` |

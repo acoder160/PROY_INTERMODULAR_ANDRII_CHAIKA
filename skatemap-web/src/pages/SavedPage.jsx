@@ -5,7 +5,7 @@ import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import PageBar from '../components/PageBar';
 import SpotCard from '../components/SpotCard';
-import { SignInPrompt } from './FeedPage';
+import SignInPrompt from '../components/SignInPrompt';
 import '../Social.css';
 
 export default function SavedPage() {

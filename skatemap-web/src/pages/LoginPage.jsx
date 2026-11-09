@@ -9,6 +9,16 @@ import '../Auth.css';
 // Shared demo account (POST /api/auth/demo); the button only shows when the backend has it on
 const DEMO_ENABLED = import.meta.env.VITE_DEMO_ENABLED === 'true';
 
+// Say what actually went wrong. The free-tier backend sleeps: no answer, a proxy 502/503/504 or any 5xx means the
+// server, not the password. Only a real 400/401/403 from the API means wrong credentials.
+const describeLoginError = (err, t, fallbackKey) => {
+  const status = err?.response?.status;
+  if (status === 429) return t('auth.tooManyAttempts');
+  if (!status || status >= 500) return t('auth.serverUnreachable');
+  if (status === 400 || status === 401 || status === 403) return t(fallbackKey);
+  return t('auth.serverUnreachable');
+};
+
 export default function LoginPage() {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
@@ -31,8 +41,8 @@ export default function LoginPage() {
     try {
       await loginDemo();
       navigate('/map');
-    } catch {
-      setError(t('auth.demoFailed'));
+    } catch (err) {
+      setError(describeLoginError(err, t, 'auth.demoFailed'));
     } finally {
       setIsDemoLoading(false);
     }
@@ -59,8 +69,8 @@ export default function LoginPage() {
     try {
       await login(formData.username, formData.password);
       navigate('/map');
-    } catch {
-      setError(t('auth.wrongCredentials'));
+    } catch (err) {
+      setError(describeLoginError(err, t, 'auth.wrongCredentials'));
     } finally {
       clearTimeout(wakeUpTimer);
       setIsLoading(false);

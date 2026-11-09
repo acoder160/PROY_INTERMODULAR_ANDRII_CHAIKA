@@ -27,6 +27,13 @@
   gap: 16px;
 }
 
+/* Dentro de una ventana sobre el mapa: sin ancho máximo propio ni relleno de página (lo da la ventana) */
+.social-main.in-window {
+  max-width: none;
+  margin: 0;
+  padding: 16px 0 0;
+}
+
 .social-empty {
   display: flex;
   flex-direction: column;
@@ -656,95 +663,6 @@
   .live-dot.is-on { animation: none; }
 }
 
-/* ---------- Búsqueda en lenguaje natural, bajo la barra superior ---------- */
-.map-search {
-  position: absolute;
-  top: calc(76px + env(safe-area-inset-top));
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999;
-  width: min(560px, calc(100% - 32px));
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.map-search-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: var(--min-target);
-  padding: 0 14px;
-  border: 2px solid var(--ink);
-  border-radius: 24px;
-  background: var(--sheet);
-  color: var(--ink);
-  box-shadow: var(--shadow-float);
-}
-
-.map-search-box input {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--ink);
-  font: inherit;
-  font-size: 16px;
-  padding: 8px 0;
-}
-
-.map-search-box:focus-within {
-  outline: 3px solid var(--paint-pink);
-  outline-offset: 2px;
-}
-
-.map-search-clear {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--ink);
-}
-
-.map-search-info {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px 12px;
-  border: 2px solid var(--sheet);
-  border-radius: 16px;
-  background: var(--asphalt);
-  color: var(--sheet);
-  font-size: 14px;
-}
-
-.map-search-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-}
-
-.map-search-chip {
-  padding: 2px 10px;
-  border-radius: 12px;
-  background: var(--paint-pink);
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.map-search-hint {
-  font-size: 12px;
-  opacity: 0.85;
-}
-
 /* ---------- Añadir spot (solo informa: se crea desde la app) ---------- */
 .map-fab.map-fab-add {
   left: 0;
@@ -755,11 +673,16 @@
   padding: 0 16px;
   gap: 8px;
   background: var(--paint-pink);
-  font-weight: 900;
-  font-size: 18px;
+  font: 900 18px/1.1 var(--display);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+.map-fab.map-fab-add span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .map-fab.map-fab-add:hover {
@@ -785,3 +708,9 @@
 
 .weather-badge.is-dry { background: var(--paint-yellow); }
 .weather-badge.is-wet { background: var(--sheet); }
+
+/* ---------- Crédito del mapa plegado a un icono "i" ---------- */
+.leaflet-control-attribution.attr-toggle { cursor: pointer; border-radius: 12px; margin: 0 8px 8px 0 !important; }
+.leaflet-control-attribution.attr-toggle.is-collapsed { width: 26px; height: 26px; padding: 0; overflow: hidden; border-radius: 50%; font-size: 0; line-height: 0; background: rgba(255, 255, 255, 0.92); }
+.leaflet-control-attribution.attr-toggle.is-collapsed * { display: none; }
+.leaflet-control-attribution.attr-toggle.is-collapsed::before { content: 'i'; display: block; text-align: center; font: italic 700 15px/26px Georgia, serif; color: #1a1a1a; }

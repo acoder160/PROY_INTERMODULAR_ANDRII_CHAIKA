@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking, useWindowDimensions, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking, useWindowDimensions } from 'react-native';
 import api from '../../utils/api';
 import { cleanLabel } from '../../utils/text';
 import { useAuth } from '../../context/AuthContext';
@@ -30,19 +30,6 @@ const MODERATION_ERRORS: Record<string, string> = {
   photo_not_place: 'errors.photoNotPlace',
   text_rejected: 'errors.textRejected',
 };
-
-/** The spot list DTO, as far as the search results need it. */
-interface SearchResult {
-  filters: {
-    types: string[];
-    difficulty: string[];
-    minRating: number;
-    distanceKm: number;
-    keywords: string[];
-  };
-  aiUsed: boolean;
-  spots: any[];
-}
 
 const NO_FAVORITES: number[] = [];
 
@@ -148,41 +135,6 @@ export default function HomeScreen() {
   const flowRef = useRef(0); // bumps on every new photo or reset: late answers are dropped
   const uploadRef = useRef<Promise<string> | null>(null);
   const editedRef = useRef<Set<string>>(new Set()); // type / level chosen by the user: the AI leaves them alone
-
-  // Search in plain words
-  const [searchText, setSearchText] = useState('');
-  const [searching, setSearching] = useState(false);
-  const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
-  const [searchFailed, setSearchFailed] = useState(false);
-
-  const runSearch = async () => {
-    const query = searchText.trim();
-    if (!query || searching) return;
-    setSearching(true);
-    setSearchFailed(false);
-    try {
-      const res = await api.post('/search', {
-        query,
-        lat: userLocation?.lat,
-        lng: userLocation?.lng,
-      });
-      const result = res.data as SearchResult;
-      setSearchResult(result);
-      const best = result.spots[0];
-      if (best) setFocus({ lat: best.latitude, lng: best.longitude, id: best.id });
-    } catch {
-      setSearchResult(null);
-      setSearchFailed(true);
-    } finally {
-      setSearching(false);
-    }
-  };
-
-  const clearSearch = () => {
-    setSearchText('');
-    setSearchResult(null);
-    setSearchFailed(false);
-  };
 
   // Lógica para recargar spots (ahora funciona también sin token para invitados)
   const handleReloadSpots = async () => {
@@ -428,7 +380,7 @@ export default function HomeScreen() {
 
   // Spots opened by link that the cached list does not have yet
   const allSpots = extraSpots.length ? [...spots, ...extraSpots.filter((x) => !spots.some((s: any) => s.id === x.id))] : spots;
-  const filteredSpots = searchResult ? searchResult.spots : allSpots.filter((spot: any) => {
+  const filteredSpots = allSpots.filter((spot: any) => {
     // Filtro por tipo
     if (filters.spotType !== 'ALL' && spot.spotType !== filters.spotType && spot.type !== filters.spotType) return false;
     
@@ -532,59 +484,8 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Search in plain words ("smooth ledges for beginners near me") */}
-      <View style={[styles.searchRow, { top: insets.top + 8 + 56 + 8 }]}>
-        <View style={styles.searchBox}>
-          <Ionicons name="search" size={20} color={Palette.ink} />
-          <TextInput
-            style={styles.searchInput}
-            value={searchText}
-            onChangeText={setSearchText}
-            placeholder={t('search.placeholder')}
-            placeholderTextColor="#5b5b5b"
-            returnKeyType="search"
-            onSubmitEditing={runSearch}
-            maxLength={200}
-            autoCorrect={false}
-            accessibilityLabel={t('search.submit')}
-          />
-          {searching ? (
-            <ActivityIndicator size="small" color={Palette.ink} />
-          ) : (searchText.length > 0 || searchResult || searchFailed) ? (
-            <TouchableOpacity onPress={clearSearch} accessibilityRole="button" accessibilityLabel={t('search.clear')} hitSlop={10}>
-              <Ionicons name="close-circle" size={22} color={Palette.ink} />
-            </TouchableOpacity>
-          ) : null}
-        </View>
-        {(searchResult || searchFailed) && (
-          <View style={styles.searchInfo} accessibilityLiveRegion="polite">
-            <Text style={styles.searchInfoText}>
-              {searchFailed
-                ? t('search.failed')
-                : searchResult && searchResult.spots.length === 0
-                  ? t('search.noResults')
-                  : t('search.results', { count: searchResult?.spots.length ?? 0 })}
-            </Text>
-            {searchResult && (
-              <View style={styles.chipRow}>
-                {[
-                  ...searchResult.filters.types.map((x) => t(`types.${x}`, { defaultValue: x })),
-                  ...searchResult.filters.difficulty.map((x) => t(`difficulty.${x}`, { defaultValue: x })),
-                  ...(searchResult.filters.minRating > 0 ? [t('search.chipRating', { value: searchResult.filters.minRating })] : []),
-                  ...(searchResult.filters.distanceKm > 0 ? [t('search.chipDistance', { km: searchResult.filters.distanceKm })] : []),
-                  ...searchResult.filters.keywords,
-                ].map((chip, i) => (
-                  <View key={`${chip}-${i}`} style={styles.chip}><Text style={styles.chipText}>{chip}</Text></View>
-                ))}
-                {!searchResult.aiUsed && <Text style={styles.searchHint}>{t('search.noAi')}</Text>}
-              </View>
-            )}
-          </View>
-        )}
-      </View>
-
       {/* Avisos: modo offline */}
-      <View pointerEvents="none" style={[styles.notices, { top: insets.top + 8 + 56 + 12 + (searchResult || searchFailed ? 130 : 56) }]}>
+      <View pointerEvents="none" style={[styles.notices, { top: insets.top + 8 + 56 + 12 }]}>
         {isOffline && (
           <View style={styles.offlineBadge}>
             <Ionicons name="cloud-offline" size={16} color={Palette.ink} />
@@ -594,7 +495,7 @@ export default function HomeScreen() {
       </View>
 
       {(statusMessage || (isAddingMode && !newSpotLocation)) && (
-        <View style={[styles.addingNotice, { bottom: insets.bottom + 108 }]} accessibilityLiveRegion="polite">
+        <View style={[styles.addingNotice, { bottom: insets.bottom + 94 }]} accessibilityLiveRegion="polite">
           <Text style={styles.addingNoticeText}>{cleanLabel(statusMessage || t('status.tapCircle'))}</Text>
         </View>
       )}
@@ -605,7 +506,7 @@ export default function HomeScreen() {
         label={t('map.reloadSpots')}
         onPress={handleReloadSpots}
         spinning={isRefreshing}
-        style={{ left: 20, bottom: insets.bottom + 32 }}
+        style={{ left: 20, bottom: insets.bottom + 18 }}
       />
 
       {/* Centrar GPS (abajo a la derecha) */}
@@ -613,7 +514,7 @@ export default function HomeScreen() {
         icon="locate"
         label={t('map.centerOnMe')}
         onPress={() => handleRecenter(false, setStatusMessage)}
-        style={{ right: 20, bottom: insets.bottom + 32 }}
+        style={{ right: 20, bottom: insets.bottom + 18 }}
       />
 
       {/* Añadir spot (centro abajo): la acción principal, pintura rosa */}
@@ -622,7 +523,7 @@ export default function HomeScreen() {
           styles.fab,
           isAddingMode ? styles.fabClose : styles.fabAdd,
           // Nunca encima de los botones laterales: 20px de margen + 56px de botón + 10px de aire a cada lado
-          { bottom: insets.bottom + 32, maxWidth: windowWidth - 2 * (20 + 56 + 10) },
+          { bottom: insets.bottom + 18, maxWidth: windowWidth - 2 * (20 + 56 + 10) },
         ]}
         onPress={startAddingProcess}
         activeOpacity={0.85}
@@ -747,34 +648,6 @@ const styles = StyleSheet.create({
   },
   userPill: { backgroundColor: Palette.white, borderColor: Palette.white, flexShrink: 1 },
   userPillText: { color: Palette.ink, maxWidth: 140 },
-
-  searchRow: { position: 'absolute', left: 16, right: 16, zIndex: 10, gap: 6 },
-  searchBox: {
-    minHeight: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 14,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: Palette.ink,
-    backgroundColor: Palette.white,
-  },
-  searchInput: { flex: 1, fontSize: 16, color: Palette.ink, paddingVertical: 8 },
-  searchInfo: {
-    gap: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: Palette.white,
-    backgroundColor: Palette.asphalt,
-  },
-  searchInfoText: { color: Palette.white, fontSize: 14, fontWeight: '700' },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignItems: 'center' },
-  chip: { paddingVertical: 2, paddingHorizontal: 10, borderRadius: 12, backgroundColor: Palette.pink },
-  chipText: { color: Palette.ink, fontSize: 13, fontWeight: '700' },
-  searchHint: { color: Palette.white, fontSize: 12, opacity: 0.85 },
 
   notices: { position: 'absolute', left: 16, right: 16, alignItems: 'center', zIndex: 10 },
   offlineBadge: {

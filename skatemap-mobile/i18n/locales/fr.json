@@ -25,7 +25,12 @@
     "geoUnsupported": "Votre navigateur ne prend pas en charge la géolocalisation",
     "geoDenied": "Autorisation de localisation refusée. Activez-la dans le navigateur.",
     "geoFailed": "Impossible d'obtenir votre position.",
-    "logoutConfirm": "Se déconnecter de SkateMap ?"
+    "logoutConfirm": "Se déconnecter de SkateMap ?",
+    "serverWaking": "Réveil du serveur. Cela peut prendre une minute.",
+    "loadFailed": "Impossible de joindre SkateMap.",
+    "retry": "Réessayer",
+    "noMatches": "Aucun spot ne correspond à ces filtres.",
+    "resetFilters": "Réinitialiser les filtres"
   },
   "filters": {
     "title": "Filtrer les spots",
@@ -104,7 +109,9 @@
     "demoHint": "Sans inscription : un compte de test partagé.",
     "demoFailed": "La démo n'est pas disponible pour le moment. Réessayez plus tard.",
     "acceptTerms": "J'ai 14 ans ou plus et j'accepte les",
-    "acceptRequired": "Confirme que tu as 14 ans ou plus et que tu acceptes les règles."
+    "acceptRequired": "Confirme que tu as 14 ans ou plus et que tu acceptes les règles.",
+    "serverUnreachable": "Serveur injoignable. Il est peut-être en train de se réveiller : attends une minute et réessaie.",
+    "tooManyAttempts": "Trop de tentatives. Attends un instant et réessaie."
   },
   "admin": {
     "backToMap": "Retour à la carte",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

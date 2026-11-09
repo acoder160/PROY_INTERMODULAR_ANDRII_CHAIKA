@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
         // RateLimitInterceptor decides per path which limit applies
         registry.addInterceptor(rateLimitInterceptor)
                 .addPathPatterns("/api/auth/**", "/api/spots/**", "/api/spots", "/api/comments/**", "/api/cloudinary/**",
-                        "/api/users/**", "/api/favorites/**", "/api/push-tokens/**", "/api/sessions/**", "/api/ai/**", "/api/search");
+                        "/api/users/**", "/api/favorites/**", "/api/push-tokens/**", "/api/sessions/**", "/api/ai/**");
     }
 
     /**

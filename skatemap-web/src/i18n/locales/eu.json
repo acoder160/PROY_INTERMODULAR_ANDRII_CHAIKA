@@ -25,7 +25,12 @@
     "geoUnsupported": "Zure nabigatzaileak ez du geokokapena onartzen",
     "geoDenied": "Kokapen-baimena ukatu da. Gaitu ezazu nabigatzailean.",
     "geoFailed": "Ezin izan da zure kokapena lortu.",
-    "logoutConfirm": "SkateMap-etik irten?"
+    "logoutConfirm": "SkateMap-etik irten?",
+    "serverWaking": "Zerbitzaria esnatzen ari da. Minutu bat behar dezake.",
+    "loadFailed": "Ezin da SkateMap-ekin konektatu.",
+    "retry": "Saiatu berriro",
+    "noMatches": "Ez dago iragazki horiekin bat datorren spoterik.",
+    "resetFilters": "Garbitu iragazkiak"
   },
   "filters": {
     "title": "Iragazi spotak",
@@ -104,7 +109,9 @@
     "demoHint": "Izena eman gabe: proba-kontu partekatu bat.",
     "demoFailed": "Demoa ez dago erabilgarri orain. Saiatu geroago.",
     "acceptTerms": "14 urte edo gehiago ditut eta onartzen ditut",
-    "acceptRequired": "Baieztatu 14 urte edo gehiago dituzula eta arauak onartzen dituzula."
+    "acceptRequired": "Baieztatu 14 urte edo gehiago dituzula eta arauak onartzen dituzula.",
+    "serverUnreachable": "Ezin da zerbitzariarekin konektatu. Agian esnatzen ari da: itxaron minutu bat eta saiatu berriro.",
+    "tooManyAttempts": "Saiakera gehiegi. Itxaron pixka bat eta saiatu berriro."
   },
   "admin": {
     "backToMap": "Itzuli mapara",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

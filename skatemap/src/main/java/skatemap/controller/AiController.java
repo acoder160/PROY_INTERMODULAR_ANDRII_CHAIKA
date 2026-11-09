@@ -1,8 +1,6 @@
 package skatemap.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.CacheControl;
@@ -10,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import skatemap.service.SpotAiService;
-import skatemap.service.SpotAiService.SearchResult;
 import skatemap.service.SpotAiService.TagSuggestion;
 import skatemap.service.WeatherService;
 import skatemap.service.WeatherService.Weather;
@@ -24,10 +21,6 @@ public class AiController {
 
     public record TagRequest(@NotBlank @Size(max = 500) String mediaUrl) {}
 
-    public record SearchRequest(@NotBlank @Size(max = 200) String query,
-                                @DecimalMin("-90") @DecimalMax("90") Double lat,
-                                @DecimalMin("-180") @DecimalMax("180") Double lng) {}
-
     private final SpotAiService spotAiService;
     private final WeatherService weatherService;
 
@@ -40,16 +33,6 @@ public class AiController {
     @PostMapping("/ai/suggest-tags")
     public ResponseEntity<TagSuggestion> suggestTags(@Valid @RequestBody TagRequest request, Authentication auth) {
         return ResponseEntity.ok(spotAiService.suggestTags(auth.getName(), request.mediaUrl()));
-    }
-
-    /**
-     * Search in plain words: "smooth ledges for beginners near me". Public, rate-limited per IP. A
-     * POST so the sentence (and the position) stay out of URLs and access logs.
-     */
-    @PostMapping("/search")
-    public ResponseEntity<SearchResult> search(@Valid @RequestBody SearchRequest request) {
-        return ResponseEntity.ok().cacheControl(CacheControl.noStore())
-                .body(spotAiService.search(request.query(), request.lat(), request.lng()));
     }
 
     /** DRY / WET / RAIN at the spot, refreshed at most every 30 minutes. */

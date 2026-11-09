@@ -14,6 +14,7 @@ export default function SkateMap({ spots = [] }: { spots?: any[]; [prop: string]
     <!DOCTYPE html>
     <html>
       <head>
+        <base target="_blank" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; script-src 'unsafe-inline' https://unpkg.com; style-src 'unsafe-inline' https://unpkg.com; img-src data: blob: https://*.openstreetmap.org https://*.cartocdn.com https://*.cloudinary.com https://via.placeholder.com; connect-src https://*.openstreetmap.org https://*.cartocdn.com https://*.cloudinary.com; font-src data:; form-action 'none';" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
@@ -22,6 +23,11 @@ export default function SkateMap({ spots = [] }: { spots?: any[]; [prop: string]
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
         <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
         <style>
+          .leaflet-control-attribution.attr-toggle { cursor: pointer; border-radius: 12px; margin: 0 8px 8px 0 !important; }
+          .leaflet-control-attribution.attr-toggle.is-collapsed { width: 26px; height: 26px; padding: 0; overflow: hidden; border-radius: 50%; font-size: 0; line-height: 0; background: rgba(255, 255, 255, 0.92); }
+          .leaflet-control-attribution.attr-toggle.is-collapsed * { display: none; }
+          .leaflet-control-attribution.attr-toggle.is-collapsed::before { content: 'i'; display: block; text-align: center; font: italic 700 15px/26px Georgia, serif; color: #1a1a1a; }
+
           html, body { padding: 0; margin: 0; height: 100%; width: 100%; background-color: #e5e5e5; }
           #map { height: 100%; width: 100%; }
           .custom-marker {
@@ -52,6 +58,21 @@ export default function SkateMap({ spots = [] }: { spots?: any[]; [prop: string]
           var map = L.map('map', {
             zoomControl: false 
           }).setView([41.3874, 2.1686], 14);
+          map.attributionControl.setPrefix(false);
+          (function () {
+            var c = map.attributionControl.getContainer();
+            c.classList.add('attr-toggle', 'is-collapsed');
+            c.setAttribute('role', 'button');
+            c.setAttribute('aria-label', 'Map credits');
+            c.tabIndex = 0;
+            function toggle(e) {
+              if (e.target.closest && e.target.closest('a') && !c.classList.contains('is-collapsed')) return;
+              c.classList.toggle('is-collapsed');
+            }
+            c.addEventListener('click', toggle);
+            c.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') toggle(e); });
+            map.on('movestart click', function () { c.classList.add('is-collapsed'); });
+          })();
 
           L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             maxZoom: 19,

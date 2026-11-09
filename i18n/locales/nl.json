@@ -25,7 +25,12 @@
     "geoUnsupported": "Je browser ondersteunt geen geolocatie",
     "geoDenied": "Locatietoestemming geweigerd. Schakel deze in via je browser.",
     "geoFailed": "Je locatie kon niet worden opgehaald.",
-    "logoutConfirm": "Uitloggen bij SkateMap?"
+    "logoutConfirm": "Uitloggen bij SkateMap?",
+    "serverWaking": "Server wordt wakker gemaakt. Dat kan een minuut duren.",
+    "loadFailed": "SkateMap is niet bereikbaar.",
+    "retry": "Opnieuw proberen",
+    "noMatches": "Geen spots passen bij deze filters.",
+    "resetFilters": "Filters wissen"
   },
   "filters": {
     "title": "Spots filteren",
@@ -104,7 +109,9 @@
     "demoHint": "Zonder registratie: een gedeeld testaccount.",
     "demoFailed": "De demo is nu niet beschikbaar. Probeer het later opnieuw.",
     "acceptTerms": "Ik ben 14 jaar of ouder en accepteer de",
-    "acceptRequired": "Bevestig dat je 14 jaar of ouder bent en de regels accepteert."
+    "acceptRequired": "Bevestig dat je 14 jaar of ouder bent en de regels accepteert.",
+    "serverUnreachable": "Server niet bereikbaar. Hij is misschien aan het opstarten: wacht een minuut en probeer het opnieuw.",
+    "tooManyAttempts": "Te veel pogingen. Wacht even en probeer het opnieuw."
   },
   "admin": {
     "backToMap": "Terug naar de kaart",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

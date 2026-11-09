@@ -25,7 +25,12 @@
     "geoUnsupported": "เบราว์เซอร์ของคุณไม่รองรับการระบุตำแหน่ง",
     "geoDenied": "ปฏิเสธสิทธิ์ตำแหน่ง โปรดเปิดในเบราว์เซอร์",
     "geoFailed": "ไม่สามารถระบุตำแหน่งของคุณได้",
-    "logoutConfirm": "ออกจากระบบ SkateMap ไหม?"
+    "logoutConfirm": "ออกจากระบบ SkateMap ไหม?",
+    "serverWaking": "กำลังปลุกเซิร์ฟเวอร์ อาจใช้เวลาประมาณหนึ่งนาที",
+    "loadFailed": "เชื่อมต่อ SkateMap ไม่ได้",
+    "retry": "ลองอีกครั้ง",
+    "noMatches": "ไม่มีสปอตที่ตรงกับตัวกรอง",
+    "resetFilters": "รีเซ็ตตัวกรอง"
   },
   "filters": {
     "title": "กรองสปอต",
@@ -104,7 +109,9 @@
     "demoHint": "ไม่ต้องสมัคร: บัญชีทดสอบที่ใช้ร่วมกัน",
     "demoFailed": "เดโมยังไม่พร้อมใช้งานในขณะนี้ โปรดลองอีกครั้งภายหลัง",
     "acceptTerms": "ฉันอายุ 14 ปีขึ้นไปและยอมรับ",
-    "acceptRequired": "โปรดยืนยันว่าคุณอายุ 14 ปีขึ้นไปและยอมรับกฎ"
+    "acceptRequired": "โปรดยืนยันว่าคุณอายุ 14 ปีขึ้นไปและยอมรับกฎ",
+    "serverUnreachable": "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ อาจกำลังเริ่มทำงาน รอสักครู่แล้วลองอีกครั้ง",
+    "tooManyAttempts": "ลองหลายครั้งเกินไป รอสักครู่แล้วลองอีกครั้ง"
   },
   "admin": {
     "backToMap": "กลับไปที่แผนที่",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

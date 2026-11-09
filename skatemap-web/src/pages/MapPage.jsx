@@ -15,7 +15,9 @@ import SpotDetailsSheet from '../components/SpotDetailsSheet';
 import AddSpotNotice from '../components/AddSpotNotice';
 import { TypeChip, DifficultyMarks, StarRating } from '../components/PaintBits';
 import ReportSheet from '../components/ReportSheet';
-import { SearchIcon, PlusIcon, OptionsIcon, PersonIcon, RefreshIcon, LocateIcon, ShieldIcon, CameraIcon, CloseIcon, FeedIcon, BellIcon, BookmarkIcon } from '../components/Icons';
+import FeedWindow from '../components/FeedWindow';
+import NotificationsWindow from '../components/NotificationsWindow';
+import { PlusIcon, OptionsIcon, PersonIcon, RefreshIcon, LocateIcon, ShieldIcon, CameraIcon, CloseIcon, FeedIcon, BellIcon, BookmarkIcon } from '../components/Icons';
 import Avatar from '../components/Avatar';
 import '../Social.css';
 import { useLiveCounts } from '../utils/live';
@@ -121,6 +123,35 @@ const forEachSpotCopyInBounds = (spots, bounds, callback) => {
         }
     });
 };
+
+// Quita el prefijo "Leaflet" y pliega el crédito a un icono "i" (se abre al tocarlo); el texto de OpenStreetMap / CARTO sigue ahí
+function HideLeafletPrefix() {
+    const map = useMap();
+    useEffect(() => {
+        map.attributionControl?.setPrefix(false);
+        const c = map.attributionControl?.getContainer();
+        if (!c) return undefined;
+        c.classList.add('attr-toggle', 'is-collapsed');
+        c.setAttribute('role', 'button');
+        c.setAttribute('aria-label', 'Map credits');
+        c.tabIndex = 0;
+        const toggle = (e) => {
+            if (e.target.closest?.('a') && !c.classList.contains('is-collapsed')) return;
+            c.classList.toggle('is-collapsed');
+        };
+        const onKey = (e) => { if (e.key === 'Enter' || e.key === ' ') toggle(e); };
+        const collapse = () => c.classList.add('is-collapsed');
+        c.addEventListener('click', toggle);
+        c.addEventListener('keydown', onKey);
+        map.on('movestart click', collapse);
+        return () => {
+            c.removeEventListener('click', toggle);
+            c.removeEventListener('keydown', onKey);
+            map.off('movestart click', collapse);
+        };
+    }, [map]);
+    return null;
+}
 
 // CAPA DE SPOTS: capas nativas de Leaflet (fuera de React). Los marcadores se crean una sola vez
 // (grupo de clusters) y Leaflet.markercluster solo pinta lo que cabe en pantalla.
@@ -632,6 +663,7 @@ function FocusSpot({ focus }) {
 // Contador de notificaciones sin leer: se consulta al entrar y cada minuto mientras la pestaña está visible
 function useUnreadCount(enabled) {
     const [unread, setUnread] = useState(0);
+    const clear = useCallback(() => setUnread(0), []);
     useEffect(() => {
         if (!enabled) return undefined;
         let cancelled = false;
@@ -650,7 +682,7 @@ function useUnreadCount(enabled) {
             document.removeEventListener('visibilitychange', check);
         };
     }, [enabled]);
-    return enabled ? unread : 0;
+    return [enabled ? unread : 0, clear];
 }
 
 // BOTÓN GEOLOCALIZACIÓN (abajo a la derecha) + aviso de estado
@@ -673,18 +705,21 @@ function LocationButton({ setMyPosition }) {
         timerRef.current = setTimeout(() => setMessage(null), 4000);
     };
 
-    const goToMyLocation = () => {
+    // silent: arranque automático, sin mensajes (no hay clic del usuario que explicar)
+    const goToMyLocation = useCallback(({ silent = false } = {}) => {
         if (!navigator.geolocation) {
-            showMessage(t('map.geoUnsupported'));
+            if (!silent) showMessage(t('map.geoUnsupported'));
             return;
         }
-        clearTimeout(timerRef.current);
-        setMessage(cleanLabel(t('status.gettingLocation')));
+        if (!silent) {
+            clearTimeout(timerRef.current);
+            setMessage(cleanLabel(t('status.gettingLocation')));
+        }
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
                 latlng.accuracy = pos.coords.accuracy;
-                setMessage(null);
+                if (!silent) setMessage(null);
 
                 // Vuelo suave: más largo si el destino está lejos; si ya estamos cerca, solo desplazamos.
                 // Primero arranca el vuelo (emite zoomstart en el acto) y después se guarda la posición:
@@ -703,11 +738,27 @@ function LocationButton({ setMyPosition }) {
             },
             (err) => {
                 console.error('Error de geolocalización:', err);
-                showMessage(err.code === 1 ? t('map.geoDenied') : t('map.geoFailed'));
+                if (!silent) showMessage(err.code === 1 ? t('map.geoDenied') : t('map.geoFailed'));
             },
             { enableHighAccuracy: false, timeout: 10000, maximumAge: 5 * 60 * 1000 }
         );
-    };
+    }, [map, t, setMyPosition]);
+
+    // Si el permiso ya está concedido, el mapa abre donde está el usuario en vez de en una ciudad fija. Sin permiso
+    // no se pregunta nada al cargar: el botón "Mi ubicación" (abajo a la derecha) es la invitación.
+    const autoLocated = useRef(false);
+    useEffect(() => {
+        if (autoLocated.current || !navigator.permissions?.query || !navigator.geolocation) return undefined;
+        let cancelled = false;
+        navigator.permissions.query({ name: 'geolocation' })
+            .then((status) => {
+                if (cancelled || autoLocated.current || status.state !== 'granted') return;
+                autoLocated.current = true;
+                goToMyLocation({ silent: true });
+            })
+            .catch(() => {});
+        return () => { cancelled = true; };
+    }, [goToMyLocation]);
 
     return (
         <>
@@ -717,7 +768,7 @@ function LocationButton({ setMyPosition }) {
             <button
                 ref={buttonRef}
                 type="button"
-                onClick={goToMyLocation}
+                onClick={() => goToMyLocation()}
                 className="map-fab map-fab-right"
                 title={t('map.myLocation')}
                 aria-label={t('map.centerOnMe')}
@@ -742,16 +793,18 @@ export default function MapPage() {
     const [focus, setFocus] = useState(null);
     const [showAddNotice, setShowAddNotice] = useState(false);
 
-    // Search in plain words ("smooth ledges for beginners near me")
-    const [searchText, setSearchText] = useState('');
-    const [searching, setSearching] = useState(false);
-    const [searchResult, setSearchResult] = useState(null); // { filters, aiUsed, spots }
-    const [searchFailed, setSearchFailed] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
 
     const { user, isAdmin } = useAuth();
     const navigate = useNavigate();
-    const unread = useUnreadCount(Boolean(user));
+    const [unread, clearUnread] = useUnreadCount(Boolean(user));
+
+    // Feed and notifications are windows over the map, kept in the URL (?panel=feed|notifications) so Back closes
+    // them and old /feed and /notifications links land here. A spot link (?spot=) replaces the param and closes them.
+    const panelParam = searchParams.get('panel');
+    const panel = panelParam === 'feed' || panelParam === 'notifications' ? panelParam : null;
+    const openPanel = useCallback((name) => setSearchParams({ panel: name }), [setSearchParams]);
+    const closePanel = useCallback(() => setSearchParams({}, { replace: true }), [setSearchParams]);
     const liveCounts = useLiveCounts();
 
     // Saved spots: one list for the whole map, so the popup and the spot sheet always agree
@@ -785,22 +838,33 @@ export default function MapPage() {
     const initialCenter = [41.3874, 2.1686]; // Barcelona
     const username = user?.username;
 
+    // One loader for the first load, Reload, Retry and the refresh after an edit. 'slow' after 3 s:
+    // the free-tier backend can take 1-2 minutes to wake, and a blank map must not read as "no spots".
+    const [loadStatus, setLoadStatus] = useState('loading'); // 'loading' | 'slow' | 'ready' | 'error'
+    const loadRun = useRef(0);
     const fetchSpots = useCallback(async () => {
+        const run = ++loadRun.current;
+        setLoadStatus('loading');
+        const slowTimer = setTimeout(() => {
+            if (run === loadRun.current) setLoadStatus('slow');
+        }, 3000);
         try {
             const response = await api.get('/spots');
+            if (run !== loadRun.current) return;
             setSpots(response.data);
+            setLoadStatus('ready');
         } catch (error) {
             console.error('Error cargando spots:', error);
+            if (run === loadRun.current) setLoadStatus('error');
+        } finally {
+            clearTimeout(slowTimer);
         }
     }, []);
 
     useEffect(() => {
-        let cancelled = false;
-        api.get('/spots')
-            .then((response) => { if (!cancelled) setSpots(response.data); })
-            .catch((error) => console.error('Error cargando spots:', error));
-        return () => { cancelled = true; };
-    }, []);
+        fetchSpots();
+        return () => { loadRun.current += 1; }; // a late answer after leaving the map is dropped
+    }, [fetchSpots]);
 
     const handleRefresh = async () => {
         if (refreshing) return;
@@ -839,40 +903,7 @@ export default function MapPage() {
 
     const activeFilterCount = (filters.spotType !== 'ALL' ? 1 : 0) + (filters.minRating > 0 ? 1 : 0) + (filters.maxDistance > 0 ? 1 : 0);
 
-    const runSearch = async (event) => {
-        event.preventDefault();
-        const query = searchText.trim();
-        if (!query || searching) return;
-        setSearching(true);
-        setSearchFailed(false);
-        try {
-            const res = await api.post('/search', { query, lat: myPosition?.lat, lng: myPosition?.lng });
-            setSearchResult(res.data);
-            const best = res.data.spots[0];
-            if (best) setFocus({ lat: best.latitude, lng: best.longitude, id: best.id });
-        } catch {
-            setSearchResult(null);
-            setSearchFailed(true);
-        } finally {
-            setSearching(false);
-        }
-    };
-
-    const clearSearch = () => {
-        setSearchText('');
-        setSearchResult(null);
-        setSearchFailed(false);
-    };
-
-    const searchChips = searchResult ? [
-        ...searchResult.filters.types.map((x) => t(`types.${x}`, { defaultValue: x })),
-        ...searchResult.filters.difficulty.map((x) => t(`difficulty.${x}`, { defaultValue: x })),
-        ...(searchResult.filters.minRating > 0 ? [t('search.chipRating', { value: searchResult.filters.minRating })] : []),
-        ...(searchResult.filters.distanceKm > 0 ? [t('search.chipDistance', { km: searchResult.filters.distanceKm })] : []),
-        ...searchResult.filters.keywords,
-    ] : [];
-
-    const filteredSpots = useMemo(() => searchResult ? searchResult.spots : spots.filter((spot) => {
+    const filteredSpots = useMemo(() => spots.filter((spot) => {
         if (filters.spotType !== 'ALL' && spot.spotType !== filters.spotType) return false;
         if (filters.minRating > 0 && (spot.surfaceRating || 0) < filters.minRating) return false;
         if (filters.maxDistance > 0 && myPosition) {
@@ -880,7 +911,7 @@ export default function MapPage() {
             if (distance > filters.maxDistance) return false;
         }
         return true;
-    }), [spots, filters, myPosition, searchResult]);
+    }), [spots, filters, myPosition]);
 
     const selectedSpot = selectedSpotId === null ? null : spots.find((s) => s.id === selectedSpotId) ?? null;
     const reportSpot = reportSpotId === null ? null : spots.find((s) => s.id === reportSpotId) ?? null;
@@ -888,20 +919,50 @@ export default function MapPage() {
     const closeFilters = useCallback(() => setShowFilters(false), []);
     const closeReport = useCallback(() => setReportSpotId(null), []);
 
+    // Honest state (PRODUCT.md): say why the map is empty instead of leaving a blank map
+    const noDataYet = spots.length === 0 && loadStatus !== 'ready';
+    const filtersHideEverything = loadStatus === 'ready' && spots.length > 0 && filteredSpots.length === 0;
+    let statusNotice = null;
+    if (loadStatus === 'error') {
+        statusNotice = (
+            <>
+                <span className="map-status-text">{t('map.loadFailed')}</span>
+                <button type="button" className="map-status-action" onClick={fetchSpots}>{t('map.retry')}</button>
+            </>
+        );
+    } else if (loadStatus === 'slow') {
+        statusNotice = (
+            <>
+                <span className="map-status-spinner" aria-hidden="true" />
+                <span className="map-status-text">{t('map.serverWaking')}</span>
+            </>
+        );
+    } else if (filtersHideEverything) {
+        statusNotice = (
+            <>
+                <span className="map-status-text">{t('map.noMatches')}</span>
+                <button type="button" className="map-status-action" onClick={() => setFilters(DEFAULT_FILTERS)}>{t('map.resetFilters')}</button>
+            </>
+        );
+    }
+
     return (
         <div className="map-page">
-            {/* Barra superior asfalto: filtros (izquierda) y cuenta (derecha), igual que la app móvil */}
+            {/* Barra superior asfalto: ajustes del mapa a la izquierda (filtros + idioma), cuenta y actividad a la derecha */}
             <header className="map-topbar">
-                <button
-                    type="button"
-                    onClick={() => setShowFilters(true)}
-                    className="bar-pill"
-                    aria-label={activeFilterCount > 0 ? `${t('map.filtersActive')}: ${activeFilterCount}` : t('map.filters')}
-                >
-                    <OptionsIcon size={20} />
-                    <span className="bar-pill-text">{t('map.filters')}</span>
-                    {activeFilterCount > 0 && <span className="count-badge" aria-hidden="true">{activeFilterCount}</span>}
-                </button>
+                <div className="bar-left">
+                    <button
+                        type="button"
+                        onClick={() => setShowFilters(true)}
+                        className="bar-pill"
+                        aria-label={activeFilterCount > 0 ? `${t('map.filtersActive')}: ${activeFilterCount}` : t('map.filters')}
+                    >
+                        <OptionsIcon size={20} />
+                        <span className="bar-pill-text">{t('map.filters')}</span>
+                        {activeFilterCount > 0 && <span className="count-badge" aria-hidden="true">{activeFilterCount}</span>}
+                    </button>
+                    <LanguageSwitcher />
+                </div>
 
                 <div className="bar-right">
                     {isAdmin && (
@@ -910,16 +971,16 @@ export default function MapPage() {
                             <span className="bar-pill-text bar-hide-narrow">{t('map.admin')}</span>
                         </button>
                     )}
-                    <LanguageSwitcher />
                     {user && (
                         <>
-                            <button type="button" onClick={() => navigate('/feed')} className="bar-pill" aria-label={t('social.feed')}>
+                            <button type="button" onClick={() => openPanel('feed')} className="bar-pill" aria-label={t('social.feed')} aria-haspopup="dialog">
                                 <FeedIcon size={20} />
                                 <span className="bar-pill-text bar-hide-narrow">{t('social.feed')}</span>
                             </button>
                             <button
                                 type="button"
-                                onClick={() => navigate('/notifications')}
+                                onClick={() => openPanel('notifications')}
+                                aria-haspopup="dialog"
                                 className="bar-pill"
                                 aria-label={unread > 0 ? `${t('social.notifications')}: ${unread}` : t('social.notifications')}
                             >
@@ -942,45 +1003,18 @@ export default function MapPage() {
                 </div>
             </header>
 
-            {/* Search in plain words, under the top bar */}
-            <div className="map-search">
-                <form className="map-search-box" role="search" onSubmit={runSearch}>
-                    <SearchIcon size={20} />
-                    <input
-                        type="search"
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        placeholder={t('search.placeholder')}
-                        aria-label={t('search.submit')}
-                        maxLength={200}
-                        enterKeyHint="search"
-                    />
-                    {(searchText || searchResult || searchFailed) && (
-                        <button type="button" className="map-search-clear" onClick={clearSearch} aria-label={t('search.clear')}>
-                            <CloseIcon size={18} />
-                        </button>
-                    )}
-                </form>
-                {(searching || searchResult || searchFailed) && (
-                    <div className="map-search-info" aria-live="polite">
-                        <strong>
-                            {searching ? t('search.searching')
-                                : searchFailed ? t('search.failed')
-                                : searchResult.spots.length === 0 ? t('search.noResults')
-                                : t('search.results', { count: searchResult.spots.length })}
-                        </strong>
-                        {searchResult && (
-                            <div className="map-search-chips">
-                                {searchChips.map((chip, i) => <span className="map-search-chip" key={`${chip}-${i}`}>{chip}</span>)}
-                                {!searchResult.aiUsed && <span className="map-search-hint">{t('search.noAi')}</span>}
-                            </div>
-                        )}
-                    </div>
-                )}
+            {/* Estado de carga / error / filtros sin resultados: píldora amarilla bajo la barra (DESIGN.md > Notices) */}
+            <div className="map-status-slot" role="status" aria-live="polite">
+                {statusNotice && <div className="map-status">{statusNotice}</div>}
             </div>
 
-            {/* Añadir spot: en la web solo se explica que se hace desde la app */}
-            <button type="button" className="map-fab map-fab-add" onClick={() => setShowAddNotice(true)}>
+            {/* Añadir spot (centro abajo, rosado, como en la app móvil): en la web solo se explica que se hace desde la app */}
+            <button
+                type="button"
+                className="map-fab map-fab-add"
+                onClick={() => setShowAddNotice(true)}
+                aria-haspopup="dialog"
+            >
                 <PlusIcon size={26} />
                 <span>{t('map.addSpot')}</span>
             </button>
@@ -1008,6 +1042,7 @@ export default function MapPage() {
                 worldCopyJump
             >
                 <ZoomLimit />
+                <HideLeafletPrefix />
                 <PrerenderedTiles />
                 <LocationButton setMyPosition={setMyPosition} />
                 <DynamicSpotLayer spots={filteredSpots} onOpenDetails={setSelectedSpotId} favoriteIds={visibleFavoriteIds} onToggleFavorite={toggleFavorite} myPosition={myPosition} liveCounts={liveCounts} />
@@ -1021,6 +1056,7 @@ export default function MapPage() {
                 filters={filters}
                 setFilters={setFilters}
                 resultCount={filteredSpots.length}
+                countPending={noDataYet}
                 hasLocation={!!myPosition}
             />
 
@@ -1042,6 +1078,9 @@ export default function MapPage() {
             {reportSpot && (
                 <ReportSheet key={reportSpot.id} spot={reportSpot} onClose={closeReport} />
             )}
+
+            {panel === 'feed' && <FeedWindow onClose={closePanel} />}
+            {panel === 'notifications' && <NotificationsWindow onClose={closePanel} onRead={clearUnread} />}
         </div>
     );
 }

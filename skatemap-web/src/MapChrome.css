@@ -37,6 +37,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
+.bar-left,
 .bar-right {
   display: flex;
   align-items: center;
@@ -207,6 +208,93 @@
   font-size: 15px;
   font-weight: 700;
   text-align: center;
+}
+
+/* Estado del mapa (cargando lento, sin conexión, filtros sin resultados): píldora amarilla con borde y texto tinta,
+   bajo la barra superior (DESIGN.md > Notices). El hueco es siempre un live region; el contenido aparece y desaparece. */
+.map-status-slot {
+  position: absolute;
+  left: 50%;
+  top: calc(78px + env(safe-area-inset-top));
+  transform: translateX(-50%);
+  z-index: 999;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  pointer-events: none;
+}
+
+.map-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 12px;
+  padding: 8px 8px 8px 18px;
+  border: 2px solid var(--ink);
+  border-radius: 28px;
+  background: var(--paint-yellow);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  text-wrap: balance;
+  pointer-events: auto;
+}
+
+/* Sin botón la píldora no necesita el relleno extra de la derecha */
+.map-status:not(:has(.map-status-action)) {
+  padding: 10px 18px;
+}
+
+.map-status-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.map-status-action {
+  min-height: var(--min-target);
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--asphalt);
+  color: var(--sheet);
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.map-status-action:active {
+  transform: scale(0.97);
+}
+
+.map-status-spinner {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(28, 28, 28, 0.25);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: map-status-spin 0.9s linear infinite;
+}
+
+@keyframes map-status-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-status-spinner {
+    animation: none;
+    border-top-color: rgba(28, 28, 28, 0.25);
+    background: radial-gradient(circle, var(--ink) 0 35%, transparent 40%);
+  }
+  .map-status-action {
+    transition: none;
+  }
 }
 
 /* ---------- Marcadores ---------- */
@@ -1125,5 +1213,32 @@
 @media (min-width: 720px) {
   .sheet-overlay {
     padding-top: 24px;
+  }
+}
+
+/* Ventana centrada (feed, notificaciones): flota sobre el mapa con el velo de asfalto, a todos los tamaños.
+   Entra con un leve crecimiento en vez de subir desde abajo. */
+.sheet-overlay.is-window {
+  align-items: center;
+  padding: 16px;
+}
+
+.sheet-overlay.is-window .sheet {
+  max-width: 640px;
+  max-height: min(760px, 100%);
+  padding-bottom: 20px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--shadow-float);
+  animation: window-pop 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes window-pop {
+  from { transform: scale(0.96) translateY(8px); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-overlay.is-window .sheet {
+    animation-duration: 0.01s;
   }
 }

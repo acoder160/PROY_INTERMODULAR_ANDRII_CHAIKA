@@ -3,14 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
-import PageBar from '../components/PageBar';
-import Avatar from '../components/Avatar';
-import { SignInPrompt } from './FeedPage';
+import Sheet from './Sheet';
+import Avatar from './Avatar';
+import SignInPrompt from './SignInPrompt';
 import { timeAgo } from '../utils/social';
 import '../Social.css';
 
-/** Follows, comments on your spots, replies and likes. Opening the page marks them as read. */
-export default function NotificationsPage() {
+/**
+ * Follows, comments on your spots, replies and likes, in a window over the map. Opening it marks them as read
+ * (`onRead` lets the map clear its unread badge). Mount it only while it is open.
+ */
+export default function NotificationsWindow({ onClose, onRead }) {
   const { t, i18n } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -28,11 +31,13 @@ export default function NotificationsPage() {
         setItems(res.data.items);
         setNextCursor(res.data.nextCursor);
         // Shown once as unread (the dot), then cleared on the server
-        if (res.data.unread > 0) api.post('/notifications/read').catch(() => {});
+        if (res.data.unread > 0) {
+          api.post('/notifications/read').then(() => onRead?.()).catch(() => {});
+        }
       })
       .catch(() => { if (!cancelled) setFailed(true); });
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user, onRead]);
 
   const loadMore = async () => {
     setLoadingMore(true);
@@ -45,15 +50,15 @@ export default function NotificationsPage() {
     }
   };
 
+  // Both targets leave ?panel= behind: a spot replaces it (the map opens the spot), a profile is another page
   const open = (n) => {
     if (n.type === 'FOLLOW' && n.actor.username) navigate(`/u/${encodeURIComponent(n.actor.username)}`);
     else if (n.spot) navigate(`/map?spot=${n.spot.id}`);
   };
 
   return (
-    <div className="admin-page social-page">
-      <PageBar title={t('social.notifications')} />
-      <main className="social-main">
+    <Sheet open onClose={onClose} title={t('social.notifications')} variant="window">
+      <div className="social-main in-window">
         {!authLoading && !user && <SignInPrompt onSignIn={() => navigate('/login')} />}
         {user && !items && !failed && <span className="spinner spinner-ink spinner-center" aria-label={t('popup.loading')} />}
         {failed && <p className="social-empty">{t('social.loadFailed')}</p>}
@@ -86,7 +91,7 @@ export default function NotificationsPage() {
             {loadingMore ? <span className="spinner spinner-ink" aria-label={t('popup.loading')} /> : t('social.loadMore')}
           </button>
         )}
-      </main>
-    </div>
+      </div>
+    </Sheet>
   );
 }

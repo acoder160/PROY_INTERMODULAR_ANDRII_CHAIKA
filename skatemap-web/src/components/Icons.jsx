@@ -138,11 +138,6 @@ export function StarIcon({ size = 22, filled = false }) {
   );
 }
 
-export const SearchIcon = make(<>
-  <circle cx="11" cy="11" r="6.5" />
-  <path d="M16 16l4.5 4.5" strokeWidth="2.4" />
-</>);
-
 export const PlusIcon = make(<path d="M12 5v14M5 12h14" strokeWidth="2.6" />);
 
 export const SunIcon = make(<>

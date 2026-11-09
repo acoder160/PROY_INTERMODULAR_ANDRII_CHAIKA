@@ -25,7 +25,12 @@
     "geoUnsupported": "您的浏览器不支持定位",
     "geoDenied": "定位权限被拒绝。请在浏览器中开启。",
     "geoFailed": "无法获取您的位置。",
-    "logoutConfirm": "退出 SkateMap 吗？"
+    "logoutConfirm": "退出 SkateMap 吗？",
+    "serverWaking": "正在唤醒服务器，可能需要一分钟。",
+    "loadFailed": "无法连接 SkateMap。",
+    "retry": "重试",
+    "noMatches": "没有符合这些筛选条件的场地。",
+    "resetFilters": "重置筛选"
   },
   "filters": {
     "title": "筛选地点",
@@ -104,7 +109,9 @@
     "demoHint": "无需注册：共享的测试账号。",
     "demoFailed": "演示版暂时不可用，请稍后再试。",
     "acceptTerms": "我已年满 14 岁，并接受",
-    "acceptRequired": "请确认你已年满 14 岁并接受规则。"
+    "acceptRequired": "请确认你已年满 14 岁并接受规则。",
+    "serverUnreachable": "无法连接服务器，它可能正在唤醒。请等待一分钟后重试。",
+    "tooManyAttempts": "尝试次数过多，请稍候再试。"
   },
   "admin": {
     "backToMap": "返回地图",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

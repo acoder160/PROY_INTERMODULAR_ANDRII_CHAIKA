@@ -10,8 +10,9 @@ import { cleanLabel } from '../utils/paint';
  * En pantallas anchas queda centrada con un ancho máximo. Esc o clic en el velo la cierran.
  * Con varias hojas abiertas (detalle + denuncia) Esc solo cierra la de arriba.
  * `heroActions`: botones extra que van junto a la X sobre la foto (p. ej. denunciar).
+ * `variant="window"`: ventana centrada sobre el mapa (feed, notificaciones) en vez de hoja pegada abajo.
  */
-export default function Sheet({ open, onClose, title, children, footer, className = '', hero = null, closeOnHero = false, heroActions = null }) {
+export default function Sheet({ open, onClose, title, children, footer, className = '', hero = null, closeOnHero = false, heroActions = null, variant = 'sheet' }) {
   const { t } = useTranslation();
   const overlayRef = useRef(null);
   const panelRef = useRef(null);
@@ -43,7 +44,7 @@ export default function Sheet({ open, onClose, title, children, footer, classNam
   );
 
   return createPortal(
-    <div ref={overlayRef} className="sheet-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div ref={overlayRef} className={`sheet-overlay${variant === 'window' ? ' is-window' : ''}`} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div
         ref={panelRef}
         className={`sheet ${hero ? 'has-hero' : ''} ${className}`}

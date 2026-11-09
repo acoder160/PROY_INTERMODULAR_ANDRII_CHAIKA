@@ -25,7 +25,12 @@
     "geoUnsupported": "Peramban Anda tidak mendukung geolokasi",
     "geoDenied": "Izin lokasi ditolak. Aktifkan di peramban.",
     "geoFailed": "Tidak dapat memperoleh lokasi Anda.",
-    "logoutConfirm": "Keluar dari SkateMap?"
+    "logoutConfirm": "Keluar dari SkateMap?",
+    "serverWaking": "Server sedang dibangunkan. Bisa memakan waktu semenit.",
+    "loadFailed": "SkateMap tidak dapat dijangkau.",
+    "retry": "Coba lagi",
+    "noMatches": "Tidak ada spot yang cocok dengan filter ini.",
+    "resetFilters": "Atur ulang filter"
   },
   "filters": {
     "title": "Filter spot",
@@ -104,7 +109,9 @@
     "demoHint": "Tanpa daftar: akun uji bersama.",
     "demoFailed": "Demo sedang tidak tersedia. Coba lagi nanti.",
     "acceptTerms": "Saya berusia 14 tahun atau lebih dan menerima",
-    "acceptRequired": "Konfirmasi bahwa kamu berusia 14 tahun atau lebih dan menerima aturan."
+    "acceptRequired": "Konfirmasi bahwa kamu berusia 14 tahun atau lebih dan menerima aturan.",
+    "serverUnreachable": "Server tidak dapat dijangkau. Mungkin sedang bangun: tunggu semenit lalu coba lagi.",
+    "tooManyAttempts": "Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi."
   },
   "admin": {
     "backToMap": "Kembali ke peta",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/** Duplicate detection (PostGIS + pg_trgm) and plain-words search on a real database. */
+/** Duplicate detection (PostGIS + pg_trgm) on a real database. */
 class AiIntegrationTest extends AbstractIntegrationTest {
 
     private static final GeometryFactory GEO = new GeometryFactory(new PrecisionModel(), 4326);
@@ -96,54 +96,6 @@ class AiIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void searchTurnsWordsIntoFiltersAndRunsThemOnTheMap() throws Exception {
-        modelAnswers("{\"types\":[\"LEDGE\"],\"difficulty\":[],\"minRating\":4,\"distanceKm\":0,\"keywords\":[\"guggenheim\"]}");
-        search("best ledges at the guggenheim", null, null)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.aiUsed").value(true))
-                .andExpect(jsonPath("$.filters.types[0]").value("LEDGE"))
-                .andExpect(jsonPath("$.spots[?(@.id == " + ledge.getId() + ")]").exists());
-    }
-
-    @Test
-    void nearMeRunsThroughPostGisAndLeavesFarSpotsOut() throws Exception {
-        modelAnswers("{\"types\":[],\"difficulty\":[],\"minRating\":0,\"distanceKm\":3,\"keywords\":[]}");
-        double lat = ledge.getLocation().getY();
-        double lng = ledge.getLocation().getX();
-        // 1 km east of the ledge: inside 3 km
-        search("ledges close to me", lat, lng + 0.0125)
-                .andExpect(jsonPath("$.spots[?(@.id == " + ledge.getId() + ")]").exists());
-        // ~30 km away: outside
-        search("ledges close to me", lat, lng + 0.4)
-                .andExpect(jsonPath("$.spots[?(@.id == " + ledge.getId() + ")]").doesNotExist());
-    }
-
-    @Test
-    void searchFallsBackToKeywordsWhenNoModelAnswers() throws Exception {
-        modelAnswers(null);
-        search("guggenheim", null, null)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.aiUsed").value(false))
-                .andExpect(jsonPath("$.filters.keywords[0]").value("guggenheim"))
-                .andExpect(jsonPath("$.spots[?(@.id == " + ledge.getId() + ")]").exists());
-    }
-
-    @Test
-    void searchIsPublicButValidatesItsInput() throws Exception {
-        modelAnswers(null);
-        search("guggenheim", null, null).andExpect(status().isOk()); // no token
-        mvc.perform(post("/api/search").contentType(MediaType.APPLICATION_JSON).content("{\"query\":\"\"}"))
-                .andExpect(status().isBadRequest());
-        search("guggenheim", 123.0, 0.0).andExpect(status().isBadRequest()); // latitude out of range
-    }
-
-    @Test
-    void theOldGetSearchIsGone() throws Exception {
-        mvc.perform(get("/api/spots/search").param("q", "guggenheim"))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
     void tagSuggestionsNeedAnAccount() throws Exception {
         mvc.perform(post("/api/ai/suggest-tags").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"mediaUrl\":\"https://res.cloudinary.com/demo/image/upload/skatemap_spots/u1/x.jpg\"}"))
@@ -179,19 +131,6 @@ class AiIntegrationTest extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"mediaUrl\":\"https://res.cloudinary.com/demo/image/upload/skatemap_spots/u999999/x.jpg\"}"))
                 .andExpect(status().isBadRequest());
-    }
-
-    private org.springframework.test.web.servlet.ResultActions search(String query, Double lat, Double lng) throws Exception {
-        java.util.Map<String, Object> body = new java.util.LinkedHashMap<>();
-        body.put("query", query);
-        if (lat != null) body.put("lat", lat);
-        if (lng != null) body.put("lng", lng);
-        return mvc.perform(post("/api/search").contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(body)));
-    }
-
-    private void modelAnswers(String body) throws Exception {
-        when(aiClient.chatJsonSchema(any(), anyString(), any(), anyInt(), anyString(), anyMap()))
-                .thenReturn(body == null ? null : json.readTree(body));
     }
 
     private org.springframework.test.web.servlet.ResultActions createWithPhoto(String name, double lat, double lng) throws Exception {

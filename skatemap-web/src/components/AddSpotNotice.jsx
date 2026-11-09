@@ -12,8 +12,9 @@ export default function AddSpotNotice({ open, onClose }) {
       <span className="btn-label">{t('addSpot.mobileOnly.get')}</span>
     </a>
   ) : (
-    <button type="button" className="btn-primary btn-grow" disabled>
-      <span className="btn-label">{t('addSpot.mobileOnly.soon')}</span>
+    // Sin enlace de descarga no hay nada que pulsar: un botón desactivado parece un fallo, así que solo se cierra
+    <button type="button" className="btn-outline btn-grow" onClick={onClose}>
+      <span className="btn-label">{t('common.ok')}</span>
     </button>
   );
   return (

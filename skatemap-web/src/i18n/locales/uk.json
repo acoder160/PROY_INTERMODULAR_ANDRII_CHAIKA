@@ -25,7 +25,12 @@
     "geoUnsupported": "Ваш браузер не підтримує геолокацію",
     "geoDenied": "Доступ до місцезнаходження заборонено. Дозвольте його в браузері.",
     "geoFailed": "Не вдалося визначити ваше місцезнаходження.",
-    "logoutConfirm": "Вийти з SkateMap?"
+    "logoutConfirm": "Вийти з SkateMap?",
+    "serverWaking": "Сервер прокидається. Це може тривати хвилину.",
+    "loadFailed": "Не вдається зв'язатися зі SkateMap.",
+    "retry": "Повторити",
+    "noMatches": "Немає спотів під ці фільтри.",
+    "resetFilters": "Скинути фільтри"
   },
   "filters": {
     "title": "Фільтр спотів",
@@ -104,7 +109,9 @@
     "demoHint": "Без реєстрації: спільний тестовий акаунт.",
     "demoFailed": "Демо зараз недоступне. Спробуйте пізніше.",
     "acceptTerms": "Мені 14 років або більше, і я приймаю",
-    "acceptRequired": "Підтвердьте, що вам 14 років або більше і ви приймаєте правила."
+    "acceptRequired": "Підтвердьте, що вам 14 років або більше і ви приймаєте правила.",
+    "serverUnreachable": "Сервер недоступний. Можливо, він прокидається: зачекайте хвилину й повторіть.",
+    "tooManyAttempts": "Забагато спроб. Зачекайте трохи й повторіть."
   },
   "admin": {
     "backToMap": "Назад до карти",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",

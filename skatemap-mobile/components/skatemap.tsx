@@ -1,6 +1,6 @@
-import React, { useRef, useEffect, useState, type ComponentRef } from 'react';
+import React, { useCallback, useRef, useEffect, useState, type ComponentRef } from 'react';
 import { WebView } from 'react-native-webview';
-import { StyleSheet, View, Linking, Image, Dimensions } from 'react-native';
+import { StyleSheet, View, Linking, Image, Dimensions, AppState } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { CARTO_API_KEY } from '../constants/api';
 import { Palette, spotTypePaint } from '../constants/theme';
@@ -51,6 +51,8 @@ export default function SkateMap({
 }: SkateMapProps) {
   const { t } = useTranslation();
   const webviewRef = useRef<ComponentRef<typeof WebView>>(null);
+  // Last center/zoom the map reported, to put it back if the system kills the page (see recoverMap)
+  const lastViewRef = useRef<{ lat: number; lng: number; zoom: number } | null>(null);
   const mapReadyRef = useRef(false);
   const windowHeight = Dimensions.get('window').height;
 
@@ -163,6 +165,36 @@ export default function SkateMap({
     }
   }, [isAddingMode]);
 
+  // iOS (WKWebView) and Android end the page's process when memory runs low, for example after the camera
+  // or while the app is in the background. The map then stays blank. reload() does nothing for a page that
+  // was loaded from an HTML string, so the WebView is created again (new key); onLoadEnd puts the view back.
+  const [mapKey, setMapKey] = useState(0);
+  const lastPongRef = useRef(0);
+  const recoverMap = useCallback(() => {
+    mapReadyRef.current = false;
+    lastPongRef.current = Date.now();
+    setMapKey((k) => k + 1);
+  }, []);
+
+  // Heartbeat: iOS does not always report that the page died. A live page answers every few seconds;
+  // if it stays silent while the app is in the foreground, the map is rebuilt.
+  useEffect(() => {
+    lastPongRef.current = Date.now();
+    const timer = setInterval(() => {
+      if (AppState.currentState !== 'active') {
+        lastPongRef.current = Date.now();
+        return;
+      }
+      if (!mapReadyRef.current) return;
+      if (Date.now() - lastPongRef.current > 15000) {
+        recoverMap();
+        return;
+      }
+      webviewRef.current?.injectJavaScript("window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'pong' })); true;");
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [recoverMap]);
+
   const [staticHtml] = useState(`
     <!DOCTYPE html>
     <html>
@@ -189,6 +221,10 @@ export default function SkateMap({
           html, body { padding: 0; margin: 0; height: 100vh; min-height: 1px; width: 100%; background-color: var(--concrete); }
           #map { height: 100vh; min-height: 1px; width: 100%; background-color: var(--concrete); }
           body { -webkit-tap-highlight-color: transparent; }
+          .leaflet-control-attribution.attr-toggle { cursor: pointer; border-radius: 12px; margin: 0 8px 8px 0 !important; }
+          .leaflet-control-attribution.attr-toggle.is-collapsed { width: 26px; height: 26px; padding: 0; overflow: hidden; border-radius: 50%; font-size: 0; line-height: 0; background: rgba(255, 255, 255, 0.92); }
+          .leaflet-control-attribution.attr-toggle.is-collapsed * { display: none; }
+          .leaflet-control-attribution.attr-toggle.is-collapsed::before { content: 'i'; display: block; text-align: center; font: italic 700 15px/26px Georgia, serif; color: #1a1a1a; }
 
           /* Usuario: punto asfalto con anillo blanco y pulso */
           .blue-dot { display: flex; justify-content: center; align-items: center; }
@@ -374,6 +410,22 @@ export default function SkateMap({
           }
 
           var map = L.map('map', { zoomControl: false, doubleClickZoom: false, zoomSnap: 0, fadeAnimation: false }).setView([41.3874, 2.1686], 14);
+          // Hide the "Leaflet" prefix; the OpenStreetMap / CARTO credit (required by their terms) stays
+          map.attributionControl.setPrefix(false);
+          (function () {
+            var c = map.attributionControl.getContainer();
+            c.classList.add('attr-toggle', 'is-collapsed');
+            c.setAttribute('role', 'button');
+            c.setAttribute('aria-label', 'Map credits');
+            c.tabIndex = 0;
+            function toggle(e) {
+              if (e.target.closest && e.target.closest('a') && !c.classList.contains('is-collapsed')) return;
+              c.classList.toggle('is-collapsed');
+            }
+            c.addEventListener('click', toggle);
+            c.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') toggle(e); });
+            map.on('movestart click', function () { c.classList.add('is-collapsed'); });
+          })();
 
           var tileUrl = ${CARTO_API_KEY
             ? `'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(CARTO_API_KEY)}'`
@@ -400,7 +452,7 @@ export default function SkateMap({
             maxNativeZoom: 18,
             subdomains: 'abcd',
             preloadTiles: 1,
-            keepBuffer: 4,
+            keepBuffer: 2,
             updateWhenIdle: false,
             updateWhenZooming: true,
             updateInterval: 100,
@@ -416,7 +468,7 @@ export default function SkateMap({
             updateWhenIdle: false,
             updateWhenZooming: true,
             updateInterval: 100,
-            keepBuffer: 3,
+            keepBuffer: 2,
             // Sin franja extra aquí: la subcapa ya cubre los bordes al alejar y cuesta la mitad de datos
             zIndex: 1,
             attribution: ${CARTO_API_KEY
@@ -957,6 +1009,10 @@ export default function SkateMap({
               }));
             }
           });
+          map.on('moveend', function () {
+            var c = map.getCenter();
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'view', lat: c.lat, lng: c.lng, zoom: map.getZoom() }));
+          });
           window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'mapReady' }));
         </script>
       </body>
@@ -966,6 +1022,7 @@ export default function SkateMap({
   return (
     <View style={styles.container}>
       <WebView 
+        key={mapKey}
         ref={webviewRef}
         originWhitelist={['*']}
         allowFileAccess={true}
@@ -978,10 +1035,23 @@ export default function SkateMap({
         style={[styles.map, { height: windowHeight }]} 
         scrollEnabled={false}
         bounces={false}
+        onContentProcessDidTerminate={recoverMap}
+        // A tap on a link inside the page (the OpenStreetMap / CARTO credit) must open the browser, never
+        // replace the map: the WebView would show that site's page, or a blank one that never finishes loading.
+        onShouldStartLoadWithRequest={(request) => {
+          if (/^https?:/i.test(request.url)) {
+            Linking.openURL(request.url).catch(() => {});
+            return false;
+          }
+          return true;
+        }}
+        onRenderProcessGone={recoverMap}
         onLoadEnd={() => {
           mapReadyRef.current = true;
+          const view = lastViewRef.current;
           webviewRef.current?.injectJavaScript(`
             if (typeof map !== 'undefined') {
+              ${view ? `map.setView([${view.lat}, ${view.lng}], ${view.zoom}, { animate: false });` : ''}
               document.documentElement.style.height = window.innerHeight + 'px';
               document.body.style.height = window.innerHeight + 'px';
               document.getElementById('map').style.height = window.innerHeight + 'px';
@@ -1016,8 +1086,14 @@ export default function SkateMap({
             return;
           }
           if (!data || typeof data.type !== 'string') return;
+          lastPongRef.current = Date.now();
+          if (data.type === 'pong') return;
             
-          if (data.type === 'mapReady') {
+          if (data.type === 'view') {
+            if (Number.isFinite(data.lat) && Number.isFinite(data.lng) && Number.isFinite(data.zoom)) {
+              lastViewRef.current = { lat: data.lat, lng: data.lng, zoom: data.zoom };
+            }
+          } else if (data.type === 'mapReady') {
             mapReadyRef.current = true;
           } else if (data.type === 'error') {
              if (data.code === 'tooFar') {

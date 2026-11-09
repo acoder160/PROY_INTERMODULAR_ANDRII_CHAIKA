@@ -25,7 +25,12 @@
     "geoUnsupported": "आपका ब्राउज़र लोकेशन का समर्थन नहीं करता",
     "geoDenied": "लोकेशन की अनुमति अस्वीकृत। इसे ब्राउज़र में चालू करें।",
     "geoFailed": "आपकी लोकेशन प्राप्त नहीं हो सकी।",
-    "logoutConfirm": "SkateMap से लॉग आउट करें?"
+    "logoutConfirm": "SkateMap से लॉग आउट करें?",
+    "serverWaking": "सर्वर चालू हो रहा है। इसमें एक मिनट लग सकता है।",
+    "loadFailed": "SkateMap से कनेक्ट नहीं हो पा रहा।",
+    "retry": "फिर कोशिश करें",
+    "noMatches": "इन फ़िल्टर से कोई स्पॉट मेल नहीं खाता।",
+    "resetFilters": "फ़िल्टर रीसेट करें"
   },
   "filters": {
     "title": "स्पॉट फ़िल्टर करें",
@@ -104,7 +109,9 @@
     "demoHint": "साइन अप की ज़रूरत नहीं: एक साझा टेस्ट खाता।",
     "demoFailed": "डेमो अभी उपलब्ध नहीं है। बाद में फिर कोशिश करें।",
     "acceptTerms": "मैं 14 वर्ष या उससे अधिक का हूँ और मैं स्वीकार करता/करती हूँ:",
-    "acceptRequired": "कृपया पुष्टि करें कि आप 14 वर्ष या उससे अधिक के हैं और नियम स्वीकार करते हैं।"
+    "acceptRequired": "कृपया पुष्टि करें कि आप 14 वर्ष या उससे अधिक के हैं और नियम स्वीकार करते हैं।",
+    "serverUnreachable": "सर्वर से कनेक्ट नहीं हो पा रहा। हो सकता है वह चालू हो रहा हो: एक मिनट रुककर फिर कोशिश करें।",
+    "tooManyAttempts": "बहुत ज़्यादा कोशिशें। थोड़ा रुककर फिर कोशिश करें।"
   },
   "admin": {
     "backToMap": "नक्शे पर वापस",
@@ -349,18 +356,6 @@
     "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
     "openExisting": "Open it",
     "createAnyway": "It's different, create it"
-  },
-  "search": {
-    "placeholder": "Try “smooth ledges for beginners near me”",
-    "submit": "Search spots",
-    "clear": "Clear search",
-    "searching": "Searching…",
-    "results": "{{count}} spots found",
-    "noResults": "No spots match. Try different words.",
-    "noAi": "Keyword search (AI unavailable)",
-    "failed": "Search isn't available right now.",
-    "chipRating": "{{value}}★ and up",
-    "chipDistance": "within {{km}} km"
   },
   "weather": {
     "label": "Weather",
