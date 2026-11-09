@@ -25,12 +25,17 @@
     "geoUnsupported": "Ваш браузер не підтримує геолокацію",
     "geoDenied": "Доступ до місцезнаходження заборонено. Дозвольте його в браузері.",
     "geoFailed": "Не вдалося визначити ваше місцезнаходження.",
-    "logoutConfirm": "Вийти з SkateMap?",
+    "logoutConfirm": "Вийти з SpotCheck?",
     "serverWaking": "Сервер прокидається. Це може тривати хвилину.",
-    "loadFailed": "Не вдається зв'язатися зі SkateMap.",
+    "loadFailed": "Не вдається зв'язатися зі SpotCheck.",
     "retry": "Повторити",
     "noMatches": "Немає спотів під ці фільтри.",
-    "resetFilters": "Скинути фільтри"
+    "resetFilters": "Скинути фільтри",
+    "hintTitle": "Як це працює",
+    "hintSpot": "Торкніться спота, щоб побачити фото й рейтинг.",
+    "hintCluster": "Число на кшталт +12 об'єднує найближчі споти. Торкніться, щоб наблизити.",
+    "hintLive": "Відкрийте спот і натисніть «Наживо», щоб побачити, хто там катається.",
+    "hintDismiss": "Зрозуміло"
   },
   "filters": {
     "title": "Фільтр спотів",
@@ -45,7 +50,8 @@
     "allStars": "Будь-які",
     "starsOrMore": "{{n}} ⭐️ і більше",
     "applyResults": "Показати результати",
-    "reset": "Скинути"
+    "reset": "Скинути",
+    "legend": "Кольори показують тип спота, смужки складність, а +N об'єднує найближчі споти."
   },
   "popup": {
     "loading": "Завантаження...",
@@ -66,7 +72,9 @@
     "averageRating": "Середня оцінка: {{value}}/5",
     "thanks": "Дякуємо за вашу оцінку! 🛹",
     "noImage": "Немає зображення",
-    "commentsFailed": "Не вдалося завантажити коментарі."
+    "commentsFailed": "Не вдалося завантажити коментарі.",
+    "expand": "Показати більше",
+    "collapse": "Показати менше"
   },
   "auth": {
     "welcomeBack": "З поверненням",
@@ -85,7 +93,7 @@
     "registerHere": "Зареєструйтеся",
     "backToMap": "← Повернутися до карти без акаунта",
     "joinCrew": "Приєднуйтесь до команди",
-    "createAccountSubtitle": "Створіть акаунт у SkateMap",
+    "createAccountSubtitle": "Створіть акаунт у SpotCheck",
     "email": "Ел. пошта",
     "registerUsernamePlaceholder": "Напр.: tonyhawk99",
     "emailPlaceholder": "you@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "Редагувати спот",
     "deleteSpot": "Видалити спот",
     "deleteSpotConfirm": "Видалити цей спот? Разом із ним зникнуть фото, оцінки й коментарі.",
-    "loadFailed": "Не вдалося завантажити. Перевірте з’єднання і спробуйте ще раз."
+    "loadFailed": "Не вдалося завантажити. Перевірте з’єднання і спробуйте ще раз.",
+    "activityTitle": "Активність"
   },
   "live": {
     "title": "Наживо",
@@ -346,7 +355,9 @@
     "cancelSession": "Скасувати",
     "cancelConfirm": "Скасувати цю сесію?",
     "going": "Ідуть: {{count}}",
-    "hostedBy": "Організатор: {{username}}"
+    "hostedBy": "Організатор: {{username}}",
+    "keepSession": "Залишити",
+    "cancelSessionAction": "Скасувати сесію"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

@@ -1,0 +1,104 @@
+:root {
+  font-family: var(--body);
+  line-height: 1.4;
+  font-weight: 400;
+  color-scheme: light;
+  color: var(--ink);
+  background-color: var(--asphalt);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  accent-color: var(--paint-pink);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Visible solo para lectores de pantalla (p. ej. el h1 del mapa, que no tiene título a la vista) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+::selection {
+  background: var(--paint-pink);
+  color: var(--ink);
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Anillo doble: tinta por fuera y un halo blanco pegado al control. Sobre hormigón, blanco o amarillo se ve la tinta;
+   sobre asfalto (barra, tarjeta de acceso) se ve el halo. El rosado solo daba ~3:1 sobre blanco y menos sobre el mapa. */
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--sheet);
+}
+
+/* Clusters "+N": asfalto, anillo blanco (igual que en la app móvil) */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  width: 42px !important;
+  height: 42px !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--sheet);
+  border-radius: 50%;
+  background: var(--asphalt);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.35);
+  color: var(--sheet);
+  font: 900 17px/1 var(--display) !important;
+  letter-spacing: 0.4px;
+}
+
+.spot-cluster-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+}

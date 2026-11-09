@@ -25,12 +25,17 @@
     "geoUnsupported": "Dein Browser unterstützt keine Standortbestimmung",
     "geoDenied": "Standortberechtigung verweigert. Aktiviere sie im Browser.",
     "geoFailed": "Dein Standort konnte nicht ermittelt werden.",
-    "logoutConfirm": "Von SkateMap abmelden?",
+    "logoutConfirm": "Von SpotCheck abmelden?",
     "serverWaking": "Server wird gestartet. Das kann eine Minute dauern.",
-    "loadFailed": "SkateMap ist nicht erreichbar.",
+    "loadFailed": "SpotCheck ist nicht erreichbar.",
     "retry": "Erneut versuchen",
     "noMatches": "Keine Spots passen zu diesen Filtern.",
-    "resetFilters": "Filter zurücksetzen"
+    "resetFilters": "Filter zurücksetzen",
+    "hintTitle": "So funktioniert's",
+    "hintSpot": "Tippe auf einen Spot, um Foto und Bewertung zu sehen.",
+    "hintCluster": "Eine Zahl wie +12 fasst Spots in der Nähe zusammen. Tippe darauf, um zu zoomen.",
+    "hintLive": "Öffne einen Spot und tippe auf Live, um zu sehen, wer gerade dort skatet.",
+    "hintDismiss": "Verstanden"
   },
   "filters": {
     "title": "Spots filtern",
@@ -45,7 +50,8 @@
     "allStars": "Alle",
     "starsOrMore": "{{n}} ⭐️ oder mehr",
     "applyResults": "Ergebnisse anzeigen",
-    "reset": "Zurücksetzen"
+    "reset": "Zurücksetzen",
+    "legend": "Farben zeigen die Spot-Art, Balken die Schwierigkeit und +N fasst Spots in der Nähe zusammen."
   },
   "popup": {
     "loading": "Wird geladen...",
@@ -66,7 +72,9 @@
     "averageRating": "Durchschnittliche Bewertung: {{value}}/5",
     "thanks": "Danke für deine Bewertung! 🛹",
     "noImage": "Kein Bild",
-    "commentsFailed": "Kommentare konnten nicht geladen werden."
+    "commentsFailed": "Kommentare konnten nicht geladen werden.",
+    "expand": "Mehr anzeigen",
+    "collapse": "Weniger anzeigen"
   },
   "auth": {
     "welcomeBack": "Willkommen zurück",
@@ -85,7 +93,7 @@
     "registerHere": "Hier registrieren",
     "backToMap": "← Zurück zur Karte ohne Konto",
     "joinCrew": "Werde Teil der Crew",
-    "createAccountSubtitle": "Erstelle dein SkateMap-Konto",
+    "createAccountSubtitle": "Erstelle dein SpotCheck-Konto",
     "email": "E-Mail",
     "registerUsernamePlaceholder": "z. B. tonyhawk99",
     "emailPlaceholder": "du@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "Spot bearbeiten",
     "deleteSpot": "Spot löschen",
     "deleteSpotConfirm": "Diesen Spot löschen? Foto, Bewertungen und Kommentare werden mit gelöscht.",
-    "loadFailed": "Laden fehlgeschlagen. Prüfe deine Verbindung und versuch es noch einmal."
+    "loadFailed": "Laden fehlgeschlagen. Prüfe deine Verbindung und versuch es noch einmal.",
+    "activityTitle": "Aktivität"
   },
   "live": {
     "title": "Live",
@@ -346,7 +355,9 @@
     "cancelSession": "Absagen",
     "cancelConfirm": "Diese Session absagen?",
     "going": "Dabei: {{count}}",
-    "hostedBy": "Gastgeber: {{username}}"
+    "hostedBy": "Gastgeber: {{username}}",
+    "keepSession": "Behalten",
+    "cancelSessionAction": "Session absagen"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

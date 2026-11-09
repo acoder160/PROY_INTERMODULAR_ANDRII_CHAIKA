@@ -2,21 +2,21 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "skatemap-web",
+      "name": "spotcheck-web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "skatemap-web", "run", "dev", "--", "--port", "5173", "--strictPort"],
+      "runtimeArgs": ["--prefix", "spotcheck-web", "run", "dev", "--", "--port", "5173", "--strictPort"],
       "port": 5173
     },
     {
-      "name": "skatemap-web-demo",
+      "name": "spotcheck-web-demo",
       "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "set VITE_DEMO_ENABLED=true&& npm --prefix skatemap-web run dev -- --port 5174 --strictPort"],
+      "runtimeArgs": ["/c", "set VITE_DEMO_ENABLED=true&& npm --prefix spotcheck-web run dev -- --port 5174 --strictPort"],
       "port": 5174
     },
     {
-      "name": "skatemap-web-isolated-api",
+      "name": "spotcheck-web-isolated-api",
       "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "set VITE_API_URL=http://localhost:8090/api&& npm --prefix skatemap-web run dev -- --port 5175 --strictPort"],
+      "runtimeArgs": ["/c", "set VITE_API_URL=http://localhost:8090/api&& npm --prefix spotcheck-web run dev -- --port 5175 --strictPort"],
       "port": 5175
     }
   ]

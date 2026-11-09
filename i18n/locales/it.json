@@ -25,12 +25,17 @@
     "geoUnsupported": "Il tuo browser non supporta la geolocalizzazione",
     "geoDenied": "Permesso di localizzazione negato. Attivalo nel browser.",
     "geoFailed": "Impossibile ottenere la tua posizione.",
-    "logoutConfirm": "Uscire da SkateMap?",
+    "logoutConfirm": "Uscire da SpotCheck?",
     "serverWaking": "Sto svegliando il server. Può volerci un minuto.",
-    "loadFailed": "Impossibile raggiungere SkateMap.",
+    "loadFailed": "Impossibile raggiungere SpotCheck.",
     "retry": "Riprova",
     "noMatches": "Nessuno spot corrisponde ai filtri.",
-    "resetFilters": "Azzera i filtri"
+    "resetFilters": "Azzera i filtri",
+    "hintTitle": "Come funziona",
+    "hintSpot": "Tocca uno spot per vedere foto e valutazione.",
+    "hintCluster": "Un numero come +12 raggruppa spot vicini. Toccalo per ingrandire.",
+    "hintLive": "Apri uno spot e tocca Live per vedere chi sta skateando lì ora.",
+    "hintDismiss": "Capito"
   },
   "filters": {
     "title": "Filtra spot",
@@ -45,7 +50,8 @@
     "allStars": "Tutte",
     "starsOrMore": "{{n}} ⭐️ o più",
     "applyResults": "Vedi risultati",
-    "reset": "Reimposta"
+    "reset": "Reimposta",
+    "legend": "I colori indicano il tipo di spot, le barre la difficoltà e +N raggruppa spot vicini."
   },
   "popup": {
     "loading": "Caricamento...",
@@ -66,7 +72,9 @@
     "averageRating": "Voto medio: {{value}}/5",
     "thanks": "Grazie per la tua valutazione! 🛹",
     "noImage": "Nessuna immagine",
-    "commentsFailed": "Impossibile caricare i commenti."
+    "commentsFailed": "Impossibile caricare i commenti.",
+    "expand": "Mostra di più",
+    "collapse": "Mostra meno"
   },
   "auth": {
     "welcomeBack": "Bentornato",
@@ -85,7 +93,7 @@
     "registerHere": "Registrati qui",
     "backToMap": "← Torna alla mappa senza account",
     "joinCrew": "Unisciti alla crew",
-    "createAccountSubtitle": "Crea il tuo account SkateMap",
+    "createAccountSubtitle": "Crea il tuo account SpotCheck",
     "email": "Email",
     "registerUsernamePlaceholder": "Es.: tonyhawk99",
     "emailPlaceholder": "tu@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "Modifica spot",
     "deleteSpot": "Elimina spot",
     "deleteSpotConfirm": "Eliminare questo spot? Verranno eliminati anche foto, valutazioni e commenti.",
-    "loadFailed": "Impossibile caricare. Controlla la connessione e riprova."
+    "loadFailed": "Impossibile caricare. Controlla la connessione e riprova.",
+    "activityTitle": "Attività"
   },
   "live": {
     "title": "Live",
@@ -346,7 +355,9 @@
     "cancelSession": "Annulla",
     "cancelConfirm": "Annullare questa sessione?",
     "going": "Partecipanti: {{count}}",
-    "hostedBy": "Organizza: {{username}}"
+    "hostedBy": "Organizza: {{username}}",
+    "keepSession": "Mantieni",
+    "cancelSessionAction": "Annulla sessione"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

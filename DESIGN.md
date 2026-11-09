@@ -1,5 +1,5 @@
 ---
-name: SkateMap
+name: SpotCheck
 description: Locate-paint skate map. Asphalt shell, concrete map ground, five flat paint colours, a dashed pink painted route.
 colors:
   asphalt: "#1C1C1C"
@@ -91,7 +91,7 @@ components:
     height: "48px"
 ---
 
-# Design System: SkateMap
+# Design System: SpotCheck
 
 ## Overview
 
@@ -167,7 +167,7 @@ Flat by default: depth comes from 2px outlines and colour contrast, not tonal la
 
 ### Named Rules
 **The Flat-Fields Rule.** Fills are solid. Shadows are only for objects floating over the map, never for sheet content.
-**The Quiet Tone Rule.** The only gradients allowed are vertical tonal ones inside a single colour, about ±6% lightness, on exactly these surfaces: top bar (`#262626 → #1C1C1C`), auth screen (radial `#2A2A2A → #1C1C1C`) and auth card (`#2E2E2E → #2A2A2A`), the pink primary action (`#FF66B0 → #FF4FA3`, flat while pressed), and the empty-photo placeholder (`#D3D3CE → #C9C9C4`). Never on chips, pills, paint dots, markers, clusters or the route; never across two hues. Tokens: `Gradients` in `skatemap-mobile/constants/theme.ts`, `--grad-*` in `skatemap-web/src/tokens.css`.
+**The Quiet Tone Rule.** The only gradients allowed are vertical tonal ones inside a single colour, about ±6% lightness, on exactly these surfaces: top bar (`#262626 → #1C1C1C`), auth screen (radial `#2A2A2A → #1C1C1C`) and auth card (`#2E2E2E → #2A2A2A`), the pink primary action (`#FF66B0 → #FF4FA3`, flat while pressed), and the empty-photo placeholder (`#D3D3CE → #C9C9C4`). Never on chips, pills, paint dots, markers, clusters or the route; never across two hues. Tokens: `Gradients` in `spotcheck-mobile/constants/theme.ts`, `--grad-*` in `spotcheck-web/src/tokens.css`.
 
 ## Shapes
 
@@ -225,4 +225,4 @@ Pills and rounded sheets, always outlined. Controls are fully round pills (24-28
 - **Don't** use the paints for decoration or non-type state.
 - **Don't** signal difficulty by colour.
 - **Don't** set paragraphs in the display face.
-- **Don't** reintroduce the old navy and teal palette. Web (`skatemap-web`) and mobile share this system one-to-one: same tokens, top bar, sheets, popup, markers and route.
+- **Don't** reintroduce the old navy and teal palette. Web (`spotcheck-web`) and mobile share this system one-to-one: same tokens, top bar, sheets, popup, markers and route.

@@ -25,12 +25,17 @@
     "geoUnsupported": "您的浏览器不支持定位",
     "geoDenied": "定位权限被拒绝。请在浏览器中开启。",
     "geoFailed": "无法获取您的位置。",
-    "logoutConfirm": "退出 SkateMap 吗？",
+    "logoutConfirm": "退出 SpotCheck 吗？",
     "serverWaking": "正在唤醒服务器，可能需要一分钟。",
-    "loadFailed": "无法连接 SkateMap。",
+    "loadFailed": "无法连接 SpotCheck。",
     "retry": "重试",
     "noMatches": "没有符合这些筛选条件的场地。",
-    "resetFilters": "重置筛选"
+    "resetFilters": "重置筛选",
+    "hintTitle": "使用方法",
+    "hintSpot": "点按场地即可查看照片和评分。",
+    "hintCluster": "像 +12 这样的数字表示附近场地的合集，点按即可放大。",
+    "hintLive": "打开场地并点按实时，即可看到谁正在那里滑。",
+    "hintDismiss": "知道了"
   },
   "filters": {
     "title": "筛选地点",
@@ -45,7 +50,8 @@
     "allStars": "全部",
     "starsOrMore": "{{n}} ⭐️ 及以上",
     "applyResults": "查看结果",
-    "reset": "重置"
+    "reset": "重置",
+    "legend": "颜色表示场地类型，条形表示难度，+N 表示附近场地的合集。"
   },
   "popup": {
     "loading": "加载中...",
@@ -66,7 +72,9 @@
     "averageRating": "平均评分：{{value}}/5",
     "thanks": "感谢您的评分！🛹",
     "noImage": "暂无图片",
-    "commentsFailed": "无法加载评论。"
+    "commentsFailed": "无法加载评论。",
+    "expand": "展开",
+    "collapse": "收起"
   },
   "auth": {
     "welcomeBack": "欢迎回来",
@@ -85,7 +93,7 @@
     "registerHere": "在此注册",
     "backToMap": "← 不登录，返回地图",
     "joinCrew": "加入我们的圈子",
-    "createAccountSubtitle": "创建您的 SkateMap 账号",
+    "createAccountSubtitle": "创建您的 SpotCheck 账号",
     "email": "邮箱",
     "registerUsernamePlaceholder": "例如：tonyhawk99",
     "emailPlaceholder": "you@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "编辑地点",
     "deleteSpot": "删除地点",
     "deleteSpotConfirm": "删除这个地点？它的照片、评分和评论也会一并删除。",
-    "loadFailed": "加载失败。请检查网络连接后重试。"
+    "loadFailed": "加载失败。请检查网络连接后重试。",
+    "activityTitle": "动态"
   },
   "live": {
     "title": "实时",
@@ -346,7 +355,9 @@
     "cancelSession": "取消",
     "cancelConfirm": "取消这个活动？",
     "going": "参加：{{count}}",
-    "hostedBy": "发起人：{{username}}"
+    "hostedBy": "发起人：{{username}}",
+    "keepSession": "保留",
+    "cancelSessionAction": "取消活动"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

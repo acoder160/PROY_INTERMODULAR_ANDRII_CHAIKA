@@ -25,12 +25,17 @@
     "geoUnsupported": "Twoja przeglądarka nie obsługuje geolokalizacji",
     "geoDenied": "Odmówiono dostępu do lokalizacji. Włącz go w przeglądarce.",
     "geoFailed": "Nie udało się ustalić Twojej lokalizacji.",
-    "logoutConfirm": "Wylogować się ze SkateMap?",
+    "logoutConfirm": "Wylogować się ze SpotCheck?",
     "serverWaking": "Budzenie serwera. To może potrwać minutę.",
-    "loadFailed": "Nie można połączyć się z SkateMap.",
+    "loadFailed": "Nie można połączyć się z SpotCheck.",
     "retry": "Spróbuj ponownie",
     "noMatches": "Żaden spot nie pasuje do filtrów.",
-    "resetFilters": "Wyczyść filtry"
+    "resetFilters": "Wyczyść filtry",
+    "hintTitle": "Jak to działa",
+    "hintSpot": "Dotknij spotu, aby zobaczyć zdjęcie i ocenę.",
+    "hintCluster": "Liczba jak +12 grupuje pobliskie spoty. Dotknij, aby przybliżyć.",
+    "hintLive": "Otwórz spot i dotknij Na żywo, aby zobaczyć, kto tam teraz jeździ.",
+    "hintDismiss": "Rozumiem"
   },
   "filters": {
     "title": "Filtruj spoty",
@@ -45,7 +50,8 @@
     "allStars": "Wszystkie",
     "starsOrMore": "{{n}} ⭐️ lub więcej",
     "applyResults": "Zobacz wyniki",
-    "reset": "Wyczyść"
+    "reset": "Wyczyść",
+    "legend": "Kolory pokazują typ spotu, paski trudność, a +N grupuje pobliskie spoty."
   },
   "popup": {
     "loading": "Ładowanie...",
@@ -66,7 +72,9 @@
     "averageRating": "Średnia ocena: {{value}}/5",
     "thanks": "Dziękujemy za ocenę! 🛹",
     "noImage": "Brak obrazu",
-    "commentsFailed": "Nie udało się wczytać komentarzy."
+    "commentsFailed": "Nie udało się wczytać komentarzy.",
+    "expand": "Pokaż więcej",
+    "collapse": "Pokaż mniej"
   },
   "auth": {
     "welcomeBack": "Witaj ponownie",
@@ -85,7 +93,7 @@
     "registerHere": "Zarejestruj się tutaj",
     "backToMap": "← Wróć do mapy bez konta",
     "joinCrew": "Dołącz do ekipy",
-    "createAccountSubtitle": "Załóż konto w SkateMap",
+    "createAccountSubtitle": "Załóż konto w SpotCheck",
     "email": "E-mail",
     "registerUsernamePlaceholder": "Np.: tonyhawk99",
     "emailPlaceholder": "ty@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "Edytuj spot",
     "deleteSpot": "Usuń spot",
     "deleteSpotConfirm": "Usunąć ten spot? Zdjęcie, oceny i komentarze też zostaną usunięte.",
-    "loadFailed": "Nie udało się wczytać. Sprawdź połączenie i spróbuj ponownie."
+    "loadFailed": "Nie udało się wczytać. Sprawdź połączenie i spróbuj ponownie.",
+    "activityTitle": "Aktywność"
   },
   "live": {
     "title": "Na żywo",
@@ -346,7 +355,9 @@
     "cancelSession": "Odwołaj",
     "cancelConfirm": "Odwołać tę sesję?",
     "going": "Idzie: {{count}}",
-    "hostedBy": "Organizator: {{username}}"
+    "hostedBy": "Organizator: {{username}}",
+    "keepSession": "Zostaw",
+    "cancelSessionAction": "Odwołaj sesję"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

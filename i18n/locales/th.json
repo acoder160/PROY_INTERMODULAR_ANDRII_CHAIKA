@@ -25,12 +25,17 @@
     "geoUnsupported": "เบราว์เซอร์ของคุณไม่รองรับการระบุตำแหน่ง",
     "geoDenied": "ปฏิเสธสิทธิ์ตำแหน่ง โปรดเปิดในเบราว์เซอร์",
     "geoFailed": "ไม่สามารถระบุตำแหน่งของคุณได้",
-    "logoutConfirm": "ออกจากระบบ SkateMap ไหม?",
+    "logoutConfirm": "ออกจากระบบ SpotCheck ไหม?",
     "serverWaking": "กำลังปลุกเซิร์ฟเวอร์ อาจใช้เวลาประมาณหนึ่งนาที",
-    "loadFailed": "เชื่อมต่อ SkateMap ไม่ได้",
+    "loadFailed": "เชื่อมต่อ SpotCheck ไม่ได้",
     "retry": "ลองอีกครั้ง",
     "noMatches": "ไม่มีสปอตที่ตรงกับตัวกรอง",
-    "resetFilters": "รีเซ็ตตัวกรอง"
+    "resetFilters": "รีเซ็ตตัวกรอง",
+    "hintTitle": "ใช้งานอย่างไร",
+    "hintSpot": "แตะสปอตเพื่อดูรูปและคะแนน",
+    "hintCluster": "ตัวเลขอย่าง +12 รวมสปอตที่อยู่ใกล้กัน แตะเพื่อซูมเข้า",
+    "hintLive": "เปิดสปอตแล้วแตะสดเพื่อดูว่าตอนนี้ใครกำลังเล่นอยู่ที่นั่น",
+    "hintDismiss": "เข้าใจแล้ว"
   },
   "filters": {
     "title": "กรองสปอต",
@@ -45,7 +50,8 @@
     "allStars": "ทั้งหมด",
     "starsOrMore": "{{n}} ⭐️ ขึ้นไป",
     "applyResults": "ดูผลลัพธ์",
-    "reset": "รีเซ็ต"
+    "reset": "รีเซ็ต",
+    "legend": "สีบอกประเภทสปอต แถบบอกความยาก และ +N รวมสปอตที่อยู่ใกล้กัน"
   },
   "popup": {
     "loading": "กำลังโหลด...",
@@ -66,7 +72,9 @@
     "averageRating": "คะแนนเฉลี่ย: {{value}}/5",
     "thanks": "ขอบคุณสำหรับคะแนนของคุณ! 🛹",
     "noImage": "ไม่มีรูปภาพ",
-    "commentsFailed": "โหลดความคิดเห็นไม่ได้"
+    "commentsFailed": "โหลดความคิดเห็นไม่ได้",
+    "expand": "ดูเพิ่มเติม",
+    "collapse": "ดูน้อยลง"
   },
   "auth": {
     "welcomeBack": "ยินดีต้อนรับกลับ",
@@ -85,7 +93,7 @@
     "registerHere": "สมัครที่นี่",
     "backToMap": "← กลับไปที่แผนที่โดยไม่ใช้บัญชี",
     "joinCrew": "เข้าร่วมทีม",
-    "createAccountSubtitle": "สร้างบัญชี SkateMap ของคุณ",
+    "createAccountSubtitle": "สร้างบัญชี SpotCheck ของคุณ",
     "email": "อีเมล",
     "registerUsernamePlaceholder": "เช่น tonyhawk99",
     "emailPlaceholder": "you@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "แก้ไขสปอต",
     "deleteSpot": "ลบสปอต",
     "deleteSpotConfirm": "ลบสปอตนี้ใช่ไหม? รูป คะแนน และความคิดเห็นจะถูกลบไปด้วย",
-    "loadFailed": "โหลดไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง"
+    "loadFailed": "โหลดไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
+    "activityTitle": "กิจกรรม"
   },
   "live": {
     "title": "สด",
@@ -346,7 +355,9 @@
     "cancelSession": "ยกเลิก",
     "cancelConfirm": "ยกเลิกเซสชันนี้ใช่ไหม?",
     "going": "ไปด้วย: {{count}}",
-    "hostedBy": "ผู้จัด: {{username}}"
+    "hostedBy": "ผู้จัด: {{username}}",
+    "keepSession": "เก็บไว้",
+    "cancelSessionAction": "ยกเลิกเซสชัน"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

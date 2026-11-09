@@ -25,12 +25,17 @@
     "geoUnsupported": "Je browser ondersteunt geen geolocatie",
     "geoDenied": "Locatietoestemming geweigerd. Schakel deze in via je browser.",
     "geoFailed": "Je locatie kon niet worden opgehaald.",
-    "logoutConfirm": "Uitloggen bij SkateMap?",
+    "logoutConfirm": "Uitloggen bij SpotCheck?",
     "serverWaking": "Server wordt wakker gemaakt. Dat kan een minuut duren.",
-    "loadFailed": "SkateMap is niet bereikbaar.",
+    "loadFailed": "SpotCheck is niet bereikbaar.",
     "retry": "Opnieuw proberen",
     "noMatches": "Geen spots passen bij deze filters.",
-    "resetFilters": "Filters wissen"
+    "resetFilters": "Filters wissen",
+    "hintTitle": "Zo werkt het",
+    "hintSpot": "Tik op een spot voor de foto en de beoordeling.",
+    "hintCluster": "Een getal als +12 groepeert spots in de buurt. Tik erop om in te zoomen.",
+    "hintLive": "Open een spot en tik op Live om te zien wie er nu skatet.",
+    "hintDismiss": "Begrepen"
   },
   "filters": {
     "title": "Spots filteren",
@@ -45,7 +50,8 @@
     "allStars": "Alle",
     "starsOrMore": "{{n}} ⭐️ of meer",
     "applyResults": "Resultaten bekijken",
-    "reset": "Wissen"
+    "reset": "Wissen",
+    "legend": "Kleuren tonen het type spot, balkjes de moeilijkheid en +N groepeert spots in de buurt."
   },
   "popup": {
     "loading": "Laden...",
@@ -66,7 +72,9 @@
     "averageRating": "Gemiddelde score: {{value}}/5",
     "thanks": "Bedankt voor je beoordeling! 🛹",
     "noImage": "Geen afbeelding",
-    "commentsFailed": "Reacties konden niet worden geladen."
+    "commentsFailed": "Reacties konden niet worden geladen.",
+    "expand": "Meer tonen",
+    "collapse": "Minder tonen"
   },
   "auth": {
     "welcomeBack": "Welkom terug",
@@ -85,7 +93,7 @@
     "registerHere": "Registreer hier",
     "backToMap": "← Terug naar de kaart zonder account",
     "joinCrew": "Word lid van de crew",
-    "createAccountSubtitle": "Maak je SkateMap-account aan",
+    "createAccountSubtitle": "Maak je SpotCheck-account aan",
     "email": "E-mail",
     "registerUsernamePlaceholder": "Bijv.: tonyhawk99",
     "emailPlaceholder": "jij@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "Spot bewerken",
     "deleteSpot": "Spot verwijderen",
     "deleteSpotConfirm": "Deze spot verwijderen? De foto, beoordelingen en reacties verdwijnen ook.",
-    "loadFailed": "Laden mislukt. Controleer je verbinding en probeer het opnieuw."
+    "loadFailed": "Laden mislukt. Controleer je verbinding en probeer het opnieuw.",
+    "activityTitle": "Activiteit"
   },
   "live": {
     "title": "Live",
@@ -346,7 +355,9 @@
     "cancelSession": "Annuleren",
     "cancelConfirm": "Deze sessie annuleren?",
     "going": "Gaan: {{count}}",
-    "hostedBy": "Host: {{username}}"
+    "hostedBy": "Host: {{username}}",
+    "keepSession": "Behouden",
+    "cancelSessionAction": "Sessie annuleren"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

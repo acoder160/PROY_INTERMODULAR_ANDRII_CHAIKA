@@ -6,7 +6,7 @@
 
 web
 
-The design language is one custom look shared by two clients: `skatemap-web` (React + Vite, browser) and `skatemap-mobile` (Expo / React Native, shipped to Android, with an Expo web export). Neither client follows per-OS native conventions; both must read as the same product.
+The design language is one custom look shared by two clients: `spotcheck-web` (React + Vite, browser) and `spotcheck-mobile` (Expo / React Native, shipped to Android, with an Expo web export). Neither client follows per-OS native conventions; both must read as the same product.
 
 ## Users
 
@@ -14,7 +14,7 @@ Travelling skaters: people visiting a city they don't know who need trustworthy 
 
 ## Product Purpose
 
-SkateMap geolocates skate spots on a map and lets the community rate and comment on them. Anyone can browse; an account is needed to add, rate or comment. Success is a skater in an unfamiliar city opening the app, seeing what is close, judging a spot from its photo and rating, and getting there.
+SpotCheck geolocates skate spots on a map and lets the community rate and comment on them. Anyone can browse; an account is needed to add, rate or comment. Success is a skater in an unfamiliar city opening the app, seeing what is close, judging a spot from its photo and rating, and getting there.
 
 ## Positioning
 
@@ -41,7 +41,7 @@ Spots enter the map photo-first: a new spot starts with a photo taken on site, t
 - Map-first layout stays: full-screen map, no tab bar, primary map controls along the bottom on mobile.
 - The photo-first add-spot flow stays.
 - The recent map visuals stay: the user location marker and the "+N" cluster labels.
-- Name: SkateMap. No logo asset exists beyond the default app icons.
+- Name: SpotCheck. No logo asset exists beyond the default app icons.
 
 ## Evidence on Hand
 

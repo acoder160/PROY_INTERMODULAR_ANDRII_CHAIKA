@@ -25,12 +25,17 @@
     "geoUnsupported": "متصفحك لا يدعم تحديد الموقع",
     "geoDenied": "تم رفض إذن الموقع. فعّله من المتصفح.",
     "geoFailed": "تعذّر تحديد موقعك.",
-    "logoutConfirm": "تسجيل الخروج من SkateMap؟",
+    "logoutConfirm": "تسجيل الخروج من SpotCheck؟",
     "serverWaking": "جارٍ تشغيل الخادم. قد يستغرق ذلك دقيقة.",
-    "loadFailed": "تعذّر الاتصال بـ SkateMap.",
+    "loadFailed": "تعذّر الاتصال بـ SpotCheck.",
     "retry": "إعادة المحاولة",
     "noMatches": "لا توجد أماكن مطابقة لهذه التصفية.",
-    "resetFilters": "إعادة ضبط التصفية"
+    "resetFilters": "إعادة ضبط التصفية",
+    "hintTitle": "كيف يعمل",
+    "hintSpot": "اضغط على مكان لرؤية صورته وتقييمه.",
+    "hintCluster": "رقم مثل +12 يجمع الأماكن القريبة. اضغط عليه للتقريب.",
+    "hintLive": "افتح مكانًا واضغط على مباشر لترى من يتزلج هناك الآن.",
+    "hintDismiss": "فهمت"
   },
   "filters": {
     "title": "تصفية الأماكن",
@@ -45,7 +50,8 @@
     "allStars": "الكل",
     "starsOrMore": "{{n}} ⭐️ فأكثر",
     "applyResults": "عرض النتائج",
-    "reset": "إعادة الضبط"
+    "reset": "إعادة الضبط",
+    "legend": "الألوان تعرض نوع المكان والأشرطة تعرض الصعوبة و+N يجمع الأماكن القريبة."
   },
   "popup": {
     "loading": "جارٍ التحميل...",
@@ -66,7 +72,9 @@
     "averageRating": "متوسط التقييم: {{value}}/5",
     "thanks": "شكرًا على تقييمك! 🛹",
     "noImage": "لا توجد صورة",
-    "commentsFailed": "تعذّر تحميل التعليقات."
+    "commentsFailed": "تعذّر تحميل التعليقات.",
+    "expand": "عرض المزيد",
+    "collapse": "عرض أقل"
   },
   "auth": {
     "welcomeBack": "مرحبًا بعودتك",
@@ -85,7 +93,7 @@
     "registerHere": "أنشئ حسابًا هنا",
     "backToMap": "← العودة إلى الخريطة بدون حساب",
     "joinCrew": "انضم إلى الفريق",
-    "createAccountSubtitle": "أنشئ حسابك في SkateMap",
+    "createAccountSubtitle": "أنشئ حسابك في SpotCheck",
     "email": "البريد الإلكتروني",
     "registerUsernamePlaceholder": "مثال: tonyhawk99",
     "emailPlaceholder": "you@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "تعديل المكان",
     "deleteSpot": "حذف المكان",
     "deleteSpotConfirm": "حذف هذا المكان؟ ستُحذف معه صورته وتقييماته وتعليقاته.",
-    "loadFailed": "تعذّر التحميل. تحقّق من اتصالك وحاول مرة أخرى."
+    "loadFailed": "تعذّر التحميل. تحقّق من اتصالك وحاول مرة أخرى.",
+    "activityTitle": "النشاط"
   },
   "live": {
     "title": "مباشر",
@@ -346,7 +355,9 @@
     "cancelSession": "إلغاء",
     "cancelConfirm": "إلغاء هذه الجلسة؟",
     "going": "سيحضرون: {{count}}",
-    "hostedBy": "المنظِّم: {{username}}"
+    "hostedBy": "المنظِّم: {{username}}",
+    "keepSession": "إبقاؤها",
+    "cancelSessionAction": "إلغاء الجلسة"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

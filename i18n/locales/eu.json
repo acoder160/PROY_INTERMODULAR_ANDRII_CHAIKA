@@ -25,12 +25,17 @@
     "geoUnsupported": "Zure nabigatzaileak ez du geokokapena onartzen",
     "geoDenied": "Kokapen-baimena ukatu da. Gaitu ezazu nabigatzailean.",
     "geoFailed": "Ezin izan da zure kokapena lortu.",
-    "logoutConfirm": "SkateMap-etik irten?",
+    "logoutConfirm": "SpotCheck-etik irten?",
     "serverWaking": "Zerbitzaria esnatzen ari da. Minutu bat behar dezake.",
-    "loadFailed": "Ezin da SkateMap-ekin konektatu.",
+    "loadFailed": "Ezin da SpotCheck-ekin konektatu.",
     "retry": "Saiatu berriro",
     "noMatches": "Ez dago iragazki horiekin bat datorren spoterik.",
-    "resetFilters": "Garbitu iragazkiak"
+    "resetFilters": "Garbitu iragazkiak",
+    "hintTitle": "Nola funtzionatzen du",
+    "hintSpot": "Sakatu spot bat bere argazkia eta balorazioa ikusteko.",
+    "hintCluster": "+12 bezalako zenbaki batek inguruko spotak biltzen ditu. Sakatu zoom egiteko.",
+    "hintLive": "Ireki spot bat eta sakatu Zuzenean orain nor ari den patinatzen ikusteko.",
+    "hintDismiss": "Ulertuta"
   },
   "filters": {
     "title": "Iragazi spotak",
@@ -45,7 +50,8 @@
     "allStars": "Denak",
     "starsOrMore": "{{n}} ⭐️ edo gehiago",
     "applyResults": "Ikusi emaitzak",
-    "reset": "Berrezarri"
+    "reset": "Berrezarri",
+    "legend": "Koloreek spot mota erakusten dute, barrek zailtasuna eta +N-k inguruko spotak biltzen ditu."
   },
   "popup": {
     "loading": "Kargatzen...",
@@ -66,7 +72,9 @@
     "averageRating": "Batez besteko nota: {{value}}/5",
     "thanks": "Eskerrik asko zure balorazioagatik! 🛹",
     "noImage": "Irudirik gabe",
-    "commentsFailed": "Ezin izan dira iruzkinak kargatu."
+    "commentsFailed": "Ezin izan dira iruzkinak kargatu.",
+    "expand": "Erakutsi gehiago",
+    "collapse": "Erakutsi gutxiago"
   },
   "auth": {
     "welcomeBack": "Ongi etorri berriro",
@@ -85,7 +93,7 @@
     "registerHere": "Eman izena hemen",
     "backToMap": "← Itzuli mapara konturik gabe",
     "joinCrew": "Sartu crewean",
-    "createAccountSubtitle": "Sortu zure SkateMap kontua",
+    "createAccountSubtitle": "Sortu zure SpotCheck kontua",
     "email": "Posta elektronikoa",
     "registerUsernamePlaceholder": "Adib.: tonyhawk99",
     "emailPlaceholder": "zu@posta.com",
@@ -325,7 +333,8 @@
     "editSpot": "Editatu spota",
     "deleteSpot": "Ezabatu spota",
     "deleteSpotConfirm": "Spot hau ezabatu? Argazkia, balorazioak eta iruzkinak ere ezabatuko dira.",
-    "loadFailed": "Ezin izan da kargatu. Egiaztatu konexioa eta saiatu berriro."
+    "loadFailed": "Ezin izan da kargatu. Egiaztatu konexioa eta saiatu berriro.",
+    "activityTitle": "Jarduera"
   },
   "live": {
     "title": "Zuzenean",
@@ -346,7 +355,9 @@
     "cancelSession": "Bertan behera utzi",
     "cancelConfirm": "Saio hau bertan behera utzi?",
     "going": "Doaz: {{count}}",
-    "hostedBy": "Antolatzailea: {{username}}"
+    "hostedBy": "Antolatzailea: {{username}}",
+    "keepSession": "Mantendu",
+    "cancelSessionAction": "Saioa bertan behera utzi"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

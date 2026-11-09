@@ -25,12 +25,17 @@
     "geoUnsupported": "Trình duyệt của bạn không hỗ trợ định vị",
     "geoDenied": "Quyền vị trí bị từ chối. Hãy bật trong trình duyệt.",
     "geoFailed": "Không thể lấy vị trí của bạn.",
-    "logoutConfirm": "Đăng xuất khỏi SkateMap?",
+    "logoutConfirm": "Đăng xuất khỏi SpotCheck?",
     "serverWaking": "Đang đánh thức máy chủ. Việc này có thể mất một phút.",
-    "loadFailed": "Không kết nối được với SkateMap.",
+    "loadFailed": "Không kết nối được với SpotCheck.",
     "retry": "Thử lại",
     "noMatches": "Không có spot nào khớp với bộ lọc.",
-    "resetFilters": "Đặt lại bộ lọc"
+    "resetFilters": "Đặt lại bộ lọc",
+    "hintTitle": "Cách dùng",
+    "hintSpot": "Chạm vào một spot để xem ảnh và điểm đánh giá.",
+    "hintCluster": "Một số như +12 gom các spot gần nhau. Chạm để phóng to.",
+    "hintLive": "Mở một spot và chạm Trực tiếp để xem ai đang trượt ở đó.",
+    "hintDismiss": "Đã hiểu"
   },
   "filters": {
     "title": "Lọc spot",
@@ -45,7 +50,8 @@
     "allStars": "Tất cả",
     "starsOrMore": "{{n}} ⭐️ trở lên",
     "applyResults": "Xem kết quả",
-    "reset": "Đặt lại"
+    "reset": "Đặt lại",
+    "legend": "Màu cho biết loại spot, thanh cho biết độ khó và +N gom các spot gần nhau."
   },
   "popup": {
     "loading": "Đang tải...",
@@ -66,7 +72,9 @@
     "averageRating": "Điểm trung bình: {{value}}/5",
     "thanks": "Cảm ơn bạn đã đánh giá! 🛹",
     "noImage": "Không có ảnh",
-    "commentsFailed": "Không thể tải bình luận."
+    "commentsFailed": "Không thể tải bình luận.",
+    "expand": "Xem thêm",
+    "collapse": "Thu gọn"
   },
   "auth": {
     "welcomeBack": "Chào mừng trở lại",
@@ -85,7 +93,7 @@
     "registerHere": "Đăng ký tại đây",
     "backToMap": "← Quay lại bản đồ không cần tài khoản",
     "joinCrew": "Tham gia crew",
-    "createAccountSubtitle": "Tạo tài khoản SkateMap của bạn",
+    "createAccountSubtitle": "Tạo tài khoản SpotCheck của bạn",
     "email": "Email",
     "registerUsernamePlaceholder": "VD: tonyhawk99",
     "emailPlaceholder": "ban@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "Sửa spot",
     "deleteSpot": "Xóa spot",
     "deleteSpotConfirm": "Xóa spot này? Ảnh, đánh giá và bình luận của nó cũng sẽ bị xóa.",
-    "loadFailed": "Không tải được. Hãy kiểm tra kết nối và thử lại."
+    "loadFailed": "Không tải được. Hãy kiểm tra kết nối và thử lại.",
+    "activityTitle": "Hoạt động"
   },
   "live": {
     "title": "Trực tiếp",
@@ -346,7 +355,9 @@
     "cancelSession": "Hủy",
     "cancelConfirm": "Hủy buổi trượt này?",
     "going": "Sẽ đến: {{count}}",
-    "hostedBy": "Chủ trì: {{username}}"
+    "hostedBy": "Chủ trì: {{username}}",
+    "keepSession": "Giữ lại",
+    "cancelSessionAction": "Hủy buổi trượt"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

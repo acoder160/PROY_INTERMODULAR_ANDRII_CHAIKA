@@ -25,12 +25,17 @@
     "geoUnsupported": "Votre navigateur ne prend pas en charge la géolocalisation",
     "geoDenied": "Autorisation de localisation refusée. Activez-la dans le navigateur.",
     "geoFailed": "Impossible d'obtenir votre position.",
-    "logoutConfirm": "Se déconnecter de SkateMap ?",
+    "logoutConfirm": "Se déconnecter de SpotCheck ?",
     "serverWaking": "Réveil du serveur. Cela peut prendre une minute.",
-    "loadFailed": "Impossible de joindre SkateMap.",
+    "loadFailed": "Impossible de joindre SpotCheck.",
     "retry": "Réessayer",
     "noMatches": "Aucun spot ne correspond à ces filtres.",
-    "resetFilters": "Réinitialiser les filtres"
+    "resetFilters": "Réinitialiser les filtres",
+    "hintTitle": "Comment ça marche",
+    "hintSpot": "Touche un spot pour voir sa photo et sa note.",
+    "hintCluster": "Un nombre comme +12 regroupe des spots proches. Touche-le pour zoomer.",
+    "hintLive": "Ouvre un spot et touche En direct pour voir qui skate là maintenant.",
+    "hintDismiss": "Compris"
   },
   "filters": {
     "title": "Filtrer les spots",
@@ -45,7 +50,8 @@
     "allStars": "Toutes",
     "starsOrMore": "{{n}} ⭐️ ou plus",
     "applyResults": "Voir les résultats",
-    "reset": "Réinitialiser"
+    "reset": "Réinitialiser",
+    "legend": "Les couleurs indiquent le type de spot, les barres la difficulté et +N regroupe des spots proches."
   },
   "popup": {
     "loading": "Chargement...",
@@ -66,7 +72,9 @@
     "averageRating": "Note moyenne : {{value}}/5",
     "thanks": "Merci pour votre note ! 🛹",
     "noImage": "Pas d'image",
-    "commentsFailed": "Impossible de charger les commentaires."
+    "commentsFailed": "Impossible de charger les commentaires.",
+    "expand": "Voir plus",
+    "collapse": "Voir moins"
   },
   "auth": {
     "welcomeBack": "Bon retour",
@@ -85,7 +93,7 @@
     "registerHere": "Inscrivez-vous ici",
     "backToMap": "← Retour à la carte sans compte",
     "joinCrew": "Rejoignez la crew",
-    "createAccountSubtitle": "Créez votre compte SkateMap",
+    "createAccountSubtitle": "Créez votre compte SpotCheck",
     "email": "E-mail",
     "registerUsernamePlaceholder": "Ex. : tonyhawk99",
     "emailPlaceholder": "vous@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "Modifier le spot",
     "deleteSpot": "Supprimer le spot",
     "deleteSpotConfirm": "Supprimer ce spot ? Sa photo, ses notes et ses commentaires seront supprimés aussi.",
-    "loadFailed": "Chargement impossible. Vérifiez votre connexion et réessayez."
+    "loadFailed": "Chargement impossible. Vérifiez votre connexion et réessayez.",
+    "activityTitle": "Activité"
   },
   "live": {
     "title": "En direct",
@@ -346,7 +355,9 @@
     "cancelSession": "Annuler",
     "cancelConfirm": "Annuler cette session ?",
     "going": "Participants : {{count}}",
-    "hostedBy": "Organisateur : {{username}}"
+    "hostedBy": "Organisateur : {{username}}",
+    "keepSession": "La garder",
+    "cancelSessionAction": "Annuler la session"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

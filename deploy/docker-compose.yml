@@ -25,7 +25,7 @@ services:
       retries: 20
 
   app:
-    build: ../skatemap
+    build: ../spotcheck
     restart: unless-stopped
     env_file: .env
     environment:

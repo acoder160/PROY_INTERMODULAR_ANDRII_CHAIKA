@@ -383,7 +383,7 @@ async function bulkImportSpots(regions: string[]): Promise<BulkImportSummary> {
 }
 
 const server = new McpServer({
-  name: 'skatemap-spot-server',
+  name: 'spotcheck-spot-server',
   version: '0.1.0',
 });
 

@@ -25,12 +25,17 @@
     "geoUnsupported": "Seu navegador não suporta geolocalização",
     "geoDenied": "Permissão de localização negada. Ative-a no navegador.",
     "geoFailed": "Não foi possível obter sua localização.",
-    "logoutConfirm": "Sair do SkateMap?",
+    "logoutConfirm": "Sair do SpotCheck?",
     "serverWaking": "Acordando o servidor. Pode levar um minuto.",
-    "loadFailed": "Não foi possível acessar o SkateMap.",
+    "loadFailed": "Não foi possível acessar o SpotCheck.",
     "retry": "Tentar de novo",
     "noMatches": "Nenhum spot corresponde aos filtros.",
-    "resetFilters": "Limpar filtros"
+    "resetFilters": "Limpar filtros",
+    "hintTitle": "Como funciona",
+    "hintSpot": "Toque em um spot para ver a foto e a nota.",
+    "hintCluster": "Um número como +12 agrupa spots próximos. Toque para aproximar.",
+    "hintLive": "Abra um spot e toque em Ao vivo para ver quem está andando lá agora.",
+    "hintDismiss": "Entendi"
   },
   "filters": {
     "title": "Filtrar spots",
@@ -45,7 +50,8 @@
     "allStars": "Todas",
     "starsOrMore": "{{n}} ⭐️ ou mais",
     "applyResults": "Ver resultados",
-    "reset": "Redefinir"
+    "reset": "Redefinir",
+    "legend": "As cores mostram o tipo de spot, as barras a dificuldade e +N agrupa spots próximos."
   },
   "popup": {
     "loading": "Carregando...",
@@ -66,7 +72,9 @@
     "averageRating": "Nota média: {{value}}/5",
     "thanks": "Obrigado pela sua avaliação! 🛹",
     "noImage": "Sem imagem",
-    "commentsFailed": "Não foi possível carregar os comentários."
+    "commentsFailed": "Não foi possível carregar os comentários.",
+    "expand": "Ver mais",
+    "collapse": "Ver menos"
   },
   "auth": {
     "welcomeBack": "Bem-vindo de volta",
@@ -85,7 +93,7 @@
     "registerHere": "Cadastre-se aqui",
     "backToMap": "← Voltar ao mapa sem conta",
     "joinCrew": "Junte-se à crew",
-    "createAccountSubtitle": "Crie sua conta no SkateMap",
+    "createAccountSubtitle": "Crie sua conta no SpotCheck",
     "email": "E-mail",
     "registerUsernamePlaceholder": "Ex.: tonyhawk99",
     "emailPlaceholder": "voce@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "Editar spot",
     "deleteSpot": "Excluir spot",
     "deleteSpotConfirm": "Excluir este spot? A foto, as avaliações e os comentários também serão apagados.",
-    "loadFailed": "Não foi possível carregar. Verifique sua conexão e tente de novo."
+    "loadFailed": "Não foi possível carregar. Verifique sua conexão e tente de novo.",
+    "activityTitle": "Atividade"
   },
   "live": {
     "title": "Ao vivo",
@@ -346,7 +355,9 @@
     "cancelSession": "Cancelar",
     "cancelConfirm": "Cancelar esta sessão?",
     "going": "Vão: {{count}}",
-    "hostedBy": "Organiza: {{username}}"
+    "hostedBy": "Organiza: {{username}}",
+    "keepSession": "Manter",
+    "cancelSessionAction": "Cancelar sessão"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

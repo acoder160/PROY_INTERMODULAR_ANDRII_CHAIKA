@@ -25,12 +25,17 @@
     "geoUnsupported": "Tarayıcınız konum özelliğini desteklemiyor",
     "geoDenied": "Konum izni reddedildi. Tarayıcıda etkinleştirin.",
     "geoFailed": "Konumunuz alınamadı.",
-    "logoutConfirm": "SkateMap’ten çıkış yapılsın mı?",
+    "logoutConfirm": "SpotCheck’ten çıkış yapılsın mı?",
     "serverWaking": "Sunucu uyandırılıyor. Bir dakika sürebilir.",
-    "loadFailed": "SkateMap'e ulaşılamıyor.",
+    "loadFailed": "SpotCheck'e ulaşılamıyor.",
     "retry": "Tekrar dene",
     "noMatches": "Bu filtrelere uyan spot yok.",
-    "resetFilters": "Filtreleri sıfırla"
+    "resetFilters": "Filtreleri sıfırla",
+    "hintTitle": "Nasıl çalışır",
+    "hintSpot": "Fotoğrafı ve puanı görmek için bir spota dokun.",
+    "hintCluster": "+12 gibi bir sayı yakındaki spotları gruplar. Yakınlaştırmak için dokun.",
+    "hintLive": "Bir spotu aç ve şu an kimin kaydığını görmek için Canlı'ya dokun.",
+    "hintDismiss": "Anladım"
   },
   "filters": {
     "title": "Spotları filtrele",
@@ -45,7 +50,8 @@
     "allStars": "Tümü",
     "starsOrMore": "{{n}} ⭐️ ve üzeri",
     "applyResults": "Sonuçları gör",
-    "reset": "Sıfırla"
+    "reset": "Sıfırla",
+    "legend": "Renkler spot türünü, çubuklar zorluğu gösterir; +N yakındaki spotları gruplar."
   },
   "popup": {
     "loading": "Yükleniyor...",
@@ -66,7 +72,9 @@
     "averageRating": "Ortalama puan: {{value}}/5",
     "thanks": "Değerlendirmeniz için teşekkürler! 🛹",
     "noImage": "Görsel yok",
-    "commentsFailed": "Yorumlar yüklenemedi."
+    "commentsFailed": "Yorumlar yüklenemedi.",
+    "expand": "Daha fazla göster",
+    "collapse": "Daha az göster"
   },
   "auth": {
     "welcomeBack": "Tekrar hoş geldiniz",
@@ -85,7 +93,7 @@
     "registerHere": "Buradan kayıt olun",
     "backToMap": "← Hesapsız haritaya dön",
     "joinCrew": "Ekibe katıl",
-    "createAccountSubtitle": "SkateMap hesabınızı oluşturun",
+    "createAccountSubtitle": "SpotCheck hesabınızı oluşturun",
     "email": "E-posta",
     "registerUsernamePlaceholder": "Örn.: tonyhawk99",
     "emailPlaceholder": "sen@eposta.com",
@@ -325,7 +333,8 @@
     "editSpot": "Spotu düzenle",
     "deleteSpot": "Spotu sil",
     "deleteSpotConfirm": "Bu spot silinsin mi? Fotoğrafı, puanları ve yorumları da silinir.",
-    "loadFailed": "Yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin."
+    "loadFailed": "Yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.",
+    "activityTitle": "Etkinlik"
   },
   "live": {
     "title": "Canlı",
@@ -346,7 +355,9 @@
     "cancelSession": "İptal et",
     "cancelConfirm": "Bu seans iptal edilsin mi?",
     "going": "Gelen: {{count}}",
-    "hostedBy": "Düzenleyen: {{username}}"
+    "hostedBy": "Düzenleyen: {{username}}",
+    "keepSession": "Kalsın",
+    "cancelSessionAction": "Seansı iptal et"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

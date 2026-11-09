@@ -25,12 +25,17 @@
     "geoUnsupported": "お使いのブラウザは位置情報に対応していません",
     "geoDenied": "位置情報の許可が拒否されました。ブラウザで有効にしてください。",
     "geoFailed": "現在地を取得できませんでした。",
-    "logoutConfirm": "SkateMapからログアウトしますか？",
+    "logoutConfirm": "SpotCheckからログアウトしますか？",
     "serverWaking": "サーバーを起動しています。1分ほどかかることがあります。",
-    "loadFailed": "SkateMapに接続できません。",
+    "loadFailed": "SpotCheckに接続できません。",
     "retry": "もう一度試す",
     "noMatches": "この条件に合うスポットはありません。",
-    "resetFilters": "フィルターをリセット"
+    "resetFilters": "フィルターをリセット",
+    "hintTitle": "使い方",
+    "hintSpot": "スポットをタップすると写真と評価が見られます。",
+    "hintCluster": "+12 のような数字は近くのスポットのまとまりです。タップで拡大します。",
+    "hintLive": "スポットを開いてライブをタップすると、今滑っている人が分かります。",
+    "hintDismiss": "了解"
   },
   "filters": {
     "title": "スポットを絞り込む",
@@ -45,7 +50,8 @@
     "allStars": "すべて",
     "starsOrMore": "{{n}} ⭐️ 以上",
     "applyResults": "結果を見る",
-    "reset": "リセット"
+    "reset": "リセット",
+    "legend": "色はスポットの種類、バーは難易度、+N は近くのスポットのまとまりを表します。"
   },
   "popup": {
     "loading": "読み込み中...",
@@ -66,7 +72,9 @@
     "averageRating": "平均評価：{{value}}/5",
     "thanks": "評価ありがとうございます！🛹",
     "noImage": "画像なし",
-    "commentsFailed": "コメントを読み込めませんでした。"
+    "commentsFailed": "コメントを読み込めませんでした。",
+    "expand": "もっと見る",
+    "collapse": "閉じる"
   },
   "auth": {
     "welcomeBack": "おかえりなさい",
@@ -85,7 +93,7 @@
     "registerHere": "こちらから登録",
     "backToMap": "← アカウントなしで地図に戻る",
     "joinCrew": "クルーに参加しよう",
-    "createAccountSubtitle": "SkateMapのアカウントを作成",
+    "createAccountSubtitle": "SpotCheckのアカウントを作成",
     "email": "メールアドレス",
     "registerUsernamePlaceholder": "例：tonyhawk99",
     "emailPlaceholder": "you@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "スポットを編集",
     "deleteSpot": "スポットを削除",
     "deleteSpotConfirm": "このスポットを削除しますか？写真、評価、コメントも削除されます。",
-    "loadFailed": "読み込めませんでした。接続を確認してもう一度お試しください。"
+    "loadFailed": "読み込めませんでした。接続を確認してもう一度お試しください。",
+    "activityTitle": "アクティビティ"
   },
   "live": {
     "title": "ライブ",
@@ -346,7 +355,9 @@
     "cancelSession": "中止",
     "cancelConfirm": "このセッションを中止しますか？",
     "going": "参加: {{count}}",
-    "hostedBy": "主催: {{username}}"
+    "hostedBy": "主催: {{username}}",
+    "keepSession": "残す",
+    "cancelSessionAction": "セッションを中止"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

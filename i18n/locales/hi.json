@@ -25,12 +25,17 @@
     "geoUnsupported": "आपका ब्राउज़र लोकेशन का समर्थन नहीं करता",
     "geoDenied": "लोकेशन की अनुमति अस्वीकृत। इसे ब्राउज़र में चालू करें।",
     "geoFailed": "आपकी लोकेशन प्राप्त नहीं हो सकी।",
-    "logoutConfirm": "SkateMap से लॉग आउट करें?",
+    "logoutConfirm": "SpotCheck से लॉग आउट करें?",
     "serverWaking": "सर्वर चालू हो रहा है। इसमें एक मिनट लग सकता है।",
-    "loadFailed": "SkateMap से कनेक्ट नहीं हो पा रहा।",
+    "loadFailed": "SpotCheck से कनेक्ट नहीं हो पा रहा।",
     "retry": "फिर कोशिश करें",
     "noMatches": "इन फ़िल्टर से कोई स्पॉट मेल नहीं खाता।",
-    "resetFilters": "फ़िल्टर रीसेट करें"
+    "resetFilters": "फ़िल्टर रीसेट करें",
+    "hintTitle": "यह कैसे काम करता है",
+    "hintSpot": "फ़ोटो और रेटिंग देखने के लिए किसी स्पॉट पर टैप करें।",
+    "hintCluster": "+12 जैसी संख्या आस-पास के स्पॉट को समूह में दिखाती है। ज़ूम करने के लिए टैप करें।",
+    "hintLive": "कोई स्पॉट खोलें और लाइव पर टैप करें, ताकि दिखे कि अभी वहाँ कौन स्केट कर रहा है।",
+    "hintDismiss": "समझ गया"
   },
   "filters": {
     "title": "स्पॉट फ़िल्टर करें",
@@ -45,7 +50,8 @@
     "allStars": "सभी",
     "starsOrMore": "{{n}} ⭐️ या अधिक",
     "applyResults": "नतीजे देखें",
-    "reset": "रीसेट करें"
+    "reset": "रीसेट करें",
+    "legend": "रंग स्पॉट का प्रकार बताते हैं, पट्टियाँ कठिनाई और +N आस-पास के स्पॉट को समूह में दिखाता है।"
   },
   "popup": {
     "loading": "लोड हो रहा है...",
@@ -66,7 +72,9 @@
     "averageRating": "औसत रेटिंग: {{value}}/5",
     "thanks": "आपकी रेटिंग के लिए धन्यवाद! 🛹",
     "noImage": "कोई छवि नहीं",
-    "commentsFailed": "टिप्पणियाँ लोड नहीं हो सकीं।"
+    "commentsFailed": "टिप्पणियाँ लोड नहीं हो सकीं।",
+    "expand": "और देखें",
+    "collapse": "कम देखें"
   },
   "auth": {
     "welcomeBack": "वापसी पर स्वागत है",
@@ -85,7 +93,7 @@
     "registerHere": "यहाँ साइन अप करें",
     "backToMap": "← बिना खाते के नक्शे पर लौटें",
     "joinCrew": "क्रू से जुड़ें",
-    "createAccountSubtitle": "अपना SkateMap खाता बनाएँ",
+    "createAccountSubtitle": "अपना SpotCheck खाता बनाएँ",
     "email": "ईमेल",
     "registerUsernamePlaceholder": "उदा.: tonyhawk99",
     "emailPlaceholder": "aap@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "स्पॉट संपादित करें",
     "deleteSpot": "स्पॉट हटाएँ",
     "deleteSpotConfirm": "यह स्पॉट हटाएँ? इसकी फ़ोटो, रेटिंग और टिप्पणियाँ भी हट जाएँगी।",
-    "loadFailed": "लोड नहीं हो सका। अपना कनेक्शन जाँचें और फिर कोशिश करें।"
+    "loadFailed": "लोड नहीं हो सका। अपना कनेक्शन जाँचें और फिर कोशिश करें।",
+    "activityTitle": "गतिविधि"
   },
   "live": {
     "title": "लाइव",
@@ -346,7 +355,9 @@
     "cancelSession": "रद्द करें",
     "cancelConfirm": "यह सेशन रद्द करें?",
     "going": "आ रहे: {{count}}",
-    "hostedBy": "होस्ट: {{username}}"
+    "hostedBy": "होस्ट: {{username}}",
+    "keepSession": "रहने दें",
+    "cancelSessionAction": "सेशन रद्द करें"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

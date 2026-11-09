@@ -1,4 +1,4 @@
-# SkateMap
+# SpotCheck
 
 [![CI](https://github.com/acoder160/PROY_INTERMODULAR_ANDRII_CHAIKA/actions/workflows/ci.yml/badge.svg)](https://github.com/acoder160/PROY_INTERMODULAR_ANDRII_CHAIKA/actions/workflows/ci.yml)
 
@@ -46,9 +46,9 @@ flowchart LR
 
 | Part | Stack |
 |---|---|
-| `skatemap/` | Java 21, Spring Boot 3.3 (Web, Security, Data JPA, Validation, Actuator), Hibernate Spatial, Flyway, bucket4j, Caffeine, JUnit 5, Testcontainers |
-| `skatemap-mobile/` | Expo SDK, expo-router, TypeScript, Leaflet in a WebView, expo-camera / location / secure-store, i18next |
-| `skatemap-web/` | React 19, Vite, react-router, react-leaflet + markercluster, axios, i18next |
+| `spotcheck/` | Java 21, Spring Boot 3.3 (Web, Security, Data JPA, Validation, Actuator), Hibernate Spatial, Flyway, bucket4j, Caffeine, JUnit 5, Testcontainers |
+| `spotcheck-mobile/` | Expo SDK, expo-router, TypeScript, Leaflet in a WebView, expo-camera / location / secure-store, i18next |
+| `spotcheck-web/` | React 19, Vite, react-router, react-leaflet + markercluster, axios, i18next |
 | `deploy/` | Docker Compose: PostGIS + API + Caddy on one VM, daily `pg_dump` backups |
 | `mcp-server/` | MCP server for seeding real spots (Google Places → Cloudinary → DB) |
 | `i18n/` | Master translations for 21 locales, checked and synced into both clients |
@@ -173,7 +173,7 @@ provider answers, each feature degrades instead of failing.
 - **Rate limits:** per user for writes and per client IP for auth (bucket4j, `429` +
   `Retry-After`). The client IP is resolved from the right-most proxy entry, so spoofed
   `X-Forwarded-For` headers can't get around the limits.
-- **Load testing:** k6 scripts (`skatemap/loadtest/`) with pass/fail thresholds:
+- **Load testing:** k6 scripts (`spotcheck/loadtest/`) with pass/fail thresholds:
   - p95 under 1.5 s for the first map load;
   - p95 under 300 ms for a 304;
   - p95 under 500 ms for comments;
@@ -217,7 +217,7 @@ The whole stack (PostGIS, API, Caddy) is defined in `deploy/`:
 cd deploy
 cp .env.example .env        # fill in the secrets; DEMO_ENABLED=true for a public demo
 docker compose up -d --build
-docker compose logs -f app  # wait for "Started SkatemapApplication"
+docker compose logs -f app  # wait for "Started SpotCheckApplication"
 ```
 
 The `app` service has a healthcheck on `/actuator/health`. See `deploy/README.md` for the
@@ -229,17 +229,17 @@ VM, DNS and TLS steps.
 
 ```bash
 # 1. Database: PostGIS in Docker
-docker run -d --name skatemap-db -p 5432:5432 \
+docker run -d --name spotcheck-db -p 5432:5432 \
   -e POSTGRES_DB=skatemap -e POSTGRES_USER=skatemap -e POSTGRES_PASSWORD=skatemap \
   postgis/postgis:17-3.5
 ```
 
 ```bash
-# 2. API: create skatemap/.env (see deploy/.env.example for every key), then
-cd skatemap && ./mvnw spring-boot:run          # http://localhost:8080
+# 2. API: create spotcheck/.env (see deploy/.env.example for every key), then
+cd spotcheck && ./mvnw spring-boot:run          # http://localhost:8080
 ```
 
-Minimum `skatemap/.env` for local work:
+Minimum `spotcheck/.env` for local work:
 
 ```properties
 SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/skatemap
@@ -260,7 +260,7 @@ OPENAI_API_KEY=
 
 ```bash
 # 3. Web: http://localhost:5173
-cd skatemap-web && npm install && VITE_DEMO_ENABLED=true npm run dev
+cd spotcheck-web && npm install && VITE_DEMO_ENABLED=true npm run dev
 ```
 
 Spots are added from the mobile app. The web's "Add spot" button explains that and links to
@@ -268,13 +268,13 @@ Spots are added from the mobile app. The web's "Add spot" button explains that a
 
 ```bash
 # 4. Mobile: Expo Go or an emulator (EXPO_PUBLIC_API_URL must point at your machine's LAN IP)
-cd skatemap-mobile && npm install && npx expo start
+cd spotcheck-mobile && npm install && npx expo start
 ```
 
 Run the tests (the integration tests need Docker running and are skipped without it):
 
 ```bash
-cd skatemap && ./mvnw verify
+cd spotcheck && ./mvnw verify
 ```
 
 Production deployment (one VM, HTTPS, backups): [`deploy/README.md`](deploy/README.md).
@@ -302,5 +302,5 @@ OpenAPI / Swagger UI is available at `/swagger-ui` when `SWAGGER_ENABLED=true`.
 
 ---
 
-_SkateMap began as my final project for the 2º DAM course (Desarrollo de Aplicaciones
+_SpotCheck began as my final project for the 2º DAM course (Desarrollo de Aplicaciones
 Multiplataforma) and keeps growing as a portfolio project._ — Andrii Chaika

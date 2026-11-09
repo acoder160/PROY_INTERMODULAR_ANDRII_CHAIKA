@@ -1,0 +1,45 @@
+/* SpotCheck "Locate Paint": mismos valores que spotcheck-mobile/constants/theme.ts (ver DESIGN.md) */
+:root {
+  --asphalt: #1C1C1C;
+  --asphalt-raised: #2A2A2A;
+  --concrete: #C9C9C4;
+  --sheet: #FFFFFF;
+  --ink: #1C1C1C;
+  --ink-muted: #4A4A46;
+  --hairline: #D7D7D2;
+  --on-asphalt-muted: #C8C8C3;
+
+  --paint-orange: #FF7A00;
+  --paint-yellow: #FFD400;
+  --paint-blue: #2F6BFF;
+  --paint-green: #18A558;
+  --paint-pink: #FF4FA3;
+
+  --danger: #C62828;
+  --danger-on-dark: #FF8A80;
+  --positive: #0F7A3E;
+  --danger-tint: #FCE8E6;
+  --positive-tint: #E2F4E8;
+  --danger-tint-dark: #3A1B1B;
+
+  --scrim: rgba(28, 28, 28, 0.6);
+  --shadow-float: 0 3px 6px rgba(0, 0, 0, 0.25);
+
+  /* Gradientes tonales mínimos (regla "Quiet Tone"): mismo color, ±6% de luz, siempre verticales */
+  --grad-topbar: linear-gradient(180deg, #262626 0%, #1C1C1C 100%);
+  --grad-auth-screen: radial-gradient(120% 80% at 50% 0%, #2A2A2A 0%, #1C1C1C 60%);
+  --grad-auth-card: linear-gradient(180deg, #2E2E2E 0%, #2A2A2A 100%);
+  --grad-pink: linear-gradient(180deg, #FF66B0 0%, #FF4FA3 100%);
+  --grad-concrete: linear-gradient(160deg, #D3D3CE 0%, #C9C9C4 100%);
+
+  --radius-chip: 10px;
+  --radius-input: 14px;
+  --radius-card: 16px;
+  --radius-control: 24px;
+  --radius-sheet: 28px;
+  --min-target: 48px;
+
+  /* Big Shoulders solo cubre latín: el resto de escrituras cae en la fuente del sistema */
+  --display: 'Big Shoulders Display', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}

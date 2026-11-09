@@ -1,4 +1,4 @@
-# SkateMap Spot MCP Server
+# SpotCheck Spot MCP Server
 
 This local MCP server exposes `import_skate_spot` and `bulk_import_spots`.
 Both tools check PostgreSQL for duplicates, download Google photos in memory,

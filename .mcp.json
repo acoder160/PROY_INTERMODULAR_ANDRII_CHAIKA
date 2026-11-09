@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "skatemap-spots": {
+    "spotcheck-spots": {
       "command": "cmd",
       "args": [
         "/c",

@@ -59,8 +59,8 @@ Check before going on: `nslookup yourname.duckdns.org` returns the VM's IP.
 sudo apt update && sudo apt -y upgrade
 sudo apt -y install docker.io docker-compose-v2 git
 sudo usermod -aG docker ubuntu && newgrp docker
-git clone https://github.com/acoder160/PROY_INTERMODULAR_ANDRII_CHAIKA.git skatemap
-cd skatemap/deploy
+git clone https://github.com/acoder160/PROY_INTERMODULAR_ANDRII_CHAIKA.git spotcheck
+cd spotcheck/deploy
 cp .env.example .env && chmod 600 .env
 nano .env        # fill in every value (see comments in the file)
 ```
@@ -85,7 +85,7 @@ Check: `docker compose exec db psql -U skatemap -c "select count(*) from spots"`
 
 ```bash
 docker compose up -d --build
-docker compose logs -f app        # wait for "Started SkatemapApplication"
+docker compose logs -f app        # wait for "Started SpotCheckApplication"
 curl -sI https://yourname.duckdns.org/api/spots | head -5
 ```
 
@@ -97,7 +97,7 @@ shows that port 80 isn't reachable or DNS doesn't point to the VM yet.
 
 - **Google Cloud Console** → the Web OAuth client:
   - Authorized redirect URIs: add `https://<API_DOMAIN>/api/auth/google/callback`.
-  - Authorized JavaScript origins: the website origin (e.g. `https://skatemap.netlify.app`).
+  - Authorized JavaScript origins: the website origin (e.g. `https://spotcheck.netlify.app`).
   - The ngrok URI can be removed once local testing is done.
 - **Website (Netlify)** → Site configuration → Environment variables:
   `VITE_API_URL=https://<API_DOMAIN>/api`, then redeploy. The site origin must be in
@@ -110,21 +110,21 @@ shows that port 80 isn't reachable or DNS doesn't point to the VM yet.
 ## 8. Backups
 
 ```bash
-chmod +x ~/skatemap/deploy/backup.sh
-~/skatemap/deploy/backup.sh          # first run by hand
+chmod +x ~/spotcheck/deploy/backup.sh
+~/spotcheck/deploy/backup.sh          # first run by hand
 crontab -e
 # add:
-15 3 * * * /home/ubuntu/skatemap/deploy/backup.sh >> /home/ubuntu/skatemap-backup.log 2>&1
+15 3 * * * /home/ubuntu/spotcheck/deploy/backup.sh >> /home/ubuntu/spotcheck-backup.log 2>&1
 ```
 
-Dumps go to `~/skatemap-backups`, 14 days are kept. They live on the same VM, so copy one
-off the machine from time to time (`scp ubuntu@<IP>:skatemap-backups/<file> .`), or upload
+Dumps go to `~/spotcheck-backups`, 14 days are kept. They live on the same VM, so copy one
+off the machine from time to time (`scp ubuntu@<IP>:spotcheck-backups/<file> .`), or upload
 them to Oracle Object Storage (20 GB free).
 
 ## Updating
 
 ```bash
-cd ~/skatemap && git pull
+cd ~/spotcheck && git pull
 cd deploy && docker compose up -d --build app
 ```
 
@@ -133,10 +133,10 @@ Flyway applies new migrations on start. Downtime is the ~20 s the new container 
 ## Load test against the server
 
 From a machine with good bandwidth (or from the VM itself to measure the server without the
-network), see `skatemap/loadtest/README.md`:
+network), see `spotcheck/loadtest/README.md`:
 
 ```bash
-k6 run -e BASE_URL=https://<API_DOMAIN> -e PROFILE=full skatemap/loadtest/browse.js
+k6 run -e BASE_URL=https://<API_DOMAIN> -e PROFILE=full spotcheck/loadtest/browse.js
 ```
 
 ## Optional: Cloudflare in front

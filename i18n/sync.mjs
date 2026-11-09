@@ -8,8 +8,8 @@ import { fileURLToPath } from 'node:url';
 const root = path.dirname(fileURLToPath(import.meta.url));
 const source = path.join(root, 'locales');
 const targets = [
-  path.join(root, '..', 'skatemap-web', 'src', 'i18n', 'locales'),
-  path.join(root, '..', 'skatemap-mobile', 'i18n', 'locales'),
+  path.join(root, '..', 'spotcheck-web', 'src', 'i18n', 'locales'),
+  path.join(root, '..', 'spotcheck-mobile', 'i18n', 'locales'),
 ];
 
 const flatten = (obj, prefix = '') =>

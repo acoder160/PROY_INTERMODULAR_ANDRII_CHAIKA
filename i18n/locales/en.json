@@ -25,12 +25,17 @@
     "geoUnsupported": "Your browser does not support geolocation",
     "geoDenied": "Location permission denied. Enable it in your browser.",
     "geoFailed": "Could not get your location.",
-    "logoutConfirm": "Log out of SkateMap?",
+    "logoutConfirm": "Log out of SpotCheck?",
     "serverWaking": "Waking up the server. This can take a minute.",
-    "loadFailed": "Can't reach SkateMap.",
+    "loadFailed": "Can't reach SpotCheck.",
     "retry": "Try again",
     "noMatches": "No spots match these filters.",
-    "resetFilters": "Reset filters"
+    "resetFilters": "Reset filters",
+    "hintTitle": "How it works",
+    "hintSpot": "Tap a spot to see its photo and rating.",
+    "hintCluster": "A number like +12 groups nearby spots. Tap it to zoom in.",
+    "hintLive": "Open a spot and tap Live to see who is skating there now.",
+    "hintDismiss": "Got it"
   },
   "filters": {
     "title": "Filter spots",
@@ -45,7 +50,8 @@
     "allStars": "All",
     "starsOrMore": "{{n}} ⭐️ or more",
     "applyResults": "View results",
-    "reset": "Reset"
+    "reset": "Reset",
+    "legend": "Colours show the spot type, bars show difficulty and +N groups nearby spots."
   },
   "popup": {
     "loading": "Loading...",
@@ -66,7 +72,9 @@
     "averageRating": "Average rating: {{value}}/5",
     "thanks": "Thanks for your rating! 🛹",
     "noImage": "No image",
-    "commentsFailed": "Couldn’t load comments."
+    "commentsFailed": "Couldn’t load comments.",
+    "expand": "Show more",
+    "collapse": "Show less"
   },
   "auth": {
     "welcomeBack": "Welcome back",
@@ -85,7 +93,7 @@
     "registerHere": "Sign up here",
     "backToMap": "← Back to the map without an account",
     "joinCrew": "Join the crew",
-    "createAccountSubtitle": "Create your SkateMap account",
+    "createAccountSubtitle": "Create your SpotCheck account",
     "email": "Email",
     "registerUsernamePlaceholder": "e.g. tonyhawk99",
     "emailPlaceholder": "you@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "Edit spot",
     "deleteSpot": "Delete spot",
     "deleteSpotConfirm": "Delete this spot? Its photo, ratings and comments go with it.",
-    "loadFailed": "Couldn’t load. Check your connection and try again."
+    "loadFailed": "Couldn’t load. Check your connection and try again.",
+    "activityTitle": "Activity"
   },
   "live": {
     "title": "Live",
@@ -346,7 +355,9 @@
     "cancelSession": "Cancel",
     "cancelConfirm": "Cancel this session?",
     "going": "Going: {{count}}",
-    "hostedBy": "Host: {{username}}"
+    "hostedBy": "Host: {{username}}",
+    "keepSession": "Keep it",
+    "cancelSessionAction": "Cancel session"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

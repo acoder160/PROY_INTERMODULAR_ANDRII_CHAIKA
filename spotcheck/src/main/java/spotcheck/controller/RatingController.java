@@ -1,0 +1,41 @@
+package spotcheck.controller;
+
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+import spotcheck.dto.RatingDto;
+import spotcheck.service.RatingService;
+
+@RestController
+@RequestMapping("/api/ratings")
+public class RatingController {
+
+    private final RatingService ratingService;
+
+    public RatingController(RatingService ratingService) {
+        this.ratingService = ratingService;
+    }
+
+    // POST: Guardar valoración
+    @PostMapping("/{spotId}")
+    public ResponseEntity<RatingDto> addRating(@PathVariable Long spotId, @Valid @RequestBody RatingDto ratingDto) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // Llamamos al método 'addRating'
+        RatingDto result = ratingService.addRating(spotId, auth.getName(), ratingDto.getValue());
+
+        return ResponseEntity.ok(result);
+    }
+
+    // GET: Verificar si ya voté
+    @GetMapping("/check/{spotId}")
+    public ResponseEntity<RatingDto> checkMyRating(@PathVariable Long spotId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        RatingDto myRating = ratingService.getUserRating(spotId, auth.getName());
+
+        return ResponseEntity.ok(myRating);
+    }
+}

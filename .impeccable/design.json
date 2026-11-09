@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "generatedAt": "2026-10-29T00:00:00Z",
-  "title": "Design System: SkateMap",
+  "title": "Design System: SpotCheck",
   "extensions": {
     "colorMeta": {
       "asphalt": { "role": "neutral", "displayName": "Asphalt", "canonical": "#1C1C1C", "tonalRamp": ["#0B0B0B", "#141414", "#1C1C1C", "#2A2A2A", "#4A4A46", "#8A8A85", "#C8C8C3", "#EDEDEA"] },

@@ -25,12 +25,17 @@
     "geoUnsupported": "Peramban Anda tidak mendukung geolokasi",
     "geoDenied": "Izin lokasi ditolak. Aktifkan di peramban.",
     "geoFailed": "Tidak dapat memperoleh lokasi Anda.",
-    "logoutConfirm": "Keluar dari SkateMap?",
+    "logoutConfirm": "Keluar dari SpotCheck?",
     "serverWaking": "Server sedang dibangunkan. Bisa memakan waktu semenit.",
-    "loadFailed": "SkateMap tidak dapat dijangkau.",
+    "loadFailed": "SpotCheck tidak dapat dijangkau.",
     "retry": "Coba lagi",
     "noMatches": "Tidak ada spot yang cocok dengan filter ini.",
-    "resetFilters": "Atur ulang filter"
+    "resetFilters": "Atur ulang filter",
+    "hintTitle": "Cara kerjanya",
+    "hintSpot": "Ketuk spot untuk melihat foto dan ratingnya.",
+    "hintCluster": "Angka seperti +12 mengelompokkan spot terdekat. Ketuk untuk memperbesar.",
+    "hintLive": "Buka spot dan ketuk Langsung untuk melihat siapa yang sedang bermain di sana.",
+    "hintDismiss": "Mengerti"
   },
   "filters": {
     "title": "Filter spot",
@@ -45,7 +50,8 @@
     "allStars": "Semua",
     "starsOrMore": "{{n}} ⭐️ atau lebih",
     "applyResults": "Lihat hasil",
-    "reset": "Atur ulang"
+    "reset": "Atur ulang",
+    "legend": "Warna menunjukkan jenis spot, batang menunjukkan tingkat kesulitan, dan +N mengelompokkan spot terdekat."
   },
   "popup": {
     "loading": "Memuat...",
@@ -66,7 +72,9 @@
     "averageRating": "Nilai rata-rata: {{value}}/5",
     "thanks": "Terima kasih atas penilaian Anda! 🛹",
     "noImage": "Tidak ada gambar",
-    "commentsFailed": "Komentar tidak dapat dimuat."
+    "commentsFailed": "Komentar tidak dapat dimuat.",
+    "expand": "Lihat lebih banyak",
+    "collapse": "Lihat lebih sedikit"
   },
   "auth": {
     "welcomeBack": "Selamat datang kembali",
@@ -85,7 +93,7 @@
     "registerHere": "Daftar di sini",
     "backToMap": "← Kembali ke peta tanpa akun",
     "joinCrew": "Gabung dengan crew",
-    "createAccountSubtitle": "Buat akun SkateMap Anda",
+    "createAccountSubtitle": "Buat akun SpotCheck Anda",
     "email": "Email",
     "registerUsernamePlaceholder": "Contoh: tonyhawk99",
     "emailPlaceholder": "anda@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "Edit spot",
     "deleteSpot": "Hapus spot",
     "deleteSpotConfirm": "Hapus spot ini? Foto, penilaian, dan komentarnya juga akan dihapus.",
-    "loadFailed": "Gagal memuat. Periksa koneksi Anda lalu coba lagi."
+    "loadFailed": "Gagal memuat. Periksa koneksi Anda lalu coba lagi.",
+    "activityTitle": "Aktivitas"
   },
   "live": {
     "title": "Langsung",
@@ -346,7 +355,9 @@
     "cancelSession": "Batalkan",
     "cancelConfirm": "Batalkan sesi ini?",
     "going": "Ikut: {{count}}",
-    "hostedBy": "Penyelenggara: {{username}}"
+    "hostedBy": "Penyelenggara: {{username}}",
+    "keepSession": "Pertahankan",
+    "cancelSessionAction": "Batalkan sesi"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

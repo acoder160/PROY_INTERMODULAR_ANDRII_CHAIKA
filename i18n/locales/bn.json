@@ -25,12 +25,17 @@
     "geoUnsupported": "আপনার ব্রাউজার লোকেশন সমর্থন করে না",
     "geoDenied": "লোকেশনের অনুমতি প্রত্যাখ্যাত। ব্রাউজারে চালু করুন।",
     "geoFailed": "আপনার অবস্থান পাওয়া যায়নি।",
-    "logoutConfirm": "SkateMap থেকে লগ আউট করবেন?",
+    "logoutConfirm": "SpotCheck থেকে লগ আউট করবেন?",
     "serverWaking": "সার্ভার চালু হচ্ছে। এতে এক মিনিট লাগতে পারে।",
-    "loadFailed": "SkateMap-এর সাথে সংযোগ করা যাচ্ছে না।",
+    "loadFailed": "SpotCheck-এর সাথে সংযোগ করা যাচ্ছে না।",
     "retry": "আবার চেষ্টা করুন",
     "noMatches": "এই ফিল্টারের সাথে কোনো স্পট মেলে না।",
-    "resetFilters": "ফিল্টার রিসেট করুন"
+    "resetFilters": "ফিল্টার রিসেট করুন",
+    "hintTitle": "কীভাবে কাজ করে",
+    "hintSpot": "ছবি ও রেটিং দেখতে একটি স্পটে ট্যাপ করুন।",
+    "hintCluster": "+12-এর মতো সংখ্যা কাছাকাছি স্পট একসাথে দেখায়। জুম করতে ট্যাপ করুন।",
+    "hintLive": "একটি স্পট খুলে লাইভে ট্যাপ করুন, এখন সেখানে কে স্কেট করছে দেখতে।",
+    "hintDismiss": "বুঝেছি"
   },
   "filters": {
     "title": "স্পট ফিল্টার করুন",
@@ -45,7 +50,8 @@
     "allStars": "সব",
     "starsOrMore": "{{n}} ⭐️ বা তার বেশি",
     "applyResults": "ফলাফল দেখুন",
-    "reset": "রিসেট করুন"
+    "reset": "রিসেট করুন",
+    "legend": "রং স্পটের ধরন, বার কঠিনতা আর +N কাছাকাছি স্পট একসাথে দেখায়।"
   },
   "popup": {
     "loading": "লোড হচ্ছে...",
@@ -66,7 +72,9 @@
     "averageRating": "গড় রেটিং: {{value}}/5",
     "thanks": "আপনার রেটিংয়ের জন্য ধন্যবাদ! 🛹",
     "noImage": "কোনো ছবি নেই",
-    "commentsFailed": "মন্তব্য লোড করা যায়নি।"
+    "commentsFailed": "মন্তব্য লোড করা যায়নি।",
+    "expand": "আরও দেখুন",
+    "collapse": "কম দেখুন"
   },
   "auth": {
     "welcomeBack": "আবার স্বাগতম",
@@ -85,7 +93,7 @@
     "registerHere": "এখানে সাইন আপ করুন",
     "backToMap": "← অ্যাকাউন্ট ছাড়া মানচিত্রে ফিরুন",
     "joinCrew": "ক্রুতে যোগ দিন",
-    "createAccountSubtitle": "আপনার SkateMap অ্যাকাউন্ট তৈরি করুন",
+    "createAccountSubtitle": "আপনার SpotCheck অ্যাকাউন্ট তৈরি করুন",
     "email": "ইমেইল",
     "registerUsernamePlaceholder": "যেমন: tonyhawk99",
     "emailPlaceholder": "apni@email.com",
@@ -325,7 +333,8 @@
     "editSpot": "স্পট সম্পাদনা",
     "deleteSpot": "স্পট মুছুন",
     "deleteSpotConfirm": "এই স্পটটি মুছবেন? এর ছবি, রেটিং ও মন্তব্যও মুছে যাবে।",
-    "loadFailed": "লোড করা যায়নি। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।"
+    "loadFailed": "লোড করা যায়নি। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।",
+    "activityTitle": "কার্যকলাপ"
   },
   "live": {
     "title": "লাইভ",
@@ -346,7 +355,9 @@
     "cancelSession": "বাতিল করুন",
     "cancelConfirm": "এই সেশন বাতিল করবেন?",
     "going": "যাচ্ছেন: {{count}}",
-    "hostedBy": "আয়োজক: {{username}}"
+    "hostedBy": "আয়োজক: {{username}}",
+    "keepSession": "রেখে দিন",
+    "cancelSessionAction": "সেশন বাতিল করুন"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"
