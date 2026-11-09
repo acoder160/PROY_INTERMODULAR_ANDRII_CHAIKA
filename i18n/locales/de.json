@@ -5,7 +5,9 @@
     "login": "Anmelden",
     "user": "Benutzer",
     "language": "Sprache",
-    "languageAuto": "Automatisch (Sprache des Telefons)"
+    "languageAuto": "Automatisch (Sprache des Telefons)",
+    "openSettings": "Einstellungen öffnen",
+    "retry": "Erneut versuchen"
   },
   "map": {
     "filters": "Filter",
@@ -22,7 +24,8 @@
     "offlineMode": "Offline-Modus (gespeicherte Karte wird angezeigt)",
     "geoUnsupported": "Dein Browser unterstützt keine Standortbestimmung",
     "geoDenied": "Standortberechtigung verweigert. Aktiviere sie im Browser.",
-    "geoFailed": "Dein Standort konnte nicht ermittelt werden."
+    "geoFailed": "Dein Standort konnte nicht ermittelt werden.",
+    "logoutConfirm": "Von SkateMap abmelden?"
   },
   "filters": {
     "title": "Spots filtern",
@@ -36,7 +39,8 @@
     "minStars": "Mindeststerne",
     "allStars": "Alle",
     "starsOrMore": "{{n}} ⭐️ oder mehr",
-    "applyResults": "Ergebnisse anzeigen"
+    "applyResults": "Ergebnisse anzeigen",
+    "reset": "Zurücksetzen"
   },
   "popup": {
     "loading": "Wird geladen...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "Beim Senden ist ein Fehler aufgetreten. Bitte prüfe deine Verbindung.",
     "averageRating": "Durchschnittliche Bewertung: {{value}}/5",
     "thanks": "Danke für deine Bewertung! 🛹",
-    "noImage": "Kein Bild"
+    "noImage": "Kein Bild",
+    "commentsFailed": "Kommentare konnten nicht geladen werden."
   },
   "auth": {
     "welcomeBack": "Willkommen zurück",
@@ -89,7 +94,12 @@
     "accountCreated": "Konto erfolgreich erstellt. Du kannst dich jetzt anmelden.",
     "loginRequiredTitle": "Anmeldung erforderlich",
     "loginRequiredAdd": "Du musst dich anmelden, um einen neuen Spot zur Karte hinzuzufügen.",
-    "loginRequiredRate": "Du musst dich anmelden, um diesen Spot zu bewerten und zu kommentieren."
+    "loginRequiredRate": "Du musst dich anmelden, um diesen Spot zu bewerten und zu kommentieren.",
+    "usernameTaken": "Dieser Benutzername ist bereits vergeben.",
+    "emailTaken": "Diese E-Mail ist bereits registriert.",
+    "emailInvalid": "Überprüfe die E-Mail-Adresse.",
+    "continueWithGoogle": "Weiter mit Google",
+    "googleFailed": "Anmeldung mit Google fehlgeschlagen. Versuch es erneut."
   },
   "admin": {
     "title": "Administrationsbereich",
@@ -109,7 +119,7 @@
     "cameraDenied": "⚠️ Kameraberechtigung verweigert",
     "waitingGps": "⚠️ Warte auf GPS...",
     "processingPhoto": "📸 Foto wird verarbeitet...",
-    "tapCircle": "📍 Tippe in den blauen Kreis, um den Ort zu setzen 👇",
+    "tapCircle": "📍 Tippe in den Kreis, um den Ort zu setzen 👇",
     "gettingLocation": "📍 Aktueller Standort wird ermittelt...",
     "gpsDenied": "⚠️ GPS-Berechtigung verweigert",
     "locationError": "⚠️ Fehler bei der Standortsuche"
@@ -144,7 +154,12 @@
     "description": "Beschreibung...",
     "type": "Typ",
     "level": "Level",
-    "save": "Spot speichern"
+    "save": "Spot speichern",
+    "nameRequired": "Gib dem Spot einen Namen.",
+    "discardTitle": "Diesen Spot verwerfen?",
+    "discardMessage": "Das aufgenommene Foto geht verloren.",
+    "discard": "Verwerfen",
+    "keepEditing": "Weiter bearbeiten"
   },
   "camera": {
     "takePhoto": "Mach ein Foto vom Spot 🛹"

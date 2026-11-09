@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { Palette, DisplayFont, Radius, MIN_TARGET } from '../constants/theme';
+import GradientFill from '../components/ui/GradientFill';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
@@ -78,13 +79,16 @@ export default function RegisterScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
+      <GradientFill name="authScreen" />
       <ScrollView 
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.card}>
+          <GradientFill name="authCard" radius={26} />
           <View style={styles.brandMark}>
+            <GradientFill name="pink" radius={14} />
             <Text style={styles.brandMarkText}>S</Text>
           </View>
           <Text style={styles.title}>{t('auth.joinCrew')}</Text>
@@ -147,6 +151,7 @@ export default function RegisterScreen() {
 
           <TouchableOpacity onPress={handleRegister} disabled={isLoading} activeOpacity={0.88}>
             <View style={styles.button}>
+              <GradientFill name="pink" radius={26} />
               {isLoading ? <ActivityIndicator color={Palette.ink} /> : <Text style={styles.buttonText}>{t('auth.createAccount')}</Text>}
             </View>
           </TouchableOpacity>

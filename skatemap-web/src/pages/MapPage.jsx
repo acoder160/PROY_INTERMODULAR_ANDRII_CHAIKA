@@ -10,7 +10,15 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
-import '../MapChrome.css'; 
+import FilterSheet from '../components/FilterSheet';
+import SpotDetailsSheet from '../components/SpotDetailsSheet';
+import { TypeChip, DifficultyMarks, StarRating } from '../components/PaintBits';
+import { OptionsIcon, PersonIcon, LogoutIcon, RefreshIcon, LocateIcon, ShieldIcon, CameraIcon } from '../components/Icons';
+import { DEFAULT_FILTERS, cleanLabel, directionsUrl, haversineKm } from '../utils/paint';
+import '../MapChrome.css';
+
+const ASPHALT = '#1C1C1C';
+const PINK = '#FF4FA3';
 
 const cartoApiKey = import.meta.env.VITE_CARTO_API_KEY?.trim();
 // Здесь мы применяем стиль "voyager", сохраняя передачу твоего ключа
@@ -34,8 +42,11 @@ const getSpotIcon = (type) => {
         case 'LEDGE':  iconPath = '/icons/icon_ledge.png'; break;
     }
     
-    spotIconCache[type] = L.icon({
-        iconUrl: iconPath,
+    // Los PNG no son cuadrados: la imagen se encaja sin deformar (object-fit en .spot-icon-img),
+    // igual que en la app móvil. El div exterior lo coloca Leaflet; la imagen puede escalarse al seleccionar.
+    spotIconCache[type] = L.divIcon({
+        className: 'spot-icon',
+        html: `<img class="spot-icon-img" src="${iconPath}" alt="" />`,
         iconSize: [45, 45],
         iconAnchor: [22, 45],
         popupAnchor: [0, -40]
@@ -74,7 +85,12 @@ const createSpotMarker = (spot, offset, icon) => {
         spotId: spot.id,
         spotType: spot.spotType,
     });
-    marker.bindPopup(() => getPopupContainer(marker));
+    marker.bindPopup(() => getPopupContainer(marker), {
+        maxWidth: 260,
+        minWidth: 240,
+        autoPanPaddingTopLeft: L.point(16, 96),
+        autoPanPaddingBottomRight: L.point(16, 120),
+    });
     return marker;
 };
 
@@ -100,8 +116,11 @@ const forEachSpotCopyInBounds = (spots, bounds, callback) => {
 // (grupo de clusters) y Leaflet.markercluster solo pinta lo que cabe en pantalla.
 //  - Pocos spots a la vista (< 150): iconos sueltos, nunca burbujas.
 //  - Muchos spots y zoom bajo: burbujas "+N" / "+1". Con zoom >= 15: siempre iconos.
-function DynamicSpotLayer({ spots, onUpdate }) {
+function DynamicSpotLayer({ spots, onOpenDetails, myPosition }) {
     const map = useMap();
+    const positionRef = useRef(myPosition);
+    const selectedRef = useRef(null);   // marcador con el popup abierto
+    const routeRef = useRef([]);        // [contorno de tinta, puntos rosas]
     const clusterRef = useRef(null);
     const looseRef = useRef(null);
     const clusterMarkersRef = useRef([]);
@@ -113,6 +132,30 @@ function DynamicSpotLayer({ spots, onUpdate }) {
     const [openPopup, setOpenPopup] = useState(null); // { spotId, container, popup }
 
     const spotsById = useMemo(() => new Map(spots.map((spot) => [spot.id, spot])), [spots]);
+
+    // Ruta pintada (firma visual): puntos rosas redondos sobre una línea de tinta, del usuario al spot
+    const clearRoute = useCallback(() => {
+        routeRef.current.forEach((line) => map.removeLayer(line));
+        routeRef.current = [];
+    }, [map]);
+
+    const drawRoute = useCallback(() => {
+        clearRoute();
+        const from = positionRef.current;
+        const marker = selectedRef.current;
+        if (!from || !marker) return;
+        const points = [from, marker.getLatLng()];
+        const style = { dashArray: '2 12', lineCap: 'round', lineJoin: 'round', interactive: false };
+        routeRef.current = [
+            L.polyline(points, { ...style, color: ASPHALT, weight: 9 }).addTo(map),
+            L.polyline(points, { ...style, color: PINK, weight: 6 }).addTo(map),
+        ];
+    }, [map, clearRoute]);
+
+    useEffect(() => {
+        positionRef.current = myPosition;
+        if (selectedRef.current) drawRoute();
+    }, [myPosition, drawRoute]);
 
     // Evalúa qué modo toca según los spots visibles y el zoom
     const evaluateMode = useCallback(() => {
@@ -213,9 +256,17 @@ function DynamicSpotLayer({ spots, onUpdate }) {
         const onPopupOpen = (e) => {
             const marker = e.propagatedFrom;
             const container = popupContainers.get(marker);
+            selectedRef.current = marker;
+            marker.getElement()?.classList.add('is-selected');
+            drawRoute();
             if (container) setOpenPopup({ spotId: marker.options.spotId, container, popup: e.popup });
         };
-        const onPopupClose = () => setOpenPopup(null);
+        const onPopupClose = (e) => {
+            e.propagatedFrom?.getElement()?.classList.remove('is-selected');
+            if (selectedRef.current === e.propagatedFrom) selectedRef.current = null;
+            clearRoute();
+            setOpenPopup(null);
+        };
         [cluster, loose].forEach((layer) => {
             layer.on('popupopen', onPopupOpen);
             layer.on('popupclose', onPopupClose);
@@ -244,8 +295,10 @@ function DynamicSpotLayer({ spots, onUpdate }) {
             map.removeLayer(loose);
             clusterRef.current = null;
             looseRef.current = null;
+            selectedRef.current = null;
+            clearRoute();
         };
-    }, [map, evaluateMode]);
+    }, [map, evaluateMode, drawRoute, clearRoute]);
 
     // 2. Crear los marcadores solo cuando cambia el conjunto de spots (no al mover el mapa)
     useEffect(() => {
@@ -299,189 +352,47 @@ function DynamicSpotLayer({ spots, onUpdate }) {
 
     const currentSpot = openPopup ? spotsById.get(openPopup.spotId) : null;
     return currentSpot
-        ? createPortal(<SpotPopup spot={currentSpot} onUpdate={onUpdate} />, openPopup.container)
+        ? createPortal(<SpotPopup spot={currentSpot} onOpenDetails={onOpenDetails} />, openPopup.container)
         : null;
 }
 
-// COMPONENTE POPUP 
-function SpotPopup({ spot, onUpdate }) {
+// POPUP DEL SPOT: misma tarjeta que el popup de la app móvil (skatemap-mobile/components/skatemap.tsx)
+function SpotPopup({ spot, onOpenDetails }) {
     const { t } = useTranslation();
-    const { user } = useAuth();
-    const navigate = useNavigate();
-    const [myRating, setMyRating] = useState(0);        
-    const [hasVoted, setHasVoted] = useState(false);     
-    const [hoverRating, setHoverRating] = useState(0);   
-    const [currentRating, setCurrentRating] = useState(0); 
-    const [comments, setComments] = useState([]);
-    const [showComments, setShowComments] = useState(false);
-    const [newComment, setNewComment] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [loadingData, setLoadingData] = useState(true);
-
-    const imageUrl = spot.mediaUrl ? spot.mediaUrl : 'https://skateism.com/wp-content/uploads/2019/02/placeholder-skate.jpg';
-
-    useEffect(() => {
-        const loadSpotDetails = async () => {
-            try {
-                try {
-                    const ratingRes = await api.get(`/ratings/check/${spot.id}`);
-                    if (ratingRes.data && ratingRes.data.value > 0) {
-                        setMyRating(ratingRes.data.value);
-                        setHasVoted(true);
-                    }
-                } catch (e) { }
-
-                try {
-                    const commentsRes = await api.get(`/comments/spot/${spot.id}`);
-                    setComments(commentsRes.data);
-                } catch (e) { }
-
-            } finally {
-                setLoadingData(false);
-            }
-        };
-        loadSpotDetails();
-    }, [spot.id]);
-
-    const handleSendReview = async () => {
-        if (!user) {
-            navigate('/login');
-            return;
-        }
-
-        setIsSubmitting(true); 
-        try {
-            await api.post(`/ratings/${spot.id}`, { value: currentRating });
-            if (newComment.trim().length > 0) {
-                await api.post(`/comments/${spot.id}`, { content: newComment });
-            }
-            setHasVoted(true);
-            setMyRating(currentRating);
-            const updatedComments = await api.get(`/comments/spot/${spot.id}`);
-            setComments(updatedComments.data);
-            setShowComments(true); 
-            if (onUpdate) onUpdate(); 
-        } catch (error) {
-            const errorMsg = error.response?.data?.message || error.response?.data;
-            alert(typeof errorMsg === 'string' ? errorMsg : t('popup.sendError'));
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    if (loadingData) return <div style={{padding:'10px'}}>{t('popup.loading')}</div>;
+    const [imageFailed, setImageFailed] = useState(false);
+    const spotType = (spot.spotType || spot.type || 'STREET').toUpperCase();
+    const difficulty = (spot.difficultyLevel || 'INTERMEDIATE').toUpperCase();
+    const rating = spot.surfaceRating || 0;
 
     return (
-        <div style={{ width: '260px', fontFamily: 'Segoe UI, sans-serif' }}>
-            
-            {/* IMAGEN DEL SPOT */}
-            <img 
-              src={imageUrl} 
-              alt={spot.name} 
-              style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px 8px 0 0', marginBottom: '10px' }}
-              onError={(e) => { e.target.src = `https://via.placeholder.com/400x200?text=${encodeURIComponent(t('popup.noImage'))}` }}
-            />
-
-            {/* INFO HEADER */}
-            <div style={{ textAlign: 'center', marginBottom: '10px', padding: '0 10px' }}>
-                <h3 style={{ margin: '0 0 5px 0', color: '#333', fontSize: '18px' }}>{spot.name}</h3>
-                <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#666' }}>{spot.description}</p>
-                
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                    <span style={{ background: '#f0f2f5', color: '#555', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #ddd' }}>
-                        {t(`types.${spot.spotType}`, { defaultValue: spot.spotType })}
-                    </span>
-                    <span style={{ background: '#e3f2fd', color: '#0984e3', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #74b9ff' }}>
-                        {t(`difficulty.${spot.difficultyLevel}`, { defaultValue: spot.difficultyLevel })}
-                    </span>
-                    <span style={{ background: '#fff9c4', color: '#fbc531', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', border: '1px solid #f9ca24' }}>
-                        ⭐ {spot.surfaceRating ? spot.surfaceRating.toFixed(1) : '-'}
-                    </span>
-                </div>
-            </div>
-
-            <hr style={{ border: '0', borderTop: '1px solid #eee', margin: '10px 0' }} />
-
-            {/* ESTRELLAS */}
-            <div style={{ textAlign: 'center', marginBottom: '10px', padding: '0 10px' }}>
-                {hasVoted ? (
-                    <div>
-                        <p style={{ margin: '0 0 2px 0', fontSize: '12px', fontWeight: 'bold', color: '#2ed573' }}>✅ {t('popup.yourVote')}</p>
-                        <div style={{ fontSize: '26px', color: '#f1c40f', lineHeight: 1 }}>{'★'.repeat(myRating)}{'☆'.repeat(5 - myRating)}</div>
-                    </div>
-                ) : (
-                    <div>
-                        <p style={{ margin: '0 0 2px 0', fontSize: '12px', fontWeight: 'bold', color: '#888' }}>{t('popup.rateSpot')}</p>
-                        <div style={{ fontSize: '26px', cursor: 'pointer', lineHeight: 1 }}>
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <span key={star} onMouseEnter={() => setHoverRating(star)} onMouseLeave={() => setHoverRating(0)} onClick={() => user ? setCurrentRating(star) : navigate('/login')} style={{ color: star <= (hoverRating || currentRating) ? '#f1c40f' : '#e0e0e0', transition: 'color 0.2s' }}>★</span>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* FORMULARIO */}
-            {!hasVoted && currentRating > 0 && (
-                <div style={{ animation: 'fadeIn 0.3s', padding: '0 10px' }}>
-                    <textarea
-                        placeholder={t('popup.opinionPlaceholder')}
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        style={{ width: '100%', height: '60px', padding: '10px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '13px', resize: 'none', marginBottom: '8px', background: '#ffffff', color: '#333333', boxSizing: 'border-box' }}
-                    />
-                    <button
-                        onClick={handleSendReview}
-                        disabled={isSubmitting}
-                        className="map-popup-primary"
-                    >
-                        {isSubmitting ? t('popup.sending') : t('popup.sendReview')}
-                    </button>
-                    {!user && (
-                        <p style={{ margin: '8px 0 0', fontSize: '11px', color: '#666', textAlign: 'center' }}>
-                            {t('popup.loginToReview')}
-                        </p>
-                    )}
+        <div className="popup-card">
+            {spot.mediaUrl && !imageFailed ? (
+                <img src={spot.mediaUrl} className="popup-image" alt="" onError={() => setImageFailed(true)} />
+            ) : (
+                <div className="popup-image popup-image-empty" role="img" aria-label={t('popup.noImage')}>
+                    <CameraIcon size={32} />
                 </div>
             )}
-
-            <div style={{ padding: '0 10px', marginTop: '10px' }}>
-                <button
-                    onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${spot.latitude},${spot.longitude}`, '_blank')}
-                    className="map-popup-nav"
-                >
-                    <span style={{ fontSize: '16px' }}>🗺️</span> {t('popup.directions')}
-                </button>
+            <div className="popup-info">
+                <h3 className="popup-title">{spot.name || t('webview.unnamed')}</h3>
+                <div className="popup-facts">
+                    <TypeChip type={spotType} label={t(`types.${spotType}`, { defaultValue: spotType })} />
+                    <DifficultyMarks level={difficulty} label={t(`difficulty.${difficulty}`, { defaultValue: difficulty })} />
+                </div>
+                <div className="popup-rating">
+                    <StarRating value={Math.round(rating)} size={16} label={(n) => `${n} / 5`} />
+                    <span className="popup-rating-num">{rating.toFixed(1)}</span>
+                </div>
+                <p className="popup-desc">{spot.description || t('webview.noDescription')}</p>
+                <div className="btn-container">
+                    <button type="button" className="details-btn" onClick={() => onOpenDetails(spot.id)}>
+                        {cleanLabel(t('webview.rate'))}
+                    </button>
+                    <a className="directions-btn" href={directionsUrl(spot)} target="_blank" rel="noopener noreferrer">
+                        {cleanLabel(t('webview.route'))}
+                    </a>
+                </div>
             </div>
-
-            {/* COMENTARIOS */}
-            <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #eee', padding: '0 10px 10px 10px' }}>
-                <button 
-                    onClick={() => setShowComments(!showComments)}
-                    className="map-popup-link"
-                >
-                    {showComments ? `${t('popup.hideComments')} ▲` : `${t('popup.comments', { count: comments.length })} ▼`}
-                </button>
-
-                {showComments && (
-                    <div style={{ marginTop: '10px', maxHeight: '150px', overflowY: 'auto', paddingRight: '5px' }}>
-                        {comments.length === 0 ? (
-                            <p style={{ fontSize: '12px', color: '#999', fontStyle: 'italic', textAlign: 'center' }}>{t('popup.firstComment')}</p>
-                        ) : (
-                            comments.map((c, i) => (
-                                <div key={i} style={{ background: '#f8f9fa', padding: '10px', borderRadius: '8px', marginBottom: '8px', border: '1px solid #eee' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                        <strong style={{ color: '#333', fontSize: '12px' }}>{c.username}</strong>
-                                        {c.rating > 0 && <span style={{ color: '#f1c40f', fontSize: '10px' }}>{'★'.repeat(c.rating)}</span>}
-                                    </div>
-                                    <p style={{ margin: 0, color: '#555', fontSize: '12px', lineHeight: '1.4' }}>{c.content}</p>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                )}
-            </div>
-            <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         </div>
     );
 }
@@ -561,6 +472,7 @@ function UserLocation({ position }) {
     const circleRef = useRef(null);
     const timerRef = useRef(null);
     const positionRef = useRef(null);
+    const controlsRef = useRef(null);
 
     useEffect(() => {
         const hideRadius = () => {
@@ -577,9 +489,9 @@ function UserLocation({ position }) {
                 if (!pos || circleRef.current) return;
                 const radius = Math.min(Math.max(pos.accuracy || 100, 40), 500);
                 circleRef.current = L.circle(pos, {
-                    color: '#3FA9F5',
-                    fillColor: '#3FA9F5',
-                    fillOpacity: 0.12,
+                    color: ASPHALT,
+                    fillColor: ASPHALT,
+                    fillOpacity: 0.06,
                     weight: 1.5,
                     dashArray: '4 6',
                     radius,
@@ -591,7 +503,7 @@ function UserLocation({ position }) {
 
         map.on('zoomstart', hideRadius);
         map.on('zoomend', showRadius);
-        map._userLocationControls = { hideRadius, showRadius };
+        controlsRef.current = { hideRadius, showRadius };
 
         return () => {
             map.off('zoomstart', hideRadius);
@@ -612,30 +524,31 @@ function UserLocation({ position }) {
         } else {
             markerRef.current = L.marker(position, { icon: userDotIcon, zIndexOffset: 1000, interactive: false }).addTo(map);
         }
-        map._userLocationControls?.hideRadius();
-        map._userLocationControls?.showRadius();
+        controlsRef.current?.hideRadius();
+        controlsRef.current?.showRadius();
     }, [map, position]);
 
     return null;
 }
 
-// BOTÓN GEOLOCALIZACIÓN
+// BOTÓN GEOLOCALIZACIÓN (abajo a la derecha) + aviso de estado
 function LocationButton({ setMyPosition }) {
     const { t } = useTranslation();
     const map = useMap();
     const buttonRef = useRef(null);
+    const timerRef = useRef(null);
     const [message, setMessage] = useState(null);
 
     // Evita que los clics/arrastres sobre el botón lleguen al mapa
     useEffect(() => {
-        if (buttonRef.current) {
-            L.DomEvent.disableClickPropagation(buttonRef.current);
-        }
+        if (buttonRef.current) L.DomEvent.disableClickPropagation(buttonRef.current);
+        return () => clearTimeout(timerRef.current);
     }, []);
 
     const showMessage = (text) => {
+        clearTimeout(timerRef.current);
         setMessage(text);
-        setTimeout(() => setMessage(null), 4000);
+        timerRef.current = setTimeout(() => setMessage(null), 4000);
     };
 
     const goToMyLocation = () => {
@@ -643,7 +556,8 @@ function LocationButton({ setMyPosition }) {
             showMessage(t('map.geoUnsupported'));
             return;
         }
-        setMessage(t('status.gettingLocation'));
+        clearTimeout(timerRef.current);
+        setMessage(cleanLabel(t('status.gettingLocation')));
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
@@ -665,9 +579,7 @@ function LocationButton({ setMyPosition }) {
             },
             (err) => {
                 console.error('Error de geolocalización:', err);
-                showMessage(err.code === 1
-                    ? t('map.geoDenied')
-                    : t('map.geoFailed'));
+                showMessage(err.code === 1 ? t('map.geoDenied') : t('map.geoFailed'));
             },
             { enableHighAccuracy: false, timeout: 10000, maximumAge: 5 * 60 * 1000 }
         );
@@ -675,202 +587,167 @@ function LocationButton({ setMyPosition }) {
 
     return (
         <>
-            {message && <div className="map-toast">{message}</div>}
-            <button ref={buttonRef} onClick={goToMyLocation} className="map-location-btn" title={t('map.myLocation')} aria-label={t('map.centerOnMe')}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <circle cx="12" cy="12" r="7" />
-                    <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
-                    <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-                </svg>
+            <div className="map-toast-slot" aria-live="polite">
+                {message && <div className="map-toast">{message}</div>}
+            </div>
+            <button
+                ref={buttonRef}
+                type="button"
+                onClick={goToMyLocation}
+                className="map-fab map-fab-right"
+                title={t('map.myLocation')}
+                aria-label={t('map.centerOnMe')}
+            >
+                <LocateIcon size={26} />
             </button>
         </>
     );
 }
 
 export default function MapPage() {
-  const { t } = useTranslation();
-  const [spots, setSpots] = useState([]);
-  const [myPosition, setMyPosition] = useState(null);
-  
-  // Estados de Filtros
-  const [showFilterMenu, setShowFilterMenu] = useState(false);
-  const [filters, setFilters] = useState({ spotType: 'ALL', minRating: 0, maxDistance: 0 });
+    const { t } = useTranslation();
+    const [spots, setSpots] = useState([]);
+    const [myPosition, setMyPosition] = useState(null);
+    const [showFilters, setShowFilters] = useState(false);
+    const [filters, setFilters] = useState(DEFAULT_FILTERS);
+    const [selectedSpotId, setSelectedSpotId] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
 
-  const { logout, user } = useAuth();
-  const navigate = useNavigate(); 
-  const initialCenter = [41.3874, 2.1686]; // Barcelona 
+    const { logout, user } = useAuth();
+    const navigate = useNavigate();
+    const initialCenter = [41.3874, 2.1686]; // Barcelona
+    const username = user?.username;
+    const isAdmin = username === 'a';
 
-  const [refreshing, setRefreshing] = useState(false);
+    const fetchSpots = useCallback(async () => {
+        try {
+            const response = await api.get('/spots');
+            setSpots(response.data);
+        } catch (error) {
+            console.error('Error cargando spots:', error);
+        }
+    }, []);
 
-  useEffect(() => { fetchSpots(); }, []);
+    useEffect(() => {
+        let cancelled = false;
+        api.get('/spots')
+            .then((response) => { if (!cancelled) setSpots(response.data); })
+            .catch((error) => console.error('Error cargando spots:', error));
+        return () => { cancelled = true; };
+    }, []);
 
-  const handleRefresh = async () => {
-    if (refreshing) return;
-    setRefreshing(true);
-    await fetchSpots();
-    setRefreshing(false);
-  };
-  
-  const fetchSpots = useCallback(async () => { 
-    try { 
-      const response = await api.get('/spots'); 
-      setSpots(response.data); 
-    } catch (error) { 
-      console.error("Error cargando spots:", error); 
-    } 
-  }, []);
+    const handleRefresh = async () => {
+        if (refreshing) return;
+        setRefreshing(true);
+        await fetchSpots();
+        setRefreshing(false);
+    };
 
-  // LÓGICA DE FILTRADO (Haversine Formula)
-  const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; 
-    const dLat = (lat2 - lat1) * (Math.PI / 180);
-    const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  };
+    const confirmLogout = () => {
+        if (window.confirm(`${t('map.logoutConfirm')}\n${username ?? ''}`)) logout();
+    };
 
-  const filteredSpots = useMemo(() => spots.filter(spot => {
-    if (filters.spotType !== 'ALL' && spot.spotType !== filters.spotType) return false;
-    if (filters.minRating > 0 && (spot.surfaceRating || 0) < filters.minRating) return false;
-    if (filters.maxDistance > 0 && myPosition) {
-      const distance = getDistanceFromLatLonInKm(myPosition.lat, myPosition.lng, spot.latitude, spot.longitude);
-      if (distance > filters.maxDistance) return false;
-    }
-    return true;
-  }), [spots, filters, myPosition]);
+    const activeFilterCount = (filters.spotType !== 'ALL' ? 1 : 0) + (filters.minRating > 0 ? 1 : 0) + (filters.maxDistance > 0 ? 1 : 0);
 
-  return (
-    <div style={{ height: '100vh', width: '100vw', position: 'relative', margin: 0, padding: 0, overflow: 'hidden' }}>
-      
-      {/* ESTILOS GLOBALES */}
-      <style>{`
-        .leaflet-popup-content-wrapper { padding: 0 !important; overflow: hidden; border-radius: 12px !important; }
-        .leaflet-popup-content { margin: 0 !important; width: 260px !important; }
-        .leaflet-popup-tip-container { margin-top: -1px; }
-      `}</style>
+    const filteredSpots = useMemo(() => spots.filter((spot) => {
+        if (filters.spotType !== 'ALL' && spot.spotType !== filters.spotType) return false;
+        if (filters.minRating > 0 && (spot.surfaceRating || 0) < filters.minRating) return false;
+        if (filters.maxDistance > 0 && myPosition) {
+            const distance = haversineKm(myPosition.lat, myPosition.lng, spot.latitude, spot.longitude);
+            if (distance > filters.maxDistance) return false;
+        }
+        return true;
+    }), [spots, filters, myPosition]);
 
-      {/* BOTÓN DE FILTROS (Arriba Izquierda) */}
-      <button
-        onClick={() => setShowFilterMenu(!showFilterMenu)}
-        className="map-chrome-btn"
-      >
-        ⚙️ {filters.spotType !== 'ALL' || filters.minRating > 0 || filters.maxDistance > 0 ? t('map.filtersActive') : t('map.filters')}
-      </button>
+    const selectedSpot = selectedSpotId === null ? null : spots.find((s) => s.id === selectedSpotId) ?? null;
+    const closeDetails = useCallback(() => setSelectedSpotId(null), []);
+    const closeFilters = useCallback(() => setShowFilters(false), []);
 
-      {/* MENÚ DESPLEGABLE DE FILTROS */}
-      {showFilterMenu && (
-        <div className="map-filter-panel">
-          <div className="map-filter-header">
-            <h3>⚙️ {t('filters.title')}</h3>
-            <button onClick={() => setShowFilterMenu(false)} className="map-filter-close">✕</button>
-          </div>
-
-          <div className="map-filter-section">
-            <strong>{t('filters.spotType')}</strong>
-            <div className="map-filter-pills">
-              {['ALL', 'STREET', 'PARK', 'RAMPS', 'RAIL', 'LEDGE'].map(type => (
-                <span
-                  key={type}
-                  onClick={() => setFilters({...filters, spotType: type})}
-                  className={`map-filter-pill${filters.spotType === type ? ' active' : ''}`}
+    return (
+        <div className="map-page">
+            {/* Barra superior asfalto: filtros (izquierda) y cuenta (derecha), igual que la app móvil */}
+            <header className="map-topbar">
+                <button
+                    type="button"
+                    onClick={() => setShowFilters(true)}
+                    className="bar-pill"
+                    aria-label={activeFilterCount > 0 ? `${t('map.filtersActive')}: ${activeFilterCount}` : t('map.filters')}
                 >
-                  {type === 'ALL' ? t('filters.all') : t(`types.${type}`)}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="map-filter-section">
-            <strong>{t('filters.maxDistanceGps')}</strong>
-            <div className="map-filter-pills">
-              {[{l: t('filters.anyDistance'), v: 0}, ...[1, 5, 10].map(km => ({l: t('filters.under', { km }), v: km}))].map(d => (
-                <span
-                  key={d.v}
-                  onClick={() => { if(myPosition || d.v === 0) setFilters({...filters, maxDistance: d.v}) }}
-                  className={`map-filter-pill${filters.maxDistance === d.v ? ' active' : ''}${(!myPosition && d.v > 0) ? ' disabled' : ''}`}
-                >
-                  {d.l}
-                </span>
-              ))}
-            </div>
-            {!myPosition && <small className="map-filter-hint">{t('filters.gpsHint')}</small>}
-          </div>
-
-          <div className="map-filter-section">
-            <strong>{t('filters.minStars')}</strong>
-            <div className="map-filter-pills">
-              {[0, 1, 2, 3, 4, 5].map(r => (
-                <span
-                  key={r}
-                  onClick={() => setFilters({...filters, minRating: r})}
-                  className={`map-filter-pill${filters.minRating === r ? ' active' : ''}`}
-                >
-                  {r === 0 ? t('filters.allStars') : `${r} ★`}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* HEADER DE USUARIO Y BOTÓN ADMIN */}
-      <div className="map-chrome-chip">
-        {user ? (
-          <>
-            <span className="map-chip-user">👤 {user.username || user}</span>
-            {(user.username === 'a' || user === 'a') && (
-              <>
-                <div className="map-chip-divider"></div>
-                <button onClick={() => navigate('/admin')} className="map-chip-admin">
-                  🛡️ {t('map.admin')}
+                    <OptionsIcon size={20} />
+                    <span className="bar-pill-text">{t('map.filters')}</span>
+                    {activeFilterCount > 0 && <span className="count-badge" aria-hidden="true">{activeFilterCount}</span>}
                 </button>
-              </>
+
+                <div className="bar-right">
+                    {isAdmin && (
+                        <button type="button" onClick={() => navigate('/admin')} className="bar-pill" aria-label={t('map.admin')}>
+                            <ShieldIcon size={18} />
+                            <span className="bar-pill-text bar-hide-narrow">{t('map.admin')}</span>
+                        </button>
+                    )}
+                    <LanguageSwitcher />
+                    {user ? (
+                        <button type="button" onClick={confirmLogout} className="bar-pill bar-pill-account" aria-label={`${username}. ${t('map.logout')}`}>
+                            <PersonIcon size={18} />
+                            <span className="bar-pill-text">{username}</span>
+                            <LogoutIcon size={20} />
+                        </button>
+                    ) : (
+                        <button type="button" onClick={() => navigate('/login')} className="bar-pill bar-pill-account">
+                            <PersonIcon size={18} />
+                            <span className="bar-pill-text">{t('map.enter')}</span>
+                        </button>
+                    )}
+                </div>
+            </header>
+
+            {/* Recargar (abajo a la izquierda) */}
+            <button
+                type="button"
+                onClick={handleRefresh}
+                className={`map-fab map-fab-left${refreshing ? ' is-spinning' : ''}`}
+                title={t('map.reloadSpots')}
+                aria-label={t('map.reloadSpots')}
+                aria-busy={refreshing}
+            >
+                <RefreshIcon size={26} />
+            </button>
+
+            <MapContainer
+                center={initialCenter}
+                zoom={14}
+                className="map-canvas"
+                zoomControl={false}
+                maxBounds={[[-85.0511, -Infinity], [85.0511, Infinity]]}
+                maxBoundsViscosity={1.0}
+                worldCopyJump
+            >
+                <ZoomLimit />
+                <PrerenderedTiles />
+                <LocationButton setMyPosition={setMyPosition} />
+                <DynamicSpotLayer spots={filteredSpots} onOpenDetails={setSelectedSpotId} myPosition={myPosition} />
+                <UserLocation position={myPosition} />
+            </MapContainer>
+
+            <FilterSheet
+                open={showFilters}
+                onClose={closeFilters}
+                filters={filters}
+                setFilters={setFilters}
+                resultCount={filteredSpots.length}
+                hasLocation={!!myPosition}
+            />
+
+            {selectedSpot && (
+                <SpotDetailsSheet
+                    key={selectedSpot.id}
+                    spot={selectedSpot}
+                    userLocation={myPosition}
+                    onClose={closeDetails}
+                    onSpotUpdated={fetchSpots}
+                />
             )}
-            <div className="map-chip-divider"></div>
-            <button onClick={logout} className="map-chip-logout">{t('map.logout')}</button>
-          </>
-        ) : (
-          <>
-            <button onClick={() => navigate('/login')} className="map-chip-ghost">{t('map.enter')}</button>
-            <button onClick={() => navigate('/register')} className="map-chip-primary">{t('map.register')}</button>
-          </>
-        )}
-        <div className="map-chip-divider"></div>
-        <LanguageSwitcher />
-      </div>
-
-      {/* BOTÓN RECARGAR SPOTS (Abajo Izquierda) */}
-      <button
-        onClick={handleRefresh}
-        className={`map-refresh-btn${refreshing ? ' spinning' : ''}`}
-        title={t('map.reloadSpots')}
-        aria-label={t('map.reloadSpots')}
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 12a8 8 0 1 1-2.6-5.9" />
-          <path d="M20 4v5h-5" />
-        </svg>
-      </button>
-
-      <MapContainer
-        center={initialCenter}
-        zoom={14}
-        style={{ height: '100%', width: '100%' }}
-        zoomControl={false}
-        maxBounds={[[-85.0511, -Infinity], [85.0511, Infinity]]}
-        maxBoundsViscosity={1.0}
-        worldCopyJump
-      >
-        <ZoomLimit />
-        <PrerenderedTiles />
-        
-        <LocationButton setMyPosition={setMyPosition} />
-        
-        <DynamicSpotLayer spots={filteredSpots} onUpdate={fetchSpots} />
-        
-        <UserLocation position={myPosition} />
-      </MapContainer>
-    </div>
-  );
+        </div>
+    );
 }
+

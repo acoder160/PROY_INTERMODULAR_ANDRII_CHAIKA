@@ -99,7 +99,7 @@ components:
 
 The app is the pavement. Spots are marked the way crews mark the street, in flat utility locate paint, and the route to a spot is a dashed painted line on the ground. The shell is asphalt-black, the map ground is concrete grey, sheets are white, and type is stencil-cut condensed caps. The result reads as marked-up street rather than a map-app skin.
 
-Everything is flat. Fields are solid colour with 2px outlines in white (on asphalt) or ink (on light). Colour is information: each of five paints is one spot type, and pink alone also owns the primary action and the route. Difficulty is never carried by hue; it is text plus one to three slanted marks.
+Everything is nearly flat. Fields are solid colour (a few large surfaces carry a barely-there tonal gradient, see Quiet Tone) with 2px outlines in white (on asphalt) or ink (on light). Colour is information: each of five paints is one spot type, and pink alone also owns the primary action and the route. Difficulty is never carried by hue; it is text plus one to three slanted marks.
 
 Recognisable with content removed: a black top bar, flat paint dots with dark rings, and a dashed pink line.
 
@@ -163,14 +163,15 @@ Full-bleed map beneath everything. A black top bar pinned to the top holds the F
 
 ## Elevation & Depth
 
-Flat by default: depth comes from 2px outlines and colour contrast, not tonal layering. Soft drop shadows exist only on floating map controls (FAB and Add: `0 3px 6px rgba(0,0,0,0.25)`, Android elevation 4) and the top bar (elevation 6). WebView markers use `0 2px 3px rgba(0,0,0,0.35)`, popups `0 4px 12px rgba(0,0,0,0.3)`. A scrim `rgba(28,28,28,0.6)` sits behind sheets. No gradients, no glows.
+Flat by default: depth comes from 2px outlines and colour contrast, not tonal layering. Soft drop shadows exist only on floating map controls (FAB and Add: `0 3px 6px rgba(0,0,0,0.25)`, Android elevation 4) and the top bar (elevation 6). WebView markers use `0 2px 3px rgba(0,0,0,0.35)`, popups `0 4px 12px rgba(0,0,0,0.3)`. A scrim `rgba(28,28,28,0.6)` sits behind sheets. No glows, no blur.
 
 ### Named Rules
 **The Flat-Fields Rule.** Fills are solid. Shadows are only for objects floating over the map, never for sheet content.
+**The Quiet Tone Rule.** The only gradients allowed are vertical tonal ones inside a single colour, about ±6% lightness, on exactly these surfaces: top bar (`#262626 → #1C1C1C`), auth screen (radial `#2A2A2A → #1C1C1C`) and auth card (`#2E2E2E → #2A2A2A`), the pink primary action (`#FF66B0 → #FF4FA3`, flat while pressed), and the empty-photo placeholder (`#D3D3CE → #C9C9C4`). Never on chips, pills, paint dots, markers, clusters or the route; never across two hues. Tokens: `Gradients` in `skatemap-mobile/constants/theme.ts`, `--grad-*` in `skatemap-web/src/tokens.css`.
 
 ## Shapes
 
-Pills and rounded sheets, always outlined. Controls are fully round pills (24-28px radius), sheet top corners 28px, cards 16px, chips 10px, inputs 14-16px, FABs 16px rounded squares. Map markers are 28px circles with a 3px ink ring; clusters are 42px asphalt circles with a 3px white ring and white "+N". Difficulty marks are 7x16 parallelograms (skewX -18deg), filled when active and outlined when off. The 6px paint strip (five paints in equal bands) is the section divider on the sheet.
+Pills and rounded sheets, always outlined. Controls are fully round pills (24-28px radius), sheet top corners 28px, cards 16px, chips 10px, inputs 14-16px, FABs 16px rounded squares. Spot markers are the per-type PNG icons (trimmed to their artwork), drawn in a 45px box with `object-fit: contain` anchored at the bottom, so every type renders at the same width without distortion; the selected one scales to 1.2; clusters are 42px asphalt circles with a 3px white ring and white "+N". Difficulty marks are 7x16 parallelograms (skewX -18deg), filled when active and outlined when off. The 6px paint strip (five paints in equal bands) is the section divider on the sheet.
 
 ## Components
 
@@ -212,8 +213,8 @@ Pills and rounded sheets, always outlined. Controls are fully round pills (24-28
 - **Do** design for long strings, RTL and non-Latin fallback: let labels wrap or shrink instead of truncating the type chip.
 
 ### Don't:
-- **Don't** use gradients, glows, or blur in new surfaces.
+- **Don't** use glows or blur, or any gradient beyond the Quiet Tone list.
 - **Don't** use the paints for decoration or non-type state.
 - **Don't** signal difficulty by colour.
 - **Don't** set paragraphs in the display face.
-- **Don't** reintroduce the old navy and teal palette; the web client keeps its own look and is out of scope.
+- **Don't** reintroduce the old navy and teal palette. Web (`skatemap-web`) and mobile share this system one-to-one: same tokens, top bar, sheets, popup, markers and route.

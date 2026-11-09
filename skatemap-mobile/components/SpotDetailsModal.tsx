@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, type ComponentRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Image, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Palette, DisplayFont, Radius, MIN_TARGET } from '../constants/theme';
+import GradientFill from '../components/ui/GradientFill';
 import { TypeChip, DifficultyMarks, StarRating, PaintStrip } from './ui/PaintBits';
 import api from '../utils/api';
 import { cleanLabel } from '../utils/text';
@@ -192,6 +193,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
               <Image source={{ uri: spot.mediaUrl }} style={styles.image} accessibilityIgnoresInvertColors />
             ) : (
               <View style={[styles.image, styles.imagePlaceholder]}>
+                <GradientFill name="concrete" diagonal />
                 <Ionicons name="camera-outline" size={36} color={Palette.inkMuted} />
               </View>
             )}
@@ -211,6 +213,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
               {!!spot.description && <Text style={styles.desc}>{spot.description}</Text>}
 
               <TouchableOpacity style={styles.directionsBtn} onPress={openDirections} accessibilityRole="button">
+                <GradientFill name="pink" radius={24} />
                 <Ionicons name="navigate" size={22} color={Palette.ink} />
                 <Text style={styles.directionsText}>{t('popup.directions')}</Text>
               </TouchableOpacity>
@@ -266,6 +269,7 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
                     disabled={isSubmitting}
                     accessibilityRole="button"
                   >
+                    <GradientFill name="pink" radius={14} />
                     {isSubmitting ? <ActivityIndicator color={Palette.ink} /> : <Text style={styles.sendText}>{t('popup.send')}</Text>}
                   </TouchableOpacity>
                 </View>

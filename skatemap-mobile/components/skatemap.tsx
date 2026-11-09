@@ -178,6 +178,9 @@ export default function SkateMap({
           .spot-icon-img {
             display: block;
             width: 45px; height: 45px;
+            /* Los PNG no son cuadrados: se encajan sin deformar, todos al mismo ancho y apoyados abajo */
+            object-fit: contain;
+            object-position: 50% 100%;
             transform-origin: 50% 100%;
             transition: transform 0.12s ease;
           }
@@ -211,7 +214,7 @@ export default function SkateMap({
             text-align: center;
           }
           .popup-card { width: 240px; font-family: system-ui, Roboto, sans-serif; color: var(--asphalt); }
-          .popup-image { display: block; width: 100%; height: 112px; object-fit: cover; background-color: var(--concrete); }
+          .popup-image { display: block; width: 100%; height: 112px; object-fit: cover; background: var(--concrete) linear-gradient(160deg, #D3D3CE, var(--concrete)); }
           .popup-image-empty { display: flex; align-items: center; justify-content: center; }
           .popup-info { padding: 12px 14px 14px; }
           .popup-title {
@@ -261,7 +264,8 @@ export default function SkateMap({
           }
           .details-btn:active, .directions-btn:active { transform: scale(0.96); }
           .details-btn { background: var(--sheet); }
-          .directions-btn { background: var(--pink); }
+          .directions-btn { background: var(--pink) linear-gradient(180deg, #FF66B0 0%, var(--pink) 100%); }
+          .directions-btn:active { background-image: none; }
 
           /* Clusters "+N": asfalto, anillo blanco */
           .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {

@@ -5,7 +5,9 @@
     "login": "Giriş yap",
     "user": "Kullanıcı",
     "language": "Dil",
-    "languageAuto": "Otomatik (telefon dili)"
+    "languageAuto": "Otomatik (telefon dili)",
+    "openSettings": "Ayarları aç",
+    "retry": "Tekrar dene"
   },
   "map": {
     "filters": "Filtreler",
@@ -22,7 +24,8 @@
     "offlineMode": "Çevrimdışı mod (kayıtlı harita gösteriliyor)",
     "geoUnsupported": "Tarayıcınız konum özelliğini desteklemiyor",
     "geoDenied": "Konum izni reddedildi. Tarayıcıda etkinleştirin.",
-    "geoFailed": "Konumunuz alınamadı."
+    "geoFailed": "Konumunuz alınamadı.",
+    "logoutConfirm": "SkateMap’ten çıkış yapılsın mı?"
   },
   "filters": {
     "title": "Spotları filtrele",
@@ -36,7 +39,8 @@
     "minStars": "En az yıldız",
     "allStars": "Tümü",
     "starsOrMore": "{{n}} ⭐️ ve üzeri",
-    "applyResults": "Sonuçları gör"
+    "applyResults": "Sonuçları gör",
+    "reset": "Sıfırla"
   },
   "popup": {
     "loading": "Yükleniyor...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "Gönderirken bir hata oluştu. Lütfen bağlantınızı kontrol edin.",
     "averageRating": "Ortalama puan: {{value}}/5",
     "thanks": "Değerlendirmeniz için teşekkürler! 🛹",
-    "noImage": "Görsel yok"
+    "noImage": "Görsel yok",
+    "commentsFailed": "Yorumlar yüklenemedi."
   },
   "auth": {
     "welcomeBack": "Tekrar hoş geldiniz",
@@ -89,7 +94,12 @@
     "accountCreated": "Hesap başarıyla oluşturuldu. Artık giriş yapabilirsiniz.",
     "loginRequiredTitle": "Giriş gerekli",
     "loginRequiredAdd": "Haritaya yeni bir spot eklemek için giriş yapmalısınız.",
-    "loginRequiredRate": "Bu spotu değerlendirmek ve yorum yapmak için giriş yapmalısınız."
+    "loginRequiredRate": "Bu spotu değerlendirmek ve yorum yapmak için giriş yapmalısınız.",
+    "usernameTaken": "Bu kullanıcı adı zaten alınmış.",
+    "emailTaken": "Bu e-posta zaten kayıtlı.",
+    "emailInvalid": "E-posta adresini kontrol et.",
+    "continueWithGoogle": "Google ile devam et",
+    "googleFailed": "Google ile giriş başarısız. Tekrar dene."
   },
   "admin": {
     "title": "Yönetim paneli",
@@ -109,7 +119,7 @@
     "cameraDenied": "⚠️ Kamera izni reddedildi",
     "waitingGps": "⚠️ GPS bekleniyor...",
     "processingPhoto": "📸 Fotoğraf işleniyor...",
-    "tapCircle": "📍 Yeri seçmek için mavi dairenin içine dokunun 👇",
+    "tapCircle": "📍 Yerleştirmek için dairenin içine dokun 👇",
     "gettingLocation": "📍 Mevcut konumunuz alınıyor...",
     "gpsDenied": "⚠️ GPS izni reddedildi",
     "locationError": "⚠️ Konum bulunurken hata oluştu"
@@ -144,7 +154,12 @@
     "description": "Açıklama...",
     "type": "Tür",
     "level": "Seviye",
-    "save": "Spotu kaydet"
+    "save": "Spotu kaydet",
+    "nameRequired": "Spota bir ad ver.",
+    "discardTitle": "Bu spot silinsin mi?",
+    "discardMessage": "Çektiğin fotoğraf kaybolacak.",
+    "discard": "Sil",
+    "keepEditing": "Düzenlemeye devam et"
   },
   "camera": {
     "takePhoto": "Spotun fotoğrafını çekin 🛹"

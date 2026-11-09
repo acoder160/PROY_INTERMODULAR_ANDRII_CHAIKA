@@ -5,7 +5,9 @@
     "login": "Log in",
     "user": "User",
     "language": "Language",
-    "languageAuto": "Automatic (phone language)"
+    "languageAuto": "Automatic (phone language)",
+    "openSettings": "Open settings",
+    "retry": "Try again"
   },
   "map": {
     "filters": "Filters",
@@ -22,7 +24,8 @@
     "offlineMode": "Offline mode (showing saved map)",
     "geoUnsupported": "Your browser does not support geolocation",
     "geoDenied": "Location permission denied. Enable it in your browser.",
-    "geoFailed": "Could not get your location."
+    "geoFailed": "Could not get your location.",
+    "logoutConfirm": "Log out of SkateMap?"
   },
   "filters": {
     "title": "Filter spots",
@@ -36,7 +39,8 @@
     "minStars": "Minimum stars",
     "allStars": "All",
     "starsOrMore": "{{n}} ⭐️ or more",
-    "applyResults": "View results"
+    "applyResults": "View results",
+    "reset": "Reset"
   },
   "popup": {
     "loading": "Loading...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "There was an error sending. Please check your connection.",
     "averageRating": "Average rating: {{value}}/5",
     "thanks": "Thanks for your rating! 🛹",
-    "noImage": "No image"
+    "noImage": "No image",
+    "commentsFailed": "Couldn’t load comments."
   },
   "auth": {
     "welcomeBack": "Welcome back",
@@ -89,7 +94,12 @@
     "accountCreated": "Account created successfully. You can now log in.",
     "loginRequiredTitle": "Login required",
     "loginRequiredAdd": "You need to log in to add a new spot to the map.",
-    "loginRequiredRate": "You need to log in to rate and comment on this spot."
+    "loginRequiredRate": "You need to log in to rate and comment on this spot.",
+    "usernameTaken": "This username is already taken.",
+    "emailTaken": "This email is already registered.",
+    "emailInvalid": "Check the email address.",
+    "continueWithGoogle": "Continue with Google",
+    "googleFailed": "Google sign-in failed. Try again."
   },
   "admin": {
     "title": "Admin panel",
@@ -109,7 +119,7 @@
     "cameraDenied": "⚠️ Camera permission denied",
     "waitingGps": "⚠️ Waiting for GPS...",
     "processingPhoto": "📸 Processing photo...",
-    "tapCircle": "📍 Tap inside the blue circle to place it 👇",
+    "tapCircle": "📍 Tap inside the circle to place it 👇",
     "gettingLocation": "📍 Getting your current location...",
     "gpsDenied": "⚠️ GPS permission denied",
     "locationError": "⚠️ Error finding location"
@@ -144,7 +154,12 @@
     "description": "Description...",
     "type": "Type",
     "level": "Level",
-    "save": "Save spot"
+    "save": "Save spot",
+    "nameRequired": "Give the spot a name.",
+    "discardTitle": "Discard this spot?",
+    "discardMessage": "The photo you took will be lost.",
+    "discard": "Discard",
+    "keepEditing": "Keep editing"
   },
   "camera": {
     "takePhoto": "Take a photo of the spot 🛹"

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [isWakingUp, setIsWakingUp] = useState(false);
 
   const navigate = useNavigate();
+  const justRegistered = Boolean(useLocation().state?.registered);
   const { login } = useAuth();
 
   const handleChange = (e) => {
@@ -41,7 +42,7 @@ export default function LoginPage() {
     try {
       await login(formData.username, formData.password);
       navigate('/map');
-    } catch (err) {
+    } catch {
       setError(t('auth.wrongCredentials'));
     } finally {
       clearTimeout(wakeUpTimer);
@@ -54,16 +55,21 @@ export default function LoginPage() {
     <div className="auth-container">
       <LanguageSwitcher variant="floating" />
       <div className="auth-card">
-        <p className="auth-eyebrow">SKATEMAP / EXPLORE MORE</p>
+        <div className="brand-mark" aria-hidden="true">S</div>
         <h1 className="auth-title">{t('auth.welcomeBack')}</h1>
         <p className="auth-subtitle">{t('auth.tagline')}</p>
 
         {/* Mensaje de Error */}
-        {error && !isLoading && <div className="error-message">{error}</div>}
+        {justRegistered && !error && (
+          <div className="success-message" role="status">
+            <strong>{t('auth.welcomeTitle')}</strong> {t('auth.accountCreated')}
+          </div>
+        )}
+        {error && !isLoading && <div className="error-message" role="alert">{error}</div>}
 
         {isWakingUp && (
-          <div className="loading-message">
-            <div className="spinner"></div>
+          <div className="loading-message" role="status">
+            <span className="spinner" aria-hidden="true"></span>
             <p className="loading-text">{t('auth.wakingUp')}</p>
             <p className="loading-subtext">{t('auth.wakingUpHint')}</p>
           </div>
@@ -71,10 +77,11 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">{t('auth.username')}</label>
+            <label className="form-label" htmlFor="login-username">{t('auth.username')}</label>
             <input
               type="text"
               name="username"
+              id="login-username"
               className="form-input"
               placeholder={t('auth.usernamePlaceholder')}
               value={formData.username}
@@ -84,10 +91,11 @@ export default function LoginPage() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">{t('auth.password')}</label>
+            <label className="form-label" htmlFor="login-password">{t('auth.password')}</label>
             <input
               type="password"
               name="password"
+              id="login-password"
               className="form-input"
               placeholder="••••••••"
               value={formData.password}

@@ -94,6 +94,20 @@ export const DisplayFont = {
   black: `BigShouldersDisplay_900Black${DISPLAY_FALLBACK}`,
 };
 
+/**
+ * Quiet Tone gradients (DESIGN.md): one hue, about ±6% lightness, always top to bottom.
+ * Same values as the web tokens in skatemap-web/src/tokens.css.
+ */
+export const Gradients = {
+  topBar: ['#262626', Palette.asphalt],
+  authScreen: ['#2A2A2A', Palette.asphalt],
+  authCard: ['#2E2E2E', Palette.asphaltRaised],
+  pink: ['#FF66B0', Palette.pink],
+  concrete: ['#D3D3CE', Palette.concrete],
+} as const;
+
+export type GradientName = keyof typeof Gradients;
+
 export const Radius = {
   chip: 10,
   input: 14,

@@ -5,7 +5,9 @@
     "login": "Zaloguj się",
     "user": "Użytkownik",
     "language": "Język",
-    "languageAuto": "Automatycznie (język telefonu)"
+    "languageAuto": "Automatycznie (język telefonu)",
+    "openSettings": "Otwórz ustawienia",
+    "retry": "Spróbuj ponownie"
   },
   "map": {
     "filters": "Filtry",
@@ -22,7 +24,8 @@
     "offlineMode": "Tryb offline (wyświetlana zapisana mapa)",
     "geoUnsupported": "Twoja przeglądarka nie obsługuje geolokalizacji",
     "geoDenied": "Odmówiono dostępu do lokalizacji. Włącz go w przeglądarce.",
-    "geoFailed": "Nie udało się ustalić Twojej lokalizacji."
+    "geoFailed": "Nie udało się ustalić Twojej lokalizacji.",
+    "logoutConfirm": "Wylogować się ze SkateMap?"
   },
   "filters": {
     "title": "Filtruj spoty",
@@ -36,7 +39,8 @@
     "minStars": "Minimalna liczba gwiazdek",
     "allStars": "Wszystkie",
     "starsOrMore": "{{n}} ⭐️ lub więcej",
-    "applyResults": "Zobacz wyniki"
+    "applyResults": "Zobacz wyniki",
+    "reset": "Wyczyść"
   },
   "popup": {
     "loading": "Ładowanie...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "Wystąpił błąd podczas wysyłania. Sprawdź połączenie.",
     "averageRating": "Średnia ocena: {{value}}/5",
     "thanks": "Dziękujemy za ocenę! 🛹",
-    "noImage": "Brak obrazu"
+    "noImage": "Brak obrazu",
+    "commentsFailed": "Nie udało się wczytać komentarzy."
   },
   "auth": {
     "welcomeBack": "Witaj ponownie",
@@ -89,7 +94,12 @@
     "accountCreated": "Konto zostało utworzone. Możesz się teraz zalogować.",
     "loginRequiredTitle": "Wymagane logowanie",
     "loginRequiredAdd": "Musisz się zalogować, aby dodać nowy spot do mapy.",
-    "loginRequiredRate": "Musisz się zalogować, aby ocenić i skomentować ten spot."
+    "loginRequiredRate": "Musisz się zalogować, aby ocenić i skomentować ten spot.",
+    "usernameTaken": "Ta nazwa użytkownika jest już zajęta.",
+    "emailTaken": "Ten e-mail jest już zarejestrowany.",
+    "emailInvalid": "Sprawdź adres e-mail.",
+    "continueWithGoogle": "Kontynuuj z Google",
+    "googleFailed": "Logowanie przez Google nie powiodło się. Spróbuj ponownie."
   },
   "admin": {
     "title": "Panel administracyjny",
@@ -109,7 +119,7 @@
     "cameraDenied": "⚠️ Odmówiono dostępu do aparatu",
     "waitingGps": "⚠️ Oczekiwanie na GPS...",
     "processingPhoto": "📸 Przetwarzanie zdjęcia...",
-    "tapCircle": "📍 Dotknij wewnątrz niebieskiego koła, aby wskazać miejsce 👇",
+    "tapCircle": "📍 Dotknij wewnątrz okręgu, aby go umieścić 👇",
     "gettingLocation": "📍 Ustalanie Twojej aktualnej lokalizacji...",
     "gpsDenied": "⚠️ Odmówiono dostępu do GPS",
     "locationError": "⚠️ Błąd wyszukiwania lokalizacji"
@@ -144,7 +154,12 @@
     "description": "Opis...",
     "type": "Typ",
     "level": "Poziom",
-    "save": "Zapisz spot"
+    "save": "Zapisz spot",
+    "nameRequired": "Nadaj spotowi nazwę.",
+    "discardTitle": "Odrzucić ten spot?",
+    "discardMessage": "Zrobione zdjęcie zostanie utracone.",
+    "discard": "Odrzuć",
+    "keepEditing": "Edytuj dalej"
   },
   "camera": {
     "takePhoto": "Zrób zdjęcie spotu 🛹"

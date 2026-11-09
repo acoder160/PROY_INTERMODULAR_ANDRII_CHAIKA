@@ -5,7 +5,9 @@
     "login": "Accedi",
     "user": "Utente",
     "language": "Lingua",
-    "languageAuto": "Automatico (lingua del telefono)"
+    "languageAuto": "Automatico (lingua del telefono)",
+    "openSettings": "Apri impostazioni",
+    "retry": "Riprova"
   },
   "map": {
     "filters": "Filtri",
@@ -22,7 +24,8 @@
     "offlineMode": "Modalità offline (mappa salvata)",
     "geoUnsupported": "Il tuo browser non supporta la geolocalizzazione",
     "geoDenied": "Permesso di localizzazione negato. Attivalo nel browser.",
-    "geoFailed": "Impossibile ottenere la tua posizione."
+    "geoFailed": "Impossibile ottenere la tua posizione.",
+    "logoutConfirm": "Uscire da SkateMap?"
   },
   "filters": {
     "title": "Filtra spot",
@@ -36,7 +39,8 @@
     "minStars": "Stelle minime",
     "allStars": "Tutte",
     "starsOrMore": "{{n}} ⭐️ o più",
-    "applyResults": "Vedi risultati"
+    "applyResults": "Vedi risultati",
+    "reset": "Reimposta"
   },
   "popup": {
     "loading": "Caricamento...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "Si è verificato un errore durante l'invio. Controlla la connessione.",
     "averageRating": "Voto medio: {{value}}/5",
     "thanks": "Grazie per la tua valutazione! 🛹",
-    "noImage": "Nessuna immagine"
+    "noImage": "Nessuna immagine",
+    "commentsFailed": "Impossibile caricare i commenti."
   },
   "auth": {
     "welcomeBack": "Bentornato",
@@ -89,7 +94,12 @@
     "accountCreated": "Account creato con successo. Ora puoi accedere.",
     "loginRequiredTitle": "Accesso richiesto",
     "loginRequiredAdd": "Devi accedere per aggiungere un nuovo spot alla mappa.",
-    "loginRequiredRate": "Devi accedere per valutare e commentare questo spot."
+    "loginRequiredRate": "Devi accedere per valutare e commentare questo spot.",
+    "usernameTaken": "Questo nome utente è già in uso.",
+    "emailTaken": "Questa email è già registrata.",
+    "emailInvalid": "Controlla l’indirizzo email.",
+    "continueWithGoogle": "Continua con Google",
+    "googleFailed": "Accesso con Google non riuscito. Riprova."
   },
   "admin": {
     "title": "Pannello di amministrazione",
@@ -109,7 +119,7 @@
     "cameraDenied": "⚠️ Permesso fotocamera negato",
     "waitingGps": "⚠️ In attesa del GPS...",
     "processingPhoto": "📸 Elaborazione della foto...",
-    "tapCircle": "📍 Tocca dentro il cerchio blu per posizionare lo spot 👇",
+    "tapCircle": "📍 Tocca all’interno del cerchio per posizionarlo 👇",
     "gettingLocation": "📍 Rilevamento della posizione attuale...",
     "gpsDenied": "⚠️ Permesso GPS negato",
     "locationError": "⚠️ Errore nella ricerca della posizione"
@@ -144,7 +154,12 @@
     "description": "Descrizione...",
     "type": "Tipo",
     "level": "Livello",
-    "save": "Salva spot"
+    "save": "Salva spot",
+    "nameRequired": "Dai un nome allo spot.",
+    "discardTitle": "Scartare questo spot?",
+    "discardMessage": "La foto che hai scattato andrà persa.",
+    "discard": "Scarta",
+    "keepEditing": "Continua a modificare"
   },
   "camera": {
     "takePhoto": "Scatta una foto dello spot 🛹"

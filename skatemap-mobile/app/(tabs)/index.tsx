@@ -12,6 +12,7 @@ import { useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Palette, DisplayFont, MIN_TARGET } from '../../constants/theme';
+import GradientFill from '../../components/ui/GradientFill';
 import { useLocation } from '../../hooks/useLocation';
 import { useSpots } from '../../hooks/useSpots';
 import SpotDetailsModal from '../../components/SpotDetailsModal';
@@ -255,6 +256,7 @@ export default function HomeScreen() {
 
       {/* Barra superior asfalto: filtros (izquierda) y cuenta (derecha) */}
       <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
+        <GradientFill name="topBar" />
         <TouchableOpacity
           onPress={() => setFilterModalVisible(true)}
           activeOpacity={0.8}
@@ -354,6 +356,7 @@ export default function HomeScreen() {
         accessibilityRole="button"
         accessibilityLabel={isAddingMode ? t('map.cancelAddSpot') : t('map.addSpot')}
       >
+        {!isAddingMode && <GradientFill name="pink" radius={14} />}
         <Ionicons name={isAddingMode ? 'close' : 'add'} size={28} color={isAddingMode ? Palette.white : Palette.ink} />
         {!isAddingMode && (
           <Text style={styles.fabText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>

@@ -5,7 +5,9 @@
     "login": "Masuk",
     "user": "Pengguna",
     "language": "Bahasa",
-    "languageAuto": "Otomatis (bahasa ponsel)"
+    "languageAuto": "Otomatis (bahasa ponsel)",
+    "openSettings": "Buka pengaturan",
+    "retry": "Coba lagi"
   },
   "map": {
     "filters": "Filter",
@@ -22,7 +24,8 @@
     "offlineMode": "Mode offline (menampilkan peta tersimpan)",
     "geoUnsupported": "Peramban Anda tidak mendukung geolokasi",
     "geoDenied": "Izin lokasi ditolak. Aktifkan di peramban.",
-    "geoFailed": "Tidak dapat memperoleh lokasi Anda."
+    "geoFailed": "Tidak dapat memperoleh lokasi Anda.",
+    "logoutConfirm": "Keluar dari SkateMap?"
   },
   "filters": {
     "title": "Filter spot",
@@ -36,7 +39,8 @@
     "minStars": "Bintang minimum",
     "allStars": "Semua",
     "starsOrMore": "{{n}} ⭐️ atau lebih",
-    "applyResults": "Lihat hasil"
+    "applyResults": "Lihat hasil",
+    "reset": "Atur ulang"
   },
   "popup": {
     "loading": "Memuat...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "Terjadi kesalahan saat mengirim. Periksa koneksi Anda.",
     "averageRating": "Nilai rata-rata: {{value}}/5",
     "thanks": "Terima kasih atas penilaian Anda! 🛹",
-    "noImage": "Tidak ada gambar"
+    "noImage": "Tidak ada gambar",
+    "commentsFailed": "Komentar tidak dapat dimuat."
   },
   "auth": {
     "welcomeBack": "Selamat datang kembali",
@@ -89,7 +94,12 @@
     "accountCreated": "Akun berhasil dibuat. Sekarang Anda dapat masuk.",
     "loginRequiredTitle": "Perlu masuk",
     "loginRequiredAdd": "Anda perlu masuk untuk menambahkan spot baru ke peta.",
-    "loginRequiredRate": "Anda perlu masuk untuk menilai dan mengomentari spot ini."
+    "loginRequiredRate": "Anda perlu masuk untuk menilai dan mengomentari spot ini.",
+    "usernameTaken": "Nama pengguna ini sudah dipakai.",
+    "emailTaken": "Email ini sudah terdaftar.",
+    "emailInvalid": "Periksa alamat email.",
+    "continueWithGoogle": "Lanjutkan dengan Google",
+    "googleFailed": "Gagal masuk dengan Google. Coba lagi."
   },
   "admin": {
     "title": "Panel admin",
@@ -109,7 +119,7 @@
     "cameraDenied": "⚠️ Izin kamera ditolak",
     "waitingGps": "⚠️ Menunggu GPS...",
     "processingPhoto": "📸 Memproses foto...",
-    "tapCircle": "📍 Ketuk di dalam lingkaran biru untuk menandai lokasi 👇",
+    "tapCircle": "📍 Ketuk di dalam lingkaran untuk menempatkannya 👇",
     "gettingLocation": "📍 Mengambil lokasi Anda saat ini...",
     "gpsDenied": "⚠️ Izin GPS ditolak",
     "locationError": "⚠️ Gagal mencari lokasi"
@@ -144,7 +154,12 @@
     "description": "Deskripsi...",
     "type": "Jenis",
     "level": "Tingkat",
-    "save": "Simpan spot"
+    "save": "Simpan spot",
+    "nameRequired": "Beri nama spot ini.",
+    "discardTitle": "Buang spot ini?",
+    "discardMessage": "Foto yang kamu ambil akan hilang.",
+    "discard": "Buang",
+    "keepEditing": "Lanjut mengedit"
   },
   "camera": {
     "takePhoto": "Ambil foto spot 🛹"

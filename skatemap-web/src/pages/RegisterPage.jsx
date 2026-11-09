@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../api/axiosConfig';
@@ -41,8 +41,8 @@ export default function RegisterPage() {
 
     try {
       await api.post('/auth/register', formData);
-      alert(t('auth.accountCreated'));
-      navigate('/login');
+      // El aviso de cuenta creada se muestra en la página de login (sin alert del navegador)
+      navigate('/login', { state: { registered: true } });
     } catch (err) {
       console.error(err);
       if (err.response && err.response.data && err.response.data.message) {
@@ -61,16 +61,16 @@ export default function RegisterPage() {
     <div className="auth-container">
       <LanguageSwitcher variant="floating" />
       <div className="auth-card">
-        <p className="auth-eyebrow">SKATEMAP / JOIN THE RIDE</p>
+        <div className="brand-mark" aria-hidden="true">S</div>
         <h1 className="auth-title">{t('auth.joinCrew')}</h1>
         <p className="auth-subtitle">{t('auth.createAccountSubtitle')}</p>
 
         {/* Mensaje de Error */}
-        {error && !isLoading && <div className="error-message">{error}</div>}
+        {error && !isLoading && <div className="error-message" role="alert">{error}</div>}
 
         {isWakingUp && (
-          <div className="loading-message">
-            <div className="spinner"></div>
+          <div className="loading-message" role="status">
+            <span className="spinner" aria-hidden="true"></span>
             <p className="loading-text">{t('auth.wakingUp')}</p>
             <p className="loading-subtext">{t('auth.wakingUpHint')}</p>
           </div>
@@ -78,10 +78,11 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">{t('auth.username')}</label>
+            <label className="form-label" htmlFor="register-username">{t('auth.username')}</label>
             <input
               type="text"
               name="username"
+              id="register-username"
               className="form-input"
               placeholder={t('auth.registerUsernamePlaceholder')}
               value={formData.username}
@@ -91,10 +92,11 @@ export default function RegisterPage() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">{t('auth.email')}</label>
+            <label className="form-label" htmlFor="register-email">{t('auth.email')}</label>
             <input
               type="email"
               name="email"
+              id="register-email"
               className="form-input"
               placeholder={t('auth.emailPlaceholder')}
               value={formData.email}
@@ -104,10 +106,11 @@ export default function RegisterPage() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">{t('auth.password')}</label>
+            <label className="form-label" htmlFor="register-password">{t('auth.password')}</label>
             <input
               type="password"
               name="password"
+              id="register-password"
               className="form-input"
               placeholder={t('auth.passwordPlaceholder')}
               value={formData.password}

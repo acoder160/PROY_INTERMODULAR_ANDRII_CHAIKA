@@ -1,74 +1,75 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SUPPORTED_LANGUAGES, normalizeLanguage } from '../i18n';
-import '../MapChrome.css';
+import Sheet from './Sheet';
+import { ChoicePill } from './PaintBits';
+import { GlobeIcon } from './Icons';
 
-// Botón con globo + código del idioma; abre una lista con los nombres nativos.
-// variant="floating" lo fija arriba a la derecha (páginas de login/registro).
+const STORAGE_KEY = 'lng';
+
+const readPreference = () => {
+  try {
+    return localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+};
+
+// Botón con globo (48px, contorno blanco sobre asfalto) que abre la hoja de idiomas,
+// igual que LanguageModal en la app móvil. variant="floating" lo fija arriba a la derecha (login/registro).
 export default function LanguageSwitcher({ variant = 'inline' }) {
   const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
-  const rootRef = useRef(null);
-  const current = normalizeLanguage(i18n.resolvedLanguage || i18n.language);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    const onPointerDown = (event) => {
-      if (rootRef.current && !rootRef.current.contains(event.target)) setOpen(false);
-    };
-    const onKeyDown = (event) => {
-      if (event.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [open]);
+  const [preference, setPreference] = useState(readPreference);
 
   const choose = (code) => {
-    i18n.changeLanguage(code);
+    if (code === null) {
+      // Automático: idioma del navegador, sin guardar elección
+      i18n.changeLanguage(normalizeLanguage(navigator.language)).then(() => {
+        try { localStorage.removeItem(STORAGE_KEY); } catch { /* almacenamiento bloqueado */ }
+      });
+    } else {
+      i18n.changeLanguage(code);
+    }
+    setPreference(code);
     setOpen(false);
   };
 
+  const current = normalizeLanguage(i18n.resolvedLanguage || i18n.language);
+
   return (
-    <div ref={rootRef} className={`lang-switcher ${variant}`}>
+    <>
       <button
         type="button"
-        className="lang-switcher-btn"
-        onClick={() => setOpen((value) => !value)}
-        aria-haspopup="listbox"
-        aria-expanded={open}
+        className={`globe-btn ${variant}`}
+        onClick={() => { setPreference(readPreference()); setOpen(true); }}
+        aria-haspopup="dialog"
         aria-label={t('common.language')}
         title={t('common.language')}
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M3 12h18" />
-          <path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z" />
-        </svg>
-        <span>{current.split('-')[0].toUpperCase()}</span>
+        <GlobeIcon size={22} />
       </button>
 
-      {open && (
-        <ul className="lang-switcher-menu" role="listbox">
+      <Sheet open={open} onClose={() => setOpen(false)} title={t('common.language')}>
+        <div className="pill-row" role="radiogroup" aria-label={t('common.language')}>
+          <ChoicePill
+            selected={preference === null}
+            onClick={() => choose(null)}
+            label={t('common.languageAuto')}
+            display={false}
+          />
           {SUPPORTED_LANGUAGES.map((language) => (
-            <li key={language.code}>
-              <button
-                type="button"
-                role="option"
-                aria-selected={language.code === current}
-                className={language.code === current ? 'active' : ''}
-                onClick={() => choose(language.code)}
-                lang={language.code}
-              >
-                {language.name}
-              </button>
-            </li>
+            <ChoicePill
+              key={language.code}
+              selected={preference !== null && current === language.code}
+              onClick={() => choose(language.code)}
+              label={language.name}
+              display={false}
+              lang={language.code}
+            />
           ))}
-        </ul>
-      )}
-    </div>
+        </div>
+      </Sheet>
+    </>
   );
 }

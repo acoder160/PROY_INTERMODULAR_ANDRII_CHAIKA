@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { DisplayFont, MIN_TARGET, Palette, Radius, spotTypePaint } from '../constants/theme';
+import GradientFill from '../components/ui/GradientFill';
 import { ChoicePill, PaintStrip } from './ui/PaintBits';
 import { cleanLabel } from '../utils/text';
 
@@ -124,6 +125,7 @@ export default function FilterModal({ visible, onClose, filters, setFilters, res
               accessibilityRole="button"
               accessibilityLabel={`${t('filters.applyResults')}: ${count}`}
             >
+              <GradientFill name="pink" radius={26} />
               <Text style={styles.applyBtnText} numberOfLines={1}>{t('filters.applyResults')}</Text>
               <View style={styles.countChip}>
                 <Text style={styles.countChipText}>{count}</Text>

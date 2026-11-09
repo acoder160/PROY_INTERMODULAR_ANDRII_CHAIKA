@@ -40,7 +40,7 @@ export default function GoogleSignInButton() {
           shape="pill"
           size="large"
           theme="filled_black"
-          width="320"
+          width="300"
           locale={i18n.language}
         />
       </div>

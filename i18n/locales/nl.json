@@ -5,7 +5,9 @@
     "login": "Inloggen",
     "user": "Gebruiker",
     "language": "Taal",
-    "languageAuto": "Automatisch (taal van de telefoon)"
+    "languageAuto": "Automatisch (taal van de telefoon)",
+    "openSettings": "Instellingen openen",
+    "retry": "Opnieuw proberen"
   },
   "map": {
     "filters": "Filters",
@@ -22,7 +24,8 @@
     "offlineMode": "Offlinemodus (opgeslagen kaart wordt getoond)",
     "geoUnsupported": "Je browser ondersteunt geen geolocatie",
     "geoDenied": "Locatietoestemming geweigerd. Schakel deze in via je browser.",
-    "geoFailed": "Je locatie kon niet worden opgehaald."
+    "geoFailed": "Je locatie kon niet worden opgehaald.",
+    "logoutConfirm": "Uitloggen bij SkateMap?"
   },
   "filters": {
     "title": "Spots filteren",
@@ -36,7 +39,8 @@
     "minStars": "Minimaal aantal sterren",
     "allStars": "Alle",
     "starsOrMore": "{{n}} ⭐️ of meer",
-    "applyResults": "Resultaten bekijken"
+    "applyResults": "Resultaten bekijken",
+    "reset": "Wissen"
   },
   "popup": {
     "loading": "Laden...",
@@ -56,7 +60,8 @@
     "sendErrorConnection": "Er is een fout opgetreden bij het verzenden. Controleer je verbinding.",
     "averageRating": "Gemiddelde score: {{value}}/5",
     "thanks": "Bedankt voor je beoordeling! 🛹",
-    "noImage": "Geen afbeelding"
+    "noImage": "Geen afbeelding",
+    "commentsFailed": "Reacties konden niet worden geladen."
   },
   "auth": {
     "welcomeBack": "Welkom terug",
@@ -89,7 +94,12 @@
     "accountCreated": "Account succesvol aangemaakt. Je kunt nu inloggen.",
     "loginRequiredTitle": "Inloggen vereist",
     "loginRequiredAdd": "Je moet inloggen om een nieuwe spot aan de kaart toe te voegen.",
-    "loginRequiredRate": "Je moet inloggen om deze spot te beoordelen en erop te reageren."
+    "loginRequiredRate": "Je moet inloggen om deze spot te beoordelen en erop te reageren.",
+    "usernameTaken": "Deze gebruikersnaam is al in gebruik.",
+    "emailTaken": "Dit e-mailadres is al geregistreerd.",
+    "emailInvalid": "Controleer het e-mailadres.",
+    "continueWithGoogle": "Doorgaan met Google",
+    "googleFailed": "Inloggen met Google is mislukt. Probeer het opnieuw."
   },
   "admin": {
     "title": "Beheerpaneel",
@@ -109,7 +119,7 @@
     "cameraDenied": "⚠️ Cameratoestemming geweigerd",
     "waitingGps": "⚠️ Wachten op GPS...",
     "processingPhoto": "📸 Foto verwerken...",
-    "tapCircle": "📍 Tik in de blauwe cirkel om de plek te kiezen 👇",
+    "tapCircle": "📍 Tik binnen de cirkel om hem te plaatsen 👇",
     "gettingLocation": "📍 Je huidige locatie ophalen...",
     "gpsDenied": "⚠️ GPS-toestemming geweigerd",
     "locationError": "⚠️ Fout bij het zoeken naar je locatie"
@@ -144,7 +154,12 @@
     "description": "Beschrijving...",
     "type": "Soort",
     "level": "Niveau",
-    "save": "Spot opslaan"
+    "save": "Spot opslaan",
+    "nameRequired": "Geef de spot een naam.",
+    "discardTitle": "Deze spot weggooien?",
+    "discardMessage": "De foto die je hebt gemaakt gaat verloren.",
+    "discard": "Weggooien",
+    "keepEditing": "Verder bewerken"
   },
   "camera": {
     "takePhoto": "Maak een foto van de spot 🛹"

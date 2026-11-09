@@ -1,0 +1,104 @@
+/* Panel de administración: barra asfalto + tabla sobre hoja blanca */
+.admin-page {
+  min-height: 100vh;
+  background: var(--concrete);
+  color: var(--ink);
+}
+
+.admin-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(10px + env(safe-area-inset-top)) 20px 12px;
+  background: var(--asphalt);
+  background-image: var(--grad-topbar);
+}
+
+.admin-title {
+  margin: 0;
+  min-width: 0;
+  color: var(--sheet);
+  font: 900 30px/1.05 var(--display);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.admin-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.admin-main .notice {
+  margin: 0 0 16px;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-card);
+  background: var(--sheet);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.admin-table th {
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--ink);
+  font: 700 16px/1.1 var(--display);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  text-align: start;
+}
+
+.admin-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--hairline);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-num {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+
+.admin-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-empty {
+  padding: 24px !important;
+  text-align: center;
+  color: var(--ink-muted);
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 2px solid var(--danger);
+  border-radius: var(--radius-control);
+  background: var(--sheet);
+  color: var(--danger);
+  font: 700 16px/1 var(--display);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.btn-danger:hover {
+  background: var(--danger-tint);
+}
