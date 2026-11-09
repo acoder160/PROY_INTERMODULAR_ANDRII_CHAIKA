@@ -31,4 +31,18 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
+
+    /** Push notifications: network calls to the Expo push service, off the request threads. */
+    @Bean(name = "pushExecutor")
+    public Executor pushExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(1000);
+        executor.setThreadNamePrefix("push-");
+        executor.setRejectedExecutionHandler((task, pool) ->
+                log.warn("Push queue is full: a push notification was dropped"));
+        executor.initialize();
+        return executor;
+    }
 }

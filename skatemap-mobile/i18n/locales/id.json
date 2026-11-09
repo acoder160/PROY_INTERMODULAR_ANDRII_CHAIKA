@@ -99,7 +99,10 @@
     "emailTaken": "Email ini sudah terdaftar.",
     "emailInvalid": "Periksa alamat email.",
     "continueWithGoogle": "Lanjutkan dengan Google",
-    "googleFailed": "Gagal masuk dengan Google. Coba lagi."
+    "googleFailed": "Gagal masuk dengan Google. Coba lagi.",
+    "tryDemo": "Coba demo",
+    "demoHint": "Tanpa daftar: akun uji bersama.",
+    "demoFailed": "Demo sedang tidak tersedia. Coba lagi nanti."
   },
   "admin": {
     "backToMap": "Kembali ke peta",
@@ -167,7 +170,10 @@
     "photoRejected": "Foto ini tidak diizinkan (ketelanjangan, narkoba, kekerasan, iklan, atau data pribadi). Pilih foto lain.",
     "photoUnclear": "Foto terlalu gelap atau buram untuk melihat spot. Ambil foto lain.",
     "photoNotPlace": "Foto harus menunjukkan spotnya sendiri, bukan meme, tangkapan layar, atau swafoto jarak dekat.",
-    "textRejected": "Nama atau deskripsi melanggar aturan (spam, konten tidak pantas, atau teks tak bermakna)."
+    "textRejected": "Nama atau deskripsi melanggar aturan (spam, konten tidak pantas, atau teks tak bermakna).",
+    "demoReadonly": "Tidak tersedia di akun demo. Buat akun sendiri untuk mencobanya.",
+    "notOwner": "Anda hanya bisa mengubah postingan Anda sendiri.",
+    "cannotFollowSelf": "Anda tidak bisa mengikuti diri sendiri."
   },
   "types": {
     "STREET": "Jalanan",
@@ -231,5 +237,70 @@
   },
   "legal": {
     "link": "Aturan & privasi"
+  },
+  "social": {
+    "map": "Peta",
+    "feed": "Linimasa",
+    "notifications": "Notifikasi",
+    "profile": "Profil",
+    "follow": "Ikuti",
+    "followingState": "Mengikuti",
+    "spotsCount": "Spot",
+    "followersCount": "Pengikut",
+    "followingCount": "Diikuti",
+    "ratingsCount": "Penilaian",
+    "commentsCount": "Komentar",
+    "memberSince": "Bergabung sejak {{date}}",
+    "editProfile": "Edit profil",
+    "bio": "Bio",
+    "bioPlaceholder": "Kota Anda, spot Anda, gaya Anda…",
+    "changePhoto": "Ganti foto",
+    "removePhoto": "Hapus foto",
+    "save": "Simpan",
+    "saved": "Tersimpan",
+    "savedSpots": "Spot tersimpan",
+    "savedEmpty": "Belum ada spot tersimpan. Ketuk Simpan pada sebuah spot untuk menyimpannya di sini.",
+    "deleteAccount": "Hapus akun",
+    "deleteAccountHint": "Menghapus akun akan menghapus profil, daftar yang Anda ikuti, dan spot tersimpan. Spot dan komentar Anda tetap ada sebagai “Pengguna dihapus”.",
+    "deleteAccountConfirm": "Hapus akun Anda? Tindakan ini tidak bisa dibatalkan.",
+    "deletedUser": "Pengguna dihapus",
+    "userNotFound": "Skater ini tidak ada atau sudah menghapus akunnya.",
+    "noSpotsYet": "Belum ada spot.",
+    "nobodyYet": "Belum ada siapa pun di sini.",
+    "feedEmpty": "Linimasa Anda kosong. Ikuti skater lain untuk melihat spot yang mereka tambahkan, nilai, dan komentari.",
+    "signInToSee": "Masuk untuk melihat linimasa dan notifikasi Anda.",
+    "notificationsEmpty": "Belum ada notifikasi.",
+    "unread": "Belum dibaca",
+    "loadMore": "Muat lainnya",
+    "activity": {
+      "SPOT_CREATED": "menambahkan spot",
+      "COMMENTED": "mengomentari spot",
+      "RATED": "menilai spot"
+    },
+    "notif": {
+      "FOLLOW": "mulai mengikuti Anda",
+      "COMMENT_ON_SPOT": "mengomentari spot Anda {{spot}}",
+      "REPLY": "membalas komentar Anda",
+      "COMMENT_LIKE": "menyukai komentar Anda"
+    },
+    "reply": "Balas",
+    "replyingTo": "Balas ke {{username}}",
+    "edit": "Edit",
+    "delete": "Hapus",
+    "edited": "diedit",
+    "like": "Suka",
+    "commentDeleted": "Komentar dihapus",
+    "deleteCommentConfirm": "Hapus komentar ini?",
+    "writeComment": "Tulis komentar…",
+    "signInToComment": "Masuk untuk berkomentar",
+    "commentRejected": "Komentar ini melanggar aturan komunitas (spam, konten tidak pantas, atau teks tak bermakna).",
+    "bioRejected": "Bio ini melanggar aturan komunitas (spam, konten tidak pantas, atau teks tak bermakna).",
+    "share": "Bagikan",
+    "linkCopied": "Tautan disalin",
+    "addedBy": "Ditambahkan oleh",
+    "editSpot": "Edit spot",
+    "deleteSpot": "Hapus spot",
+    "deleteSpotConfirm": "Hapus spot ini? Foto, penilaian, dan komentarnya juga akan dihapus.",
+    "loadFailed": "Gagal memuat. Periksa koneksi Anda lalu coba lagi."
   }
 }

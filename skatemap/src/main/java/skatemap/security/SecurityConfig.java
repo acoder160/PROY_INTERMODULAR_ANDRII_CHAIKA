@@ -77,7 +77,13 @@ public class SecurityConfig {
                     // Spots and comments are readable without an account
                     auth.requestMatchers(HttpMethod.GET, "/api/spots/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll();
+                    // Profiles are public too, except the signed-in user's own account
+                    auth.requestMatchers("/api/users/me", "/api/users/me/**").authenticated();
+                    auth.requestMatchers(HttpMethod.GET, "/api/users/**").permitAll();
+                    // Share links with link previews (outside /api)
+                    auth.requestMatchers(HttpMethod.GET, "/s/**").permitAll();
                     auth.requestMatchers("/error").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/actuator/health").permitAll();
                     // Moderation queue and decisions (also guarded with @PreAuthorize)
                     auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
                     if (swaggerEnabled) {

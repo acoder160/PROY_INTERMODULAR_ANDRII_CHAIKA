@@ -38,7 +38,8 @@ class SpotReadPathTest {
         cache = new SpotListCache();
         service = new SpotService(spotRepository, mock(UserRepository.class), ratingRepository,
                 commentRepository, mock(SpotReportRepository.class), mock(AiModerationService.class),
-                mock(ImageModerationService.class), mock(CloudinaryAssets.class), cache);
+                mock(ImageModerationService.class), mock(CloudinaryAssets.class), cache,
+                mock(FeedService.class), mock(UserLookup.class), mock(org.springframework.transaction.PlatformTransactionManager.class));
         when(spotRepository.findAllByStatus(SpotStatus.VISIBLE)).thenReturn(List.of(spot(1L), spot(2L)));
     }
 
@@ -84,22 +85,6 @@ class SpotReadPathTest {
     @Test
     void cachedListCannotBeModifiedByCallers() {
         assertThrows(UnsupportedOperationException.class, () -> service.getAllSpots().clear());
-    }
-
-    @Test
-    void commentsUseOneRatingsQueryNotOnePerComment() {
-        User ana = user(10L, "ana");
-        User bob = user(11L, "bob");
-        when(commentRepository.findBySpotIdOrderByCreatedAtDesc(5L))
-                .thenReturn(List.of(comment(1L, ana), comment(2L, bob), comment(3L, ana)));
-        when(ratingRepository.findUserRatingsBySpotId(5L)).thenReturn(List.of(rating(10L, 4)));
-
-        List<CommentDto> comments = service.getCommentsBySpot(5L);
-
-        assertEquals(List.of(4, 4), comments.stream().filter(c -> "ana".equals(c.getUsername())).map(CommentDto::getRating).toList());
-        assertNull(comments.stream().filter(c -> "bob".equals(c.getUsername())).findFirst().orElseThrow().getRating());
-        verify(ratingRepository, times(1)).findUserRatingsBySpotId(5L);
-        verify(ratingRepository, never()).findBySpotAndUser(any(), any());
     }
 
     private static Spot spot(Long id) {

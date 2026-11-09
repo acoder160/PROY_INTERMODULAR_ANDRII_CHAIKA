@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# A newer push to the same branch cancels the run still in progress
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend (tests on PostGIS)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: skatemap
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      # Integration tests start postgis/postgis through Testcontainers (Docker is preinstalled)
+      - name: Build and test
+        run: sh ./mvnw -B verify   # mvnw is not executable in git (committed from Windows)
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: skatemap/target/surefire-reports/
+
+  docker:
+    name: Docker image builds
+    runs-on: ubuntu-latest
+    needs: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: skatemap
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  web:
+    name: Web (lint + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: skatemap-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: skatemap-web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  mobile:
+    name: Mobile (types + lint)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: skatemap-mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: skatemap-mobile/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run lint

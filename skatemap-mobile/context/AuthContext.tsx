@@ -8,6 +8,7 @@ import api, {
   saveRefreshToken,
   setAccessToken,
 } from '../utils/api';
+import { unregisterPush } from '../utils/push';
 
 // Definimos la estructura del contexto
 interface AuthContextType {
@@ -59,6 +60,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = async () => {
+    // While the session still works: this device stops getting this account's pushes
+    await unregisterPush();
     try {
       const refreshToken = await getRefreshToken();
       await api.post(

@@ -31,19 +31,28 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     // Buscar spots por usuario creador
     List<Spot> findByCreatedBy_Id(Long userId);
 
-    /**
-     * CONSULTA GEOESPACIAL (POSTGIS)
-     * Busca spots visibles que estén a menos de X metros de un punto dado.
-     * ST_DWithin: Función de PostGIS que calcula si dos geometrías están dentro de una distancia.
-     * ST_MakePoint: Crea un punto con la latitud/longitud que envías.
-     * 4326: El sistema de coordenadas GPS mundial.
-     * use_spheroid=false: Calcula distancia en esfera (más rápido).
-     */
+    /** A user's spots for their profile, newest first. */
     @EntityGraph(attributePaths = "createdBy")
-    @Query(value = "SELECT * FROM spots s WHERE s.status = 'VISIBLE' AND " +
-            "ST_DWithin(s.location, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326), :distanceInMeters, false)",
+    List<Spot> findByCreatedBy_IdAndStatusOrderByIdDesc(Long userId, SpotStatus status);
+
+    long countByCreatedBy_IdAndStatus(Long userId, SpotStatus status);
+
+    /**
+     * Ids of visible spots within {@code distanceInMeters} of a point (PostGIS), nearest first.
+     * Distances are real metres on a sphere (geography, use_spheroid=false: a bit faster than the
+     * spheroid and precise enough for a few km). The cast is written out (CAST, not ::, which
+     * Hibernate could read as a parameter) because the index that serves this query,
+     * idx_spots_location_geog (V4), is on that exact expression.
+     * Only ids: Hibernate can't apply an entity graph to a native query, so the caller loads the
+     * spots with their authors through {@link #findAllByIdIn}.
+     */
+    @Query(value = "SELECT s.id FROM spots s WHERE s.status = 'VISIBLE' AND " +
+            "ST_DWithin(CAST(s.location AS geography), " +
+            "CAST(ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326) AS geography), :distanceInMeters, false) " +
+            "ORDER BY ST_Distance(CAST(s.location AS geography), " +
+            "CAST(ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326) AS geography), false)",
             nativeQuery = true)
-    List<Spot> findSpotsNearby(
+    List<Long> findSpotIdsNearby(
             @Param("latitude") double latitude,
             @Param("longitude") double longitude,
             @Param("distanceInMeters") double distanceInMeters

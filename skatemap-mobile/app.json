@@ -50,7 +50,13 @@
       "expo-image",
       "expo-status-bar",
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-notifications",
+        {
+          "color": "#FF4FA3"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

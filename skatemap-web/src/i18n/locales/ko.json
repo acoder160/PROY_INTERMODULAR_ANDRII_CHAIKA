@@ -99,7 +99,10 @@
     "emailTaken": "이미 등록된 이메일입니다.",
     "emailInvalid": "이메일 주소를 확인하세요.",
     "continueWithGoogle": "Google로 계속하기",
-    "googleFailed": "Google 로그인에 실패했습니다. 다시 시도하세요."
+    "googleFailed": "Google 로그인에 실패했습니다. 다시 시도하세요.",
+    "tryDemo": "데모 체험하기",
+    "demoHint": "가입 없이: 공용 테스트 계정입니다.",
+    "demoFailed": "지금은 데모를 사용할 수 없습니다. 나중에 다시 시도하세요."
   },
   "admin": {
     "backToMap": "지도로 돌아가기",
@@ -167,7 +170,10 @@
     "photoRejected": "이 사진은 사용할 수 없어요 (노출, 마약, 폭력, 광고 또는 개인정보). 다른 사진을 골라 주세요.",
     "photoUnclear": "사진이 너무 어둡거나 흐려서 스팟이 보이지 않아요. 다시 찍어 주세요.",
     "photoNotPlace": "사진에는 스팟 자체가 보여야 해요. 밈, 스크린샷, 가까이 찍은 셀카는 안 돼요.",
-    "textRejected": "이름이나 설명이 규칙을 어겨요 (스팸, 부적절한 내용 또는 의미 없는 글)."
+    "textRejected": "이름이나 설명이 규칙을 어겨요 (스팸, 부적절한 내용 또는 의미 없는 글).",
+    "demoReadonly": "데모 계정에서는 사용할 수 없습니다. 직접 계정을 만들어 사용해 보세요.",
+    "notOwner": "본인의 게시물만 변경할 수 있습니다.",
+    "cannotFollowSelf": "자기 자신은 팔로우할 수 없습니다."
   },
   "types": {
     "STREET": "스트리트",
@@ -231,5 +237,70 @@
   },
   "legal": {
     "link": "규칙 및 개인정보"
+  },
+  "social": {
+    "map": "지도",
+    "feed": "피드",
+    "notifications": "알림",
+    "profile": "프로필",
+    "follow": "팔로우",
+    "followingState": "팔로잉",
+    "spotsCount": "스팟",
+    "followersCount": "팔로워",
+    "followingCount": "팔로잉",
+    "ratingsCount": "평가",
+    "commentsCount": "댓글",
+    "memberSince": "{{date}}부터 활동",
+    "editProfile": "프로필 편집",
+    "bio": "소개",
+    "bioPlaceholder": "내 도시, 내 스팟, 내 스타일…",
+    "changePhoto": "사진 변경",
+    "removePhoto": "사진 삭제",
+    "save": "저장",
+    "saved": "저장됨",
+    "savedSpots": "저장한 스팟",
+    "savedEmpty": "아직 저장한 스팟이 없습니다. 스팟에서 저장을 누르면 여기에 모입니다.",
+    "deleteAccount": "계정 삭제",
+    "deleteAccountHint": "계정을 삭제하면 프로필, 팔로우, 저장한 스팟이 삭제됩니다. 올린 스팟과 댓글은 “삭제된 사용자”로 남습니다.",
+    "deleteAccountConfirm": "계정을 삭제할까요? 되돌릴 수 없습니다.",
+    "deletedUser": "삭제된 사용자",
+    "userNotFound": "존재하지 않거나 계정을 삭제한 스케이터입니다.",
+    "noSpotsYet": "아직 스팟이 없습니다.",
+    "nobodyYet": "아직 아무도 없습니다.",
+    "feedEmpty": "피드가 비어 있습니다. 스케이터를 팔로우하면 그들이 추가하고 평가하고 댓글을 단 스팟을 볼 수 있습니다.",
+    "signInToSee": "피드와 알림을 보려면 로그인하세요.",
+    "notificationsEmpty": "아직 알림이 없습니다.",
+    "unread": "읽지 않음",
+    "loadMore": "더 보기",
+    "activity": {
+      "SPOT_CREATED": "님이 스팟을 추가했습니다",
+      "COMMENTED": "님이 스팟에 댓글을 남겼습니다",
+      "RATED": "님이 스팟을 평가했습니다"
+    },
+    "notif": {
+      "FOLLOW": "님이 회원님을 팔로우하기 시작했습니다",
+      "COMMENT_ON_SPOT": "님이 회원님의 스팟 {{spot}}에 댓글을 남겼습니다",
+      "REPLY": "님이 회원님의 댓글에 답글을 남겼습니다",
+      "COMMENT_LIKE": "님이 회원님의 댓글을 좋아합니다"
+    },
+    "reply": "답글",
+    "replyingTo": "{{username}}님에게 답글",
+    "edit": "편집",
+    "delete": "삭제",
+    "edited": "수정됨",
+    "like": "좋아요",
+    "commentDeleted": "삭제된 댓글입니다",
+    "deleteCommentConfirm": "이 댓글을 삭제할까요?",
+    "writeComment": "댓글을 입력하세요…",
+    "signInToComment": "로그인하고 댓글 달기",
+    "commentRejected": "이 댓글은 커뮤니티 규칙을 위반합니다 (스팸, 부적절한 내용 또는 의미 없는 텍스트).",
+    "bioRejected": "이 소개는 커뮤니티 규칙을 위반합니다 (스팸, 부적절한 내용 또는 의미 없는 텍스트).",
+    "share": "공유",
+    "linkCopied": "링크를 복사했습니다",
+    "addedBy": "추가한 사람",
+    "editSpot": "스팟 편집",
+    "deleteSpot": "스팟 삭제",
+    "deleteSpotConfirm": "이 스팟을 삭제할까요? 사진, 평가, 댓글도 함께 삭제됩니다.",
+    "loadFailed": "불러오지 못했습니다. 연결을 확인하고 다시 시도하세요."
   }
 }

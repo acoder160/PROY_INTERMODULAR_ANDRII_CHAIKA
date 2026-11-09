@@ -23,10 +23,14 @@ interface SkateMapProps {
   isAddingMode?: boolean;
   onMapClick?: (lat: number, lng: number) => void;
   onSpotClick?: (spotId: number) => void; 
-  /** The flag button in a spot popup. */
-  onReportSpot?: (spotId: number) => void;
+  /** Saved spots: the bookmark in a spot popup shows and toggles this. */
+  /** null when signed out: the popup button then only asks to sign in. */
+  favoriteIds?: number[] | null;
+  onToggleFavorite?: (spotId: number) => void;
   /** Short notice for map-side problems while placing a spot (too far, no GPS). */
   onNotice?: (message: string) => void;
+  /** Fly to this spot (opened from the feed, a profile or a notification). A new object flies again. */
+  focus?: { lat: number; lng: number; id: number } | null;
 }
 
 export default function SkateMap({ 
@@ -35,8 +39,10 @@ export default function SkateMap({
   isAddingMode = false,
   onMapClick,
   onSpotClick,
-  onReportSpot,
-  onNotice = (message: string) => alert(message)
+  favoriteIds = null,
+  onToggleFavorite,
+  onNotice = (message: string) => alert(message),
+  focus = null,
 }: SkateMapProps) {
   const { t } = useTranslation();
   const webviewRef = useRef<ComponentRef<typeof WebView>>(null);
@@ -46,7 +52,8 @@ export default function SkateMap({
   const strings = {
     rate: cleanLabel(t('webview.rate')),
     route: cleanLabel(t('webview.route')),
-    report: t('report.title'),
+    save: t('social.save'),
+    saved: t('social.saved'),
     close: cleanLabel(t('form.close')),
     unnamed: t('webview.unnamed'),
     noDescription: t('webview.noDescription'),
@@ -98,6 +105,24 @@ export default function SkateMap({
       `);
     }
   }, [spots]);
+
+  // Spots guardados: el popup pinta el marcador de "guardado" con esta lista
+  const favoritesJson = JSON.stringify(favoriteIds);
+  useEffect(() => {
+    if (mapReadyRef.current && webviewRef.current) {
+      webviewRef.current.injectJavaScript(`window.__setFavorites(${favoritesJson}); true;`);
+    }
+  }, [favoritesJson]);
+
+  // Vuelo a un spot pedido desde fuera del mapa
+  const flyToFocus = focus
+    ? `if (typeof map !== 'undefined') { map.flyTo([${Number(focus.lat)}, ${Number(focus.lng)}], Math.max(map.getZoom(), 16), { duration: 1.2 }); }`
+    : '';
+  useEffect(() => {
+    if (mapReadyRef.current && webviewRef.current && flyToFocus) {
+      webviewRef.current.injectJavaScript(`${flyToFocus} true;`);
+    }
+  }, [focus, flyToFocus]);
 
   // Sincronizamos la ubicación del usuario
   useEffect(() => {
@@ -222,6 +247,7 @@ export default function SkateMap({
           }
           .popup-icon-btn svg { display: block; }
           .popup-icon-btn:active { transform: scale(0.94); }
+          .popup-icon-btn.is-on { color: var(--paint-yellow, #FFD400); }
           .popup-card { width: 240px; font-family: system-ui, Roboto, sans-serif; color: var(--asphalt); }
           .popup-image { display: block; width: 100%; height: 112px; object-fit: cover; background: var(--concrete) linear-gradient(160deg, #D3D3CE, var(--concrete)); }
           .popup-image-empty { display: flex; align-items: center; justify-content: center; }
@@ -560,7 +586,31 @@ export default function SkateMap({
             return out;
           }
 
-          var FLAG_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V3.5"/><path d="M5 4h12.5l-2.6 4.5 2.6 4.5H5"/></svg>';
+          function bookmarkSvg(filled) {
+            return '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="' + (filled ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
+          }
+          // Saved spots, kept in sync by the app. A tap flips the button at once; the app confirms
+          // (or puts it back) by sending the list again.
+          window.FAVORITES = {};
+          window.CAN_SAVE = false;
+          window.__setFavorites = function(ids) {
+            window.CAN_SAVE = ids !== null;
+            window.FAVORITES = {};
+            (ids || []).forEach(function(id) { window.FAVORITES[id] = true; });
+            var btn = document.querySelector('.popup-save-btn');
+            if (btn) window.__paintSave(btn, !!window.FAVORITES[Number(btn.getAttribute('data-spot'))]);
+          };
+          window.__paintSave = function(btn, on) {
+            btn.className = 'popup-icon-btn popup-save-btn' + (on ? ' is-on' : '');
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            btn.setAttribute('aria-label', on ? window.I18N.saved : window.I18N.save);
+            btn.innerHTML = bookmarkSvg(on);
+          };
+          window.__toggleSave = function(btn) {
+            var id = Number(btn.getAttribute('data-spot'));
+            if (window.CAN_SAVE) window.__paintSave(btn, !window.FAVORITES[id]);
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'toggleFavorite', spotId: id }));
+          };
           var CLOSE_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
           window.__closePopup = function() { map.closePopup(); };
           var CAMERA_SVG = '<svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="var(--ink-muted)" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
@@ -590,7 +640,7 @@ export default function SkateMap({
 
               var spotId = Number(spot.id) || 0;
               var actions = '<div class="popup-actions">' +
-                '<button class="popup-icon-btn" aria-label="' + escapeHtml(window.I18N.report) + '" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: \\'reportSpot\\', spotId: ' + spotId + ' }))">' + FLAG_SVG + '</button>' +
+                '<button class="popup-icon-btn popup-save-btn' + (window.FAVORITES[spotId] ? ' is-on' : '') + '" data-spot="' + spotId + '" aria-pressed="' + (window.FAVORITES[spotId] ? 'true' : 'false') + '" aria-label="' + escapeHtml(window.FAVORITES[spotId] ? window.I18N.saved : window.I18N.save) + '" onclick="window.__toggleSave(this)">' + bookmarkSvg(!!window.FAVORITES[spotId]) + '</button>' +
                 '<button class="popup-icon-btn" aria-label="' + escapeHtml(window.I18N.close) + '" onclick="window.__closePopup()">' + CLOSE_SVG + '</button>' +
               '</div>';
 
@@ -895,6 +945,8 @@ export default function SkateMap({
               window.renderSpots(${serializeForInlineScript(spots)});
               ${userLocation ? `window.updateUserLocation(${userLocation.lat},${userLocation.lng});` : ''}
               window.isAddingMode = ${isAddingMode};
+              window.__setFavorites(${favoritesJson});
+              ${flyToFocus}
             }
             true;
           `);
@@ -938,9 +990,9 @@ export default function SkateMap({
             Number.isSafeInteger(data.spotId) && data.spotId > 0 && onSpotClick) {
              onSpotClick(data.spotId);
           }
-          else if (data.type === 'reportSpot' &&
-            Number.isSafeInteger(data.spotId) && data.spotId > 0 && onReportSpot) {
-             onReportSpot(data.spotId);
+          else if (data.type === 'toggleFavorite' &&
+            Number.isSafeInteger(data.spotId) && data.spotId > 0 && onToggleFavorite) {
+             onToggleFavorite(data.spotId);
           }
           else if (data.type === 'openDirections' &&
             Number.isFinite(data.lat) && Number.isFinite(data.lng) &&

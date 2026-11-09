@@ -99,7 +99,10 @@
     "emailTaken": "Email này đã được đăng ký.",
     "emailInvalid": "Hãy kiểm tra địa chỉ email.",
     "continueWithGoogle": "Tiếp tục với Google",
-    "googleFailed": "Đăng nhập bằng Google thất bại. Hãy thử lại."
+    "googleFailed": "Đăng nhập bằng Google thất bại. Hãy thử lại.",
+    "tryDemo": "Dùng thử bản demo",
+    "demoHint": "Không cần đăng ký: một tài khoản thử nghiệm dùng chung.",
+    "demoFailed": "Bản demo hiện không khả dụng. Hãy thử lại sau."
   },
   "admin": {
     "backToMap": "Quay lại bản đồ",
@@ -167,7 +170,10 @@
     "photoRejected": "Ảnh này không được phép (khỏa thân, ma túy, bạo lực, quảng cáo hoặc dữ liệu cá nhân). Hãy chọn ảnh khác.",
     "photoUnclear": "Ảnh quá tối hoặc mờ, không thấy được spot. Hãy chụp ảnh khác.",
     "photoNotPlace": "Ảnh phải cho thấy chính spot, không phải meme, ảnh chụp màn hình hay ảnh tự sướng cận cảnh.",
-    "textRejected": "Tên hoặc mô tả vi phạm quy định (spam, nội dung không phù hợp hoặc vô nghĩa)."
+    "textRejected": "Tên hoặc mô tả vi phạm quy định (spam, nội dung không phù hợp hoặc vô nghĩa).",
+    "demoReadonly": "Không khả dụng với tài khoản demo. Hãy tạo tài khoản riêng để thử.",
+    "notOwner": "Bạn chỉ có thể thay đổi bài đăng của chính mình.",
+    "cannotFollowSelf": "Bạn không thể tự theo dõi chính mình."
   },
   "types": {
     "STREET": "Đường phố",
@@ -231,5 +237,70 @@
   },
   "legal": {
     "link": "Quy định & quyền riêng tư"
+  },
+  "social": {
+    "map": "Bản đồ",
+    "feed": "Bảng tin",
+    "notifications": "Thông báo",
+    "profile": "Hồ sơ",
+    "follow": "Theo dõi",
+    "followingState": "Đang theo dõi",
+    "spotsCount": "Spot",
+    "followersCount": "Người theo dõi",
+    "followingCount": "Đang theo dõi",
+    "ratingsCount": "Đánh giá",
+    "commentsCount": "Bình luận",
+    "memberSince": "Tham gia từ {{date}}",
+    "editProfile": "Chỉnh sửa hồ sơ",
+    "bio": "Giới thiệu",
+    "bioPlaceholder": "Thành phố của bạn, spot của bạn, phong cách của bạn…",
+    "changePhoto": "Đổi ảnh",
+    "removePhoto": "Xóa ảnh",
+    "save": "Lưu",
+    "saved": "Đã lưu",
+    "savedSpots": "Spot đã lưu",
+    "savedEmpty": "Chưa có spot nào được lưu. Nhấn Lưu ở một spot để giữ nó tại đây.",
+    "deleteAccount": "Xóa tài khoản",
+    "deleteAccountHint": "Xóa tài khoản sẽ xóa hồ sơ, danh sách theo dõi và các spot đã lưu. Spot và bình luận của bạn vẫn còn, hiển thị là “Người dùng đã xóa”.",
+    "deleteAccountConfirm": "Xóa tài khoản của bạn? Không thể hoàn tác.",
+    "deletedUser": "Người dùng đã xóa",
+    "userNotFound": "Skater này không tồn tại hoặc đã xóa tài khoản.",
+    "noSpotsYet": "Chưa có spot nào.",
+    "nobodyYet": "Chưa có ai ở đây.",
+    "feedEmpty": "Bảng tin của bạn đang trống. Hãy theo dõi các skater để xem spot họ thêm, đánh giá và bình luận.",
+    "signInToSee": "Đăng nhập để xem bảng tin và thông báo của bạn.",
+    "notificationsEmpty": "Chưa có thông báo nào.",
+    "unread": "Chưa đọc",
+    "loadMore": "Tải thêm",
+    "activity": {
+      "SPOT_CREATED": "đã thêm một spot",
+      "COMMENTED": "đã bình luận về một spot",
+      "RATED": "đã đánh giá một spot"
+    },
+    "notif": {
+      "FOLLOW": "đã bắt đầu theo dõi bạn",
+      "COMMENT_ON_SPOT": "đã bình luận về spot {{spot}} của bạn",
+      "REPLY": "đã trả lời bình luận của bạn",
+      "COMMENT_LIKE": "đã thích bình luận của bạn"
+    },
+    "reply": "Trả lời",
+    "replyingTo": "Trả lời {{username}}",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "edited": "đã sửa",
+    "like": "Thích",
+    "commentDeleted": "Bình luận đã bị xóa",
+    "deleteCommentConfirm": "Xóa bình luận này?",
+    "writeComment": "Viết bình luận…",
+    "signInToComment": "Đăng nhập để bình luận",
+    "commentRejected": "Bình luận này vi phạm quy tắc cộng đồng (spam, nội dung không phù hợp hoặc văn bản vô nghĩa).",
+    "bioRejected": "Phần giới thiệu này vi phạm quy tắc cộng đồng (spam, nội dung không phù hợp hoặc văn bản vô nghĩa).",
+    "share": "Chia sẻ",
+    "linkCopied": "Đã sao chép liên kết",
+    "addedBy": "Thêm bởi",
+    "editSpot": "Sửa spot",
+    "deleteSpot": "Xóa spot",
+    "deleteSpotConfirm": "Xóa spot này? Ảnh, đánh giá và bình luận của nó cũng sẽ bị xóa.",
+    "loadFailed": "Không tải được. Hãy kiểm tra kết nối và thử lại."
   }
 }

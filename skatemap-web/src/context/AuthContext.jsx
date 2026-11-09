@@ -1,8 +1,10 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-import api, { clearAccessToken, setAccessToken } from '../api/axiosConfig';
+import api, { clearAccessToken, refreshSession, setAccessToken } from '../api/axiosConfig';
 
 const AuthContext = createContext();
 
+// The hook lives next to its provider on purpose; fast refresh then reloads this file in full
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
 
 // La respuesta de sesión (login, Google, refresh) trae el rol: ROLE_USER o ROLE_ADMIN
@@ -18,11 +20,8 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        api.post('/auth/refresh')
-            .then((response) => {
-                setAccessToken(response.data.token);
-                setUser(toUser(response.data));
-            })
+        refreshSession()
+            .then((response) => setUser(toUser(response.data)))
             .catch((error) => {
                 clearAccessToken();
                 if (error.response?.status !== 401) {
@@ -58,6 +57,14 @@ export const AuthProvider = ({ children }) => {
         return true;
     };
 
+    // Shared demo account: same session shape as a normal login
+    const loginDemo = async () => {
+        const response = await api.post('/auth/demo');
+        setAccessToken(response.data.token);
+        setUser(toUser(response.data));
+        return true;
+    };
+
     const logout = async () => {
         clearAccessToken();
         setUser(null);
@@ -74,7 +81,7 @@ export const AuthProvider = ({ children }) => {
     const isAdmin = user?.role === 'ROLE_ADMIN';
 
     return (
-        <AuthContext.Provider value={{ user, isAdmin, login, loginWithGoogle, logout, loading }}>
+        <AuthContext.Provider value={{ user, isAdmin, login, loginWithGoogle, loginDemo, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );

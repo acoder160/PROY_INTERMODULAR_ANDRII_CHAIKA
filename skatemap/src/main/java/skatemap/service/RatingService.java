@@ -7,6 +7,7 @@ import skatemap.dto.RatingDto;
 import skatemap.entity.Rating;
 import skatemap.entity.Spot;
 import skatemap.entity.User;
+import skatemap.entity.enums.ActivityType;
 import skatemap.repository.RatingRepository;
 import skatemap.repository.SpotRepository;
 import skatemap.repository.UserRepository;
@@ -20,9 +21,11 @@ public class RatingService {
     private final SpotRepository spotRepository;
     private final UserRepository userRepository;
     private final SpotListCache spotListCache;
+    private final FeedService feedService;
 
     public RatingService(RatingRepository ratingRepository, SpotRepository spotRepository,
-                         UserRepository userRepository, SpotListCache spotListCache) {
+                         UserRepository userRepository, SpotListCache spotListCache, FeedService feedService) {
+        this.feedService = feedService;
         this.ratingRepository = ratingRepository;
         this.spotRepository = spotRepository;
         this.userRepository = userRepository;
@@ -38,6 +41,7 @@ public class RatingService {
                 .orElseThrow(() -> ApiException.notFound("User"));
 
         Spot spot = spotRepository.findById(spotId)
+                .filter(Spot::isPublic)
                 .orElseThrow(() -> ApiException.notFound("Spot"));
 
         // One rating per user and spot: rating again updates it
@@ -54,6 +58,10 @@ public class RatingService {
 
         rating.setValue(value);
         ratingRepository.save(rating);
+        // Only the first rating goes to the feed; changing it later is not news
+        if (existingRating.isEmpty()) {
+            feedService.record(user, ActivityType.RATED, spot, null, value);
+        }
 
         // Recompute the cached average on the spot
         Double average = ratingRepository.getAverageRating(spotId);

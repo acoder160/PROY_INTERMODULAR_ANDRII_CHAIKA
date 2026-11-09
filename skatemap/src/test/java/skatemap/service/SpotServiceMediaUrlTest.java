@@ -52,7 +52,8 @@ class SpotServiceMediaUrlTest {
 
         spotService = new SpotService(spotRepository, userRepository,
                 mock(RatingRepository.class), mock(CommentRepository.class), mock(SpotReportRepository.class),
-                moderation, imageModeration, cloudinaryAssets, new SpotListCache());
+                moderation, imageModeration, cloudinaryAssets, new SpotListCache(),
+                mock(FeedService.class), mock(UserLookup.class), mock(org.springframework.transaction.PlatformTransactionManager.class));
         ReflectionTestUtils.setField(spotService, "cloudinaryCloudName", "skatecloud");
     }
 

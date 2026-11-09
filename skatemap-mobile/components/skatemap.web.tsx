@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-export default function SkateMap({ spots = [] }: { spots?: any[] }) {
+// Same props as the native map; the web export only draws the spots
+export default function SkateMap({ spots = [] }: { spots?: any[]; [prop: string]: unknown }) {
   const spotsJSON = (JSON.stringify(spots) ?? '[]')
     .replace(/</g, '\\u003c')
     .replace(/>/g, '\\u003e')

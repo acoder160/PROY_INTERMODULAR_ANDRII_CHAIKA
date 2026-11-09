@@ -99,7 +99,10 @@
     "emailTaken": "Email hori erregistratuta dago jada.",
     "emailInvalid": "Egiaztatu email helbidea.",
     "continueWithGoogle": "Jarraitu Googlerekin",
-    "googleFailed": "Ezin izan da Googlerekin sartu. Saiatu berriro."
+    "googleFailed": "Ezin izan da Googlerekin sartu. Saiatu berriro.",
+    "tryDemo": "Probatu demoa",
+    "demoHint": "Izena eman gabe: proba-kontu partekatu bat.",
+    "demoFailed": "Demoa ez dago erabilgarri orain. Saiatu geroago."
   },
   "admin": {
     "backToMap": "Itzuli mapara",
@@ -167,7 +170,10 @@
     "photoRejected": "Argazki hau ez dago baimenduta (biluztasuna, drogak, indarkeria, iragarkiak edo datu pertsonalak). Aukeratu beste bat.",
     "photoUnclear": "Argazkia ilunegia edo lausoegia dago spota ikusteko. Atera beste bat.",
     "photoNotPlace": "Argazkiak spota bera erakutsi behar du, ez meme bat, pantaila-argazki bat edo gertuko selfie bat.",
-    "textRejected": "Izenak edo deskribapenak arauak urratzen ditu (spama, eduki desegokia edo zentzugabekeria)."
+    "textRejected": "Izenak edo deskribapenak arauak urratzen ditu (spama, eduki desegokia edo zentzugabekeria).",
+    "demoReadonly": "Ez dago erabilgarri demo kontuan. Sortu zure kontua probatzeko.",
+    "notOwner": "Zure argitalpenak soilik alda ditzakezu.",
+    "cannotFollowSelf": "Ezin diozu zeure buruari jarraitu."
   },
   "types": {
     "STREET": "Kalea",
@@ -231,5 +237,70 @@
   },
   "legal": {
     "link": "Arauak eta pribatutasuna"
+  },
+  "social": {
+    "map": "Mapa",
+    "feed": "Jarduera",
+    "notifications": "Jakinarazpenak",
+    "profile": "Profila",
+    "follow": "Jarraitu",
+    "followingState": "Jarraitzen",
+    "spotsCount": "Spotak",
+    "followersCount": "Jarraitzaileak",
+    "followingCount": "Jarraituak",
+    "ratingsCount": "Balorazioak",
+    "commentsCount": "Iruzkinak",
+    "memberSince": "Kide noiztik: {{date}}",
+    "editProfile": "Editatu profila",
+    "bio": "Biografia",
+    "bioPlaceholder": "Zure hiria, zure spotak, zure estiloa…",
+    "changePhoto": "Aldatu argazkia",
+    "removePhoto": "Kendu argazkia",
+    "save": "Gorde",
+    "saved": "Gordeta",
+    "savedSpots": "Gordetako spotak",
+    "savedEmpty": "Oraindik ez duzu spotik gorde. Sakatu Gorde spot batean hemen izateko.",
+    "deleteAccount": "Ezabatu kontua",
+    "deleteAccountHint": "Kontua ezabatzean zure profila, jarraitzen dituzunak eta gordetako spotak ezabatzen dira. Zure spotak eta iruzkinak geratu egiten dira, “Ezabatutako erabiltzailea” gisa.",
+    "deleteAccountConfirm": "Kontua ezabatu? Ezin da desegin.",
+    "deletedUser": "Ezabatutako erabiltzailea",
+    "userNotFound": "Skater hau ez dago edo kontua ezabatu du.",
+    "noSpotsYet": "Oraindik ez dago spotik.",
+    "nobodyYet": "Oraindik ez dago inor.",
+    "feedEmpty": "Zure jarduera hutsik dago. Jarraitu beste skater batzuei gehitzen, baloratzen eta iruzkintzen dituzten spotak ikusteko.",
+    "signInToSee": "Hasi saioa zure jarduera eta jakinarazpenak ikusteko.",
+    "notificationsEmpty": "Oraindik ez dago jakinarazpenik.",
+    "unread": "Irakurri gabea",
+    "loadMore": "Kargatu gehiago",
+    "activity": {
+      "SPOT_CREATED": "spot bat gehitu du",
+      "COMMENTED": "spot bati iruzkina egin dio",
+      "RATED": "spot bat baloratu du"
+    },
+    "notif": {
+      "FOLLOW": "zu jarraitzen hasi da",
+      "COMMENT_ON_SPOT": "zure {{spot}} spotari iruzkina egin dio",
+      "REPLY": "zure iruzkinari erantzun dio",
+      "COMMENT_LIKE": "zure iruzkina gustatu zaio"
+    },
+    "reply": "Erantzun",
+    "replyingTo": "Erantzuna {{username}}(r)i",
+    "edit": "Editatu",
+    "delete": "Ezabatu",
+    "edited": "editatuta",
+    "like": "Gustuko dut",
+    "commentDeleted": "Iruzkina ezabatu da",
+    "deleteCommentConfirm": "Iruzkin hau ezabatu?",
+    "writeComment": "Idatzi iruzkin bat…",
+    "signInToComment": "Hasi saioa iruzkintzeko",
+    "commentRejected": "Iruzkin honek komunitatearen arauak urratzen ditu (spama, eduki desegokia edo zentzurik gabeko testua).",
+    "bioRejected": "Biografia honek komunitatearen arauak urratzen ditu (spama, eduki desegokia edo zentzurik gabeko testua).",
+    "share": "Partekatu",
+    "linkCopied": "Esteka kopiatu da",
+    "addedBy": "Nork gehitua:",
+    "editSpot": "Editatu spota",
+    "deleteSpot": "Ezabatu spota",
+    "deleteSpotConfirm": "Spot hau ezabatu? Argazkia, balorazioak eta iruzkinak ere ezabatuko dira.",
+    "loadFailed": "Ezin izan da kargatu. Egiaztatu konexioa eta saiatu berriro."
   }
 }

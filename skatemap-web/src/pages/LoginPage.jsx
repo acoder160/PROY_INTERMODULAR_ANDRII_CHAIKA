@@ -6,6 +6,9 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 import '../Auth.css';
 
+// Shared demo account (POST /api/auth/demo); the button only shows when the backend has it on
+const DEMO_ENABLED = import.meta.env.VITE_DEMO_ENABLED === 'true';
+
 export default function LoginPage() {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
@@ -19,7 +22,21 @@ export default function LoginPage() {
 
   const navigate = useNavigate();
   const justRegistered = Boolean(useLocation().state?.registered);
-  const { login } = useAuth();
+  const { login, loginDemo } = useAuth();
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
+
+  const handleDemo = async () => {
+    setError('');
+    setIsDemoLoading(true);
+    try {
+      await loginDemo();
+      navigate('/map');
+    } catch {
+      setError(t('auth.demoFailed'));
+    } finally {
+      setIsDemoLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -65,7 +82,7 @@ export default function LoginPage() {
             <strong>{t('auth.welcomeTitle')}</strong> {t('auth.accountCreated')}
           </div>
         )}
-        {error && !isLoading && <div className="error-message" role="alert">{error}</div>}
+        {error && !isLoading && !isDemoLoading && <div className="error-message" role="alert">{error}</div>}
 
         {isWakingUp && (
           <div className="loading-message" role="status">
@@ -108,6 +125,15 @@ export default function LoginPage() {
             {isLoading ? t('auth.loggingIn') : t('auth.loginButton')}
           </button>
         </form>
+
+        {DEMO_ENABLED && (
+          <div className="demo-block">
+            <button type="button" className="demo-button" onClick={handleDemo} disabled={isLoading || isDemoLoading}>
+              {isDemoLoading ? t('auth.loggingIn') : t('auth.tryDemo')}
+            </button>
+            <p className="demo-hint">{t('auth.demoHint')}</p>
+          </div>
+        )}
 
         <GoogleSignInButton />
 

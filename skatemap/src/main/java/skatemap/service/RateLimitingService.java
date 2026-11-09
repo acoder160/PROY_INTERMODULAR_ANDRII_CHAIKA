@@ -23,11 +23,24 @@ public class RateLimitingService {
         COMMENT_ADMIN(100, Duration.ofMinutes(30)),
         UPLOAD_SIGNATURE(20, Duration.ofHours(1)),
         REPORT(5, Duration.ofMinutes(10)),
+        // Social: cheap writes, but each may notify someone, so spamming them must not pay off
+        FOLLOW(30, Duration.ofMinutes(10)),
+        LIKE(60, Duration.ofMinutes(10)),
+        FAVORITE(60, Duration.ofMinutes(10)),
+        // Each of these runs an AI moderation call
+        PROFILE_UPDATE(10, Duration.ofHours(1)),
+        SPOT_EDIT(10, Duration.ofHours(1)),
+        // Shared demo account: counted per (demo, client IP), tighter than a normal account
+        SPOT_CREATE_DEMO(1, Duration.ofMinutes(10)),
+        COMMENT_DEMO(3, Duration.ofMinutes(30)),
+        UPLOAD_SIGNATURE_DEMO(3, Duration.ofHours(1)),
+        REPORT_DEMO(2, Duration.ofMinutes(10)),
         // Per client IP
         LOGIN(10, Duration.ofMinutes(1)),
         REGISTER(5, Duration.ofHours(1)),
         REFRESH(30, Duration.ofMinutes(1)),
-        GOOGLE(20, Duration.ofMinutes(1));
+        GOOGLE(20, Duration.ofMinutes(1)),
+        DEMO_LOGIN(10, Duration.ofMinutes(1));
 
         final long capacity;
         final Duration period;

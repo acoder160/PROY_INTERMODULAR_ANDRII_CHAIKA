@@ -99,7 +99,10 @@
     "emailTaken": "Bu e-posta zaten kayıtlı.",
     "emailInvalid": "E-posta adresini kontrol et.",
     "continueWithGoogle": "Google ile devam et",
-    "googleFailed": "Google ile giriş başarısız. Tekrar dene."
+    "googleFailed": "Google ile giriş başarısız. Tekrar dene.",
+    "tryDemo": "Demoyu dene",
+    "demoHint": "Kayıt gerekmez: ortak bir test hesabı.",
+    "demoFailed": "Demo şu anda kullanılamıyor. Daha sonra tekrar deneyin."
   },
   "admin": {
     "backToMap": "Haritaya dön",
@@ -167,7 +170,10 @@
     "photoRejected": "Bu fotoğrafa izin verilmiyor (çıplaklık, uyuşturucu, şiddet, reklam veya kişisel veri). Başka bir tane seçin.",
     "photoUnclear": "Fotoğraf spotu görmek için fazla karanlık veya bulanık. Yeni bir tane çekin.",
     "photoNotPlace": "Fotoğraf spotun kendisini göstermeli; meme, ekran görüntüsü veya yakın çekim selfie olmamalı.",
-    "textRejected": "Ad veya açıklama kurallara aykırı (spam, uygunsuz içerik veya anlamsız metin)."
+    "textRejected": "Ad veya açıklama kurallara aykırı (spam, uygunsuz içerik veya anlamsız metin).",
+    "demoReadonly": "Demo hesapta kullanılamaz. Denemek için kendi hesabınızı oluşturun.",
+    "notOwner": "Yalnızca kendi paylaşımlarınızı değiştirebilirsiniz.",
+    "cannotFollowSelf": "Kendinizi takip edemezsiniz."
   },
   "types": {
     "STREET": "Sokak",
@@ -231,5 +237,70 @@
   },
   "legal": {
     "link": "Kurallar ve gizlilik"
+  },
+  "social": {
+    "map": "Harita",
+    "feed": "Akış",
+    "notifications": "Bildirimler",
+    "profile": "Profil",
+    "follow": "Takip et",
+    "followingState": "Takip ediliyor",
+    "spotsCount": "Spotlar",
+    "followersCount": "Takipçiler",
+    "followingCount": "Takip edilenler",
+    "ratingsCount": "Puanlar",
+    "commentsCount": "Yorumlar",
+    "memberSince": "Katılma tarihi: {{date}}",
+    "editProfile": "Profili düzenle",
+    "bio": "Hakkımda",
+    "bioPlaceholder": "Şehriniz, spotlarınız, tarzınız…",
+    "changePhoto": "Fotoğrafı değiştir",
+    "removePhoto": "Fotoğrafı kaldır",
+    "save": "Kaydet",
+    "saved": "Kaydedildi",
+    "savedSpots": "Kaydedilen spotlar",
+    "savedEmpty": "Henüz kaydedilmiş spot yok. Bir spotta Kaydet’e dokunarak burada saklayın.",
+    "deleteAccount": "Hesabı sil",
+    "deleteAccountHint": "Hesabınızı silmek profilinizi, takip ettiklerinizi ve kaydettiğiniz spotları kaldırır. Spotlarınız ve yorumlarınız “Silinmiş kullanıcı” olarak kalır.",
+    "deleteAccountConfirm": "Hesabınız silinsin mi? Bu işlem geri alınamaz.",
+    "deletedUser": "Silinmiş kullanıcı",
+    "userNotFound": "Bu kaykaycı yok veya hesabını silmiş.",
+    "noSpotsYet": "Henüz spot yok.",
+    "nobodyYet": "Burada henüz kimse yok.",
+    "feedEmpty": "Akışınız boş. Ekledikleri, puanladıkları ve yorumladıkları spotları görmek için kaykaycıları takip edin.",
+    "signInToSee": "Akışınızı ve bildirimlerinizi görmek için giriş yapın.",
+    "notificationsEmpty": "Henüz bildirim yok.",
+    "unread": "Okunmadı",
+    "loadMore": "Daha fazla yükle",
+    "activity": {
+      "SPOT_CREATED": "bir spot ekledi",
+      "COMMENTED": "bir spota yorum yaptı",
+      "RATED": "bir spotu puanladı"
+    },
+    "notif": {
+      "FOLLOW": "sizi takip etmeye başladı",
+      "COMMENT_ON_SPOT": "{{spot}} spotunuza yorum yaptı",
+      "REPLY": "yorumunuza yanıt verdi",
+      "COMMENT_LIKE": "yorumunuzu beğendi"
+    },
+    "reply": "Yanıtla",
+    "replyingTo": "{{username}} kullanıcısına yanıt",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "edited": "düzenlendi",
+    "like": "Beğen",
+    "commentDeleted": "Yorum silindi",
+    "deleteCommentConfirm": "Bu yorum silinsin mi?",
+    "writeComment": "Bir yorum yazın…",
+    "signInToComment": "Yorum yapmak için giriş yapın",
+    "commentRejected": "Bu yorum topluluk kurallarını ihlal ediyor (spam, uygunsuz içerik veya anlamsız metin).",
+    "bioRejected": "Bu biyografi topluluk kurallarını ihlal ediyor (spam, uygunsuz içerik veya anlamsız metin).",
+    "share": "Paylaş",
+    "linkCopied": "Bağlantı kopyalandı",
+    "addedBy": "Ekleyen",
+    "editSpot": "Spotu düzenle",
+    "deleteSpot": "Spotu sil",
+    "deleteSpotConfirm": "Bu spot silinsin mi? Fotoğrafı, puanları ve yorumları da silinir.",
+    "loadFailed": "Yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin."
   }
 }

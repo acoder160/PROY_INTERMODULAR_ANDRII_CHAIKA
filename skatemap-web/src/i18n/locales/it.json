@@ -99,7 +99,10 @@
     "emailTaken": "Questa email è già registrata.",
     "emailInvalid": "Controlla l’indirizzo email.",
     "continueWithGoogle": "Continua con Google",
-    "googleFailed": "Accesso con Google non riuscito. Riprova."
+    "googleFailed": "Accesso con Google non riuscito. Riprova.",
+    "tryDemo": "Prova la demo",
+    "demoHint": "Senza registrazione: un account di prova condiviso.",
+    "demoFailed": "La demo non è disponibile al momento. Riprova più tardi."
   },
   "admin": {
     "backToMap": "Torna alla mappa",
@@ -167,7 +170,10 @@
     "photoRejected": "Questa foto non è consentita (nudità, droghe, violenza, pubblicità o dati personali). Scegline un'altra.",
     "photoUnclear": "La foto è troppo scura o sfocata per vedere lo spot. Scattane un'altra.",
     "photoNotPlace": "La foto deve mostrare lo spot, non un meme, uno screenshot o un selfie ravvicinato.",
-    "textRejected": "Il nome o la descrizione violano le regole (spam, contenuti inappropriati o testo senza senso)."
+    "textRejected": "Il nome o la descrizione violano le regole (spam, contenuti inappropriati o testo senza senso).",
+    "demoReadonly": "Non disponibile con l’account demo. Crea il tuo account per provarlo.",
+    "notOwner": "Puoi modificare solo i tuoi contenuti.",
+    "cannotFollowSelf": "Non puoi seguire te stesso."
   },
   "types": {
     "STREET": "Street",
@@ -231,5 +237,70 @@
   },
   "legal": {
     "link": "Regole e privacy"
+  },
+  "social": {
+    "map": "Mappa",
+    "feed": "Feed",
+    "notifications": "Notifiche",
+    "profile": "Profilo",
+    "follow": "Segui",
+    "followingState": "Segui già",
+    "spotsCount": "Spot",
+    "followersCount": "Follower",
+    "followingCount": "Seguiti",
+    "ratingsCount": "Valutazioni",
+    "commentsCount": "Commenti",
+    "memberSince": "Con noi da {{date}}",
+    "editProfile": "Modifica profilo",
+    "bio": "Bio",
+    "bioPlaceholder": "La tua città, i tuoi spot, il tuo stile…",
+    "changePhoto": "Cambia foto",
+    "removePhoto": "Rimuovi foto",
+    "save": "Salva",
+    "saved": "Salvato",
+    "savedSpots": "Spot salvati",
+    "savedEmpty": "Nessuno spot salvato. Tocca Salva su uno spot per ritrovarlo qui.",
+    "deleteAccount": "Elimina account",
+    "deleteAccountHint": "Eliminando l’account cancelli profilo, persone seguite e spot salvati. I tuoi spot e commenti restano, come “Utente eliminato”.",
+    "deleteAccountConfirm": "Eliminare l’account? Non si può annullare.",
+    "deletedUser": "Utente eliminato",
+    "userNotFound": "Questo skater non esiste o ha eliminato l’account.",
+    "noSpotsYet": "Ancora nessuno spot.",
+    "nobodyYet": "Ancora nessuno qui.",
+    "feedEmpty": "Il tuo feed è vuoto. Segui altri skater per vedere gli spot che aggiungono, valutano e commentano.",
+    "signInToSee": "Accedi per vedere il tuo feed e le notifiche.",
+    "notificationsEmpty": "Ancora nessuna notifica.",
+    "unread": "Non letto",
+    "loadMore": "Carica altro",
+    "activity": {
+      "SPOT_CREATED": "ha aggiunto uno spot",
+      "COMMENTED": "ha commentato uno spot",
+      "RATED": "ha valutato uno spot"
+    },
+    "notif": {
+      "FOLLOW": "ha iniziato a seguirti",
+      "COMMENT_ON_SPOT": "ha commentato il tuo spot {{spot}}",
+      "REPLY": "ha risposto al tuo commento",
+      "COMMENT_LIKE": "ha messo mi piace al tuo commento"
+    },
+    "reply": "Rispondi",
+    "replyingTo": "Risposta a {{username}}",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "edited": "modificato",
+    "like": "Mi piace",
+    "commentDeleted": "Commento eliminato",
+    "deleteCommentConfirm": "Eliminare questo commento?",
+    "writeComment": "Scrivi un commento…",
+    "signInToComment": "Accedi per commentare",
+    "commentRejected": "Questo commento viola le regole della community (spam, contenuti inappropriati o testo senza senso).",
+    "bioRejected": "Questa bio viola le regole della community (spam, contenuti inappropriati o testo senza senso).",
+    "share": "Condividi",
+    "linkCopied": "Link copiato",
+    "addedBy": "Aggiunto da",
+    "editSpot": "Modifica spot",
+    "deleteSpot": "Elimina spot",
+    "deleteSpotConfirm": "Eliminare questo spot? Verranno eliminati anche foto, valutazioni e commenti.",
+    "loadFailed": "Impossibile caricare. Controlla la connessione e riprova."
   }
 }

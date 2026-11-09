@@ -8,6 +8,10 @@ import RegisterPage from './pages/RegisterPage';
 import MapPage from './pages/MapPage';
 import AdminPage from './pages/AdminPage';
 import LegalPage from './pages/LegalPage';
+import ProfilePage from './pages/ProfilePage';
+import FeedPage from './pages/FeedPage';
+import NotificationsPage from './pages/NotificationsPage';
+import SavedPage from './pages/SavedPage';
 
 function App() {
   return (
@@ -23,6 +27,11 @@ function App() {
 
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/legal" element={<LegalPage />} />
+          {/* Social: profiles are public; feed, notifications and saved spots ask for an account */}
+          <Route path="/u/:username" element={<ProfilePage />} />
+          <Route path="/feed" element={<FeedPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/saved" element={<SavedPage />} />
           <Route path="*" element={<Navigate to="/map" />} />
         </Routes>
       </BrowserRouter>

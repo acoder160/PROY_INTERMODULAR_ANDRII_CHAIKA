@@ -49,7 +49,20 @@ export const clearSession = async () => {
   await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
 };
 
-export const refreshSession = async () => {
+/**
+ * One refresh at a time: refresh tokens rotate and the server treats a reused one as stolen (it
+ * revokes the whole session family). A 401 arriving while the startup restore is still refreshing
+ * must wait for that request, not send the same token a second time.
+ */
+let refreshInFlight: ReturnType<typeof doRefresh> | null = null;
+export const refreshSession = () => {
+  if (!refreshInFlight) {
+    refreshInFlight = doRefresh().finally(() => { refreshInFlight = null; });
+  }
+  return refreshInFlight;
+};
+
+const doRefresh = async () => {
   const refreshToken = await getRefreshToken();
   if (Platform.OS !== 'web' && !refreshToken) {
     throw new Error('Refresh token is unavailable');
@@ -80,7 +93,6 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
     ...(Platform.OS === 'web' ? {} : { 'X-Client-Type': 'mobile' }),
-    'ngrok-skip-browser-warning': 'true',
   },
 });
 

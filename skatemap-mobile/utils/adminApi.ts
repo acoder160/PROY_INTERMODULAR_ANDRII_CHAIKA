@@ -74,6 +74,6 @@ export const removePhoto = (id: number) => api.post(`/admin/spots/${id}/photo`, 
 export const restorePhoto = (id: number) => api.post(`/admin/spots/${id}/photo`, { action: 'restore' });
 
 export const fetchComments = (spotId: number) =>
-  api.get<SpotComment[]>(`/comments/spot/${spotId}`).then((r) => (Array.isArray(r.data) ? r.data : []));
+  api.get<SpotComment[]>(`/spots/${spotId}/comments`).then((r) => (Array.isArray(r.data) ? r.data : []));
 
 export const deleteComment = (commentId: number) => api.delete(`/admin/comments/${commentId}`);

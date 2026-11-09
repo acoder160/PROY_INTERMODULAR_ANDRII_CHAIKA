@@ -5,26 +5,27 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import skatemap.exception.ApiException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import skatemap.dto.CommentDto;
-import skatemap.dto.RatingDto;
+import skatemap.dto.SocialDtos.CursorPage;
+import skatemap.dto.SocialDtos.SpotUpdate;
 import skatemap.dto.SpotDto;
+import skatemap.service.CommentService;
 import skatemap.service.SpotService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/spots")
 public class SpotController {
 
     private final SpotService spotService;
+    private final CommentService commentService;
 
-    public SpotController(SpotService spotService) {
+    public SpotController(SpotService spotService, CommentService commentService) {
         this.spotService = spotService;
+        this.commentService = commentService;
     }
 
     /** Max search radius for /nearby, so one request can't scan the whole table. */
@@ -32,12 +33,8 @@ public class SpotController {
 
     // Requires login
     @PostMapping
-    public ResponseEntity<SpotDto> createSpot(@Valid @RequestBody SpotDto spotDto) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
-        SpotDto newSpot = spotService.createSpot(spotDto, username);
-        return ResponseEntity.ok(newSpot);
+    public ResponseEntity<SpotDto> createSpot(@Valid @RequestBody SpotDto spotDto, Authentication auth) {
+        return ResponseEntity.ok(spotService.createSpot(spotDto, auth.getName()));
     }
 
     @GetMapping("/nearby")
@@ -58,26 +55,41 @@ public class SpotController {
         return revalidate(spotService.getAllSpots());
     }
 
-    // Comments of a spot
+    /** One spot, for shared links and feed items that open a spot the map hasn't loaded. */
+    @GetMapping("/{spotId}")
+    public ResponseEntity<SpotDto> getSpot(@PathVariable Long spotId) {
+        return revalidate(spotService.getVisibleSpot(spotId));
+    }
+
+    /**
+     * Comments of a spot: top-level comments newest first, each with its replies. Pass the
+     * {@code nextCursor} of a page as {@code before} for the next one. The body depends on who asks
+     * (likedByMe), so it may only be cached privately.
+     */
     @GetMapping("/{spotId}/comments")
-    public ResponseEntity<List<CommentDto>> getComments(@PathVariable Long spotId) {
-        return revalidate(spotService.getCommentsBySpot(spotId));
+    public ResponseEntity<CursorPage<CommentDto>> getComments(@PathVariable Long spotId,
+                                                              @RequestParam(required = false) Long before,
+                                                              @RequestParam(required = false) Integer limit) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noCache().cachePrivate())
+                .body(commentService.page(spotId, before, limit));
     }
 
-    // Rating the current user gave to this spot
-    @GetMapping("/{spotId}/my-rating")
-    public ResponseEntity<RatingDto> getMyRating(@PathVariable Long spotId) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
-        return ResponseEntity.ok(spotService.getUserRating(spotId, username));
+    /** The author edits their spot's texts, type or level. */
+    @PatchMapping("/{spotId}")
+    public ResponseEntity<SpotDto> updateSpot(@PathVariable Long spotId, @Valid @RequestBody SpotUpdate update,
+                                              Authentication auth) {
+        return ResponseEntity.ok(spotService.updateOwnSpot(spotId, update, auth.getName()));
     }
-    // Admins only
+
+    /** Admins may delete any spot; anyone else only their own (403 otherwise). */
     @DeleteMapping("/{spotId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteSpot(@PathVariable Long spotId) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        spotService.deleteSpot(spotId, auth.getName());
+    public ResponseEntity<Void> deleteSpot(@PathVariable Long spotId, Authentication auth) {
+        boolean admin = auth.getAuthorities().stream().anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+        if (admin) {
+            spotService.deleteSpot(spotId, auth.getName());
+        } else {
+            spotService.deleteOwnSpot(spotId, auth.getName());
+        }
         return ResponseEntity.ok().build();
     }
 

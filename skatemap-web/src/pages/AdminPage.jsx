@@ -443,7 +443,7 @@ function AdminComments({ spotId, onDeleted }) {
 
   useEffect(() => {
     let cancelled = false;
-    api.get(`/comments/spot/${spotId}`)
+    api.get(`/spots/${spotId}/comments`)
       .then((r) => { if (!cancelled) setComments(Array.isArray(r.data) ? r.data : []); })
       .catch(() => { if (!cancelled) { setFailed(true); setComments([]); } });
     return () => { cancelled = true; };

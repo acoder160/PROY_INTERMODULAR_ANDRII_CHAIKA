@@ -21,7 +21,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // RateLimitInterceptor decides per path which limit applies
         registry.addInterceptor(rateLimitInterceptor)
-                .addPathPatterns("/api/auth/**", "/api/spots/**", "/api/spots", "/api/comments/**", "/api/cloudinary/**");
+                .addPathPatterns("/api/auth/**", "/api/spots/**", "/api/spots", "/api/comments/**", "/api/cloudinary/**",
+                        "/api/users/**", "/api/favorites/**", "/api/push-tokens/**");
     }
 
     /**
@@ -34,7 +35,7 @@ public class WebConfig implements WebMvcConfigurer {
         // Weak ETag (W/"..."): Tomcat refuses to gzip responses carrying a strong one
         filter.setWriteWeakETag(true);
         FilterRegistrationBean<ShallowEtagHeaderFilter> registration = new FilterRegistrationBean<>(filter);
-        registration.addUrlPatterns("/api/spots", "/api/spots/*", "/api/comments/spot/*");
+        registration.addUrlPatterns("/api/spots", "/api/spots/*");
         registration.setName("etagFilter");
         return registration;
     }

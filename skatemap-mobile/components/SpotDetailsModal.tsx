@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, type ComponentRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Image, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Linking } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback, type ComponentRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, ScrollView, Image, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Linking, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Palette, DisplayFont, Radius, MIN_TARGET } from '../constants/theme';
 import GradientFill from '../components/ui/GradientFill';
@@ -8,14 +8,21 @@ import api from '../utils/api';
 import { cleanLabel } from '../utils/text';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
+import CommentSection from './social/CommentSection';
+import SpotFormModal from './SpotFormModal';
+import { apiErrorText, shareUrl } from '../utils/social';
 
-export default function SpotDetailsModal({ visible, onClose, spot, token, onSpotUpdated, onReport, userLocation }: any) {
+export default function SpotDetailsModal({ visible, onClose, spot, token, onSpotUpdated, onSpotDeleted, onReport, isFavorite, onToggleFavorite, userLocation }: any) {
   const { t } = useTranslation();
   const router = useRouter();
+  const { user } = useAuth();
   // El estado se reinicia al cambiar de spot: el padre monta este componente con key={spot.id}
-  const [comments, setComments] = useState<any[]>([]);
-  const [isLoadingComments, setIsLoadingComments] = useState(true);
-  const [commentsFailed, setCommentsFailed] = useState(false);
+  const [commentCount, setCommentCount] = useState<number | string>(0);
+  const [editForm, setEditForm] = useState<any | null>(null);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const isOwner = Boolean(user) && spot?.createdBy === user;
 
   const [hasVoted, setHasVoted] = useState(false);
   const [myRating, setMyRating] = useState(0);
@@ -37,53 +44,88 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
 
   // Cada cambio de reloadKey (reintentar, tras enviar una reseña) vuelve a pedir los datos
   const [reloadKey, setReloadKey] = useState(0);
-  const reload = () => {
-    setIsLoadingComments(true);
-    setReloadKey((k) => k + 1);
-  };
+  const reload = () => setReloadKey((k) => k + 1);
+  const onCountChange = useCallback((count: number | string) => setCommentCount(count), []);
 
   useEffect(() => {
-    if (!visible || spotId === undefined) return;
+    if (!visible || spotId === undefined || !token) return;
     let cancelled = false;
-    const headers = token
-      ? { Authorization: `Bearer ${token}`, 'ngrok-skip-browser-warning': 'true' }
-      : { 'ngrok-skip-browser-warning': 'true' };
-
-    (async () => {
-      // 1. Solo comprobamos si ya ha votado cuando el usuario tiene sesión iniciada (token)
-      if (token) {
-        try {
-          const ratingRes = await api.get(`/ratings/check/${spotId}`, { headers });
-          if (cancelled) return;
-          if (ratingRes.data && ratingRes.data.value > 0) {
-            setMyRating(ratingRes.data.value);
-            setHasVoted(true);
-          } else {
-            setHasVoted(false);
-          }
-        } catch {
-          if (!cancelled) setHasVoted(false);
+    api.get(`/ratings/check/${spotId}`)
+      .then((res) => {
+        if (cancelled) return;
+        if (res.data && res.data.value > 0) {
+          setMyRating(res.data.value);
+          setHasVoted(true);
         }
-      }
-
-      // 2. Los comentarios se cargan siempre (con o sin token)
-      try {
-        const commentsRes = await api.get(`/comments/spot/${spotId}`, { headers });
-        if (cancelled) return;
-        setComments(Array.isArray(commentsRes.data) ? commentsRes.data : []);
-        setCommentsFailed(false);
-      } catch (e) {
-        if (cancelled) return;
-        // Sin servidor es un estado esperado (la hoja muestra "Reintentar"): log, no pantalla roja de LogBox
-        console.log('No se pudieron cargar los comentarios:', (e as Error)?.message ?? e);
-        setCommentsFailed(true);
-      } finally {
-        if (!cancelled) setIsLoadingComments(false);
-      }
-    })();
-
+      })
+      .catch(() => {});
     return () => { cancelled = true; };
-  }, [visible, spotId, token, reloadKey]);
+  }, [visible, spotId, token]);
+
+  const goToLogin = () => {
+    onClose();
+    router.push('/login');
+  };
+
+  const toggleFavorite = () => {
+    if (!token) { goToLogin(); return; }
+    onToggleFavorite?.(spot.id);
+  };
+
+  const share = () => {
+    const url = shareUrl(spot.id);
+    // iOS shows the link as a preview card; Android only reads `message`
+    Share.share(Platform.OS === 'ios' ? { url, message: spot.name } : { message: `${spot.name} ${url}` }).catch(() => {});
+  };
+
+  const startEdit = () => {
+    setEditError(null);
+    setEditForm({
+      name: spot.name ?? '',
+      description: spot.description ?? '',
+      spotType: (spot.spotType || 'STREET').toUpperCase(),
+      difficultyLevel: (spot.difficultyLevel || 'INTERMEDIATE').toUpperCase(),
+    });
+  };
+
+  const saveEdit = async () => {
+    setIsSavingEdit(true);
+    setEditError(null);
+    try {
+      await api.patch(`/spots/${spot.id}`, editForm);
+      setEditForm(null);
+      setSuccessMessage(t('social.saved'));
+      onSpotUpdated();
+    } catch (e) {
+      setEditError(apiErrorText(e, t));
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  const deleteSpot = () => {
+    Alert.alert(t('social.deleteSpotConfirm'), undefined, [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('social.delete'),
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await api.delete(`/spots/${spot.id}`);
+            onSpotDeleted?.(spot.id);
+            onClose();
+          } catch (e) {
+            setErrorMessage(apiErrorText(e, t));
+          }
+        },
+      },
+    ]);
+  };
+
+  const openAuthor = () => {
+    onClose();
+    router.push({ pathname: '/user/[username]', params: { username: spot.createdBy } } as any);
+  };
 
   const handleStarPress = (star: number) => {
     // Si es un invitado (sin token), le pedimos iniciar sesión al intentar valorar
@@ -123,18 +165,12 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
     try {
       // Guardamos lo que devuelve Spring Boot
       const response = await api.post(`/ratings/${spot.id}`, { value: currentRating }, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          "ngrok-skip-browser-warning": "true"
-        } 
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       if (newComment.trim().length > 0) {
         await api.post(`/comments/${spot.id}`, { content: newComment }, {
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true"
-          } 
+          headers: { Authorization: `Bearer ${token}` }
         });
       }
 
@@ -187,14 +223,15 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
           >
             <Ionicons name="close" size={22} color={Palette.white} />
           </TouchableOpacity>
-          {onReport && (
+          {onToggleFavorite && (
             <TouchableOpacity
               style={[styles.closeBtn, styles.reportBtn]}
-              onPress={() => onReport(spot.id)}
+              onPress={toggleFavorite}
               accessibilityRole="button"
-              accessibilityLabel={t('report.title')}
+              accessibilityLabel={isFavorite ? t('social.saved') : t('social.save')}
+              accessibilityState={{ selected: !!isFavorite }}
             >
-              <Ionicons name="flag-outline" size={20} color={Palette.white} />
+              <Ionicons name={isFavorite ? 'bookmark' : 'bookmark-outline'} size={20} color={isFavorite ? Palette.yellow : Palette.white} />
             </TouchableOpacity>
           )}
 
@@ -211,6 +248,30 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
             <View style={styles.content}>
               <Text style={styles.title}>{spot.name}</Text>
               <PaintStrip style={{ marginVertical: 10 }} />
+              {!!spot.createdBy && !String(spot.createdBy).startsWith('deleted_') && (
+                <TouchableOpacity onPress={openAuthor} accessibilityRole="link" style={styles.authorRow}>
+                  <Text style={styles.authorText}>
+                    {t('social.addedBy')} <Text style={styles.authorName}>{spot.createdBy}</Text>
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              <View style={styles.actionsRow}>
+                <TouchableOpacity style={styles.actionBtn} onPress={share} accessibilityRole="button">
+                  <Ionicons name="share-social-outline" size={18} color={Palette.ink} />
+                  <Text style={styles.actionText}>{t('social.share')}</Text>
+                </TouchableOpacity>
+                {isOwner && (
+                  <>
+                    <TouchableOpacity style={styles.actionBtn} onPress={startEdit} accessibilityRole="button" accessibilityLabel={t('social.editSpot')}>
+                      <Ionicons name="create-outline" size={18} color={Palette.ink} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionBtn} onPress={deleteSpot} accessibilityRole="button" accessibilityLabel={t('social.deleteSpot')}>
+                      <Ionicons name="trash-outline" size={18} color={Palette.ink} />
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
 
               <View style={styles.factsRow}>
                 <View style={{ gap: 8, flexShrink: 1 }}>
@@ -291,48 +352,38 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
                 accessibilityRole="button"
                 accessibilityState={{ expanded: showComments }}
               >
-                <Text style={styles.accordionTitle}>{t('popup.comments', { count: comments.length })}</Text>
+                <Text style={styles.accordionTitle}>{t('popup.comments', { count: commentCount })}</Text>
                 <Ionicons name={showComments ? 'chevron-up' : 'chevron-down'} size={22} color={Palette.ink} />
               </TouchableOpacity>
 
-              {showComments && (
-                <View style={styles.commentsList}>
-                  {isLoadingComments ? (
-                    <ActivityIndicator size="small" color={Palette.ink} style={{ marginTop: 10 }} />
-                  ) : (
-                    <>
-                      {commentsFailed ? (
-                        <View style={styles.commentsFailed} accessibilityLiveRegion="polite">
-                          <Text style={styles.noComments}>{t('popup.commentsFailed')}</Text>
-                          <TouchableOpacity
-                            style={styles.retryBtn}
-                            onPress={reload}
-                            accessibilityRole="button"
-                          >
-                            <Ionicons name="refresh" size={18} color={Palette.ink} />
-                            <Text style={styles.retryText}>{t('common.retry')}</Text>
-                          </TouchableOpacity>
-                        </View>
-                      ) : (
-                        comments.length === 0 && <Text style={styles.noComments}>{cleanLabel(t('popup.firstComment'))}</Text>
-                      )}
-                      {comments.map((c: any, index: number) => (
-                        <View key={c.id ?? index} style={styles.commentItem}>
-                          <View style={styles.commentHead}>
-                            <Text style={styles.commentAuthor}>{c.username || t('common.user')}</Text>
-                            {c.rating > 0 && <StarRating value={c.rating} size={14} label={(n) => `${n} / 5`} />}
-                          </View>
-                          <Text style={styles.commentText}>{c.content}</Text>
-                        </View>
-                      ))}
-                    </>
-                  )}
-                </View>
+              {/* Mounted while folded too, so the header can show the count */}
+              <View style={showComments ? undefined : styles.hidden}>
+                <CommentSection spotId={spot.id} me={user} reloadKey={reloadKey} onCountChange={onCountChange} onBeforeNavigate={onClose} />
+              </View>
+
+              {onReport && (
+                <TouchableOpacity style={styles.reportLink} onPress={() => onReport(spot.id)} accessibilityRole="button">
+                  <Ionicons name="flag-outline" size={16} color={Palette.inkMuted} />
+                  <Text style={styles.reportLinkText}>{t('report.title')}</Text>
+                </TouchableOpacity>
               )}
             </View>
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
+      {editForm && (
+        <SpotFormModal
+          visible
+          title={t('social.editSpot')}
+          formData={editForm}
+          setFormData={setEditForm}
+          capturedPhoto={null}
+          isUploading={isSavingEdit}
+          errorMessage={editError}
+          onClose={() => setEditForm(null)}
+          onSave={saveEdit}
+        />
+      )}
     </Modal>
   );
 }
@@ -381,7 +432,15 @@ const styles = StyleSheet.create({
 
   accordionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: MIN_TARGET, marginTop: 14, borderBottomWidth: 1, borderBottomColor: Palette.hairline },
   accordionTitle: { fontFamily: DisplayFont.bold, fontSize: 20, letterSpacing: 0.6, color: Palette.ink, textTransform: 'uppercase' },
-  commentsList: { paddingTop: 10 },
+  hidden: { display: 'none' },
+  authorRow: { marginTop: -2, marginBottom: 10, minHeight: 32, justifyContent: 'center' },
+  authorText: { fontSize: 15, color: Palette.inkMuted },
+  authorName: { fontWeight: '800', color: Palette.ink },
+  actionsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 },
+  actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: MIN_TARGET, minWidth: MIN_TARGET, justifyContent: 'center', paddingHorizontal: 14, borderRadius: Radius.control, borderWidth: 2, borderColor: Palette.ink, backgroundColor: Palette.white },
+  reportLink: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: MIN_TARGET, marginTop: 20, alignSelf: 'center', paddingHorizontal: 16 },
+  reportLinkText: { color: Palette.inkMuted, fontSize: 14, fontWeight: '600', textDecorationLine: 'underline' },
+  actionText: { fontFamily: DisplayFont.bold, fontSize: 17, letterSpacing: 0.6, textTransform: 'uppercase', color: Palette.ink },
   commentsFailed: { alignItems: 'center', gap: 4 },
   retryBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: MIN_TARGET, paddingHorizontal: 16, borderRadius: Radius.control, borderWidth: 2, borderColor: Palette.ink },
   retryText: { fontFamily: DisplayFont.bold, fontSize: 18, letterSpacing: 0.6, textTransform: 'uppercase', color: Palette.ink },

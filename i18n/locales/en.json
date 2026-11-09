@@ -99,7 +99,10 @@
     "emailTaken": "This email is already registered.",
     "emailInvalid": "Check the email address.",
     "continueWithGoogle": "Continue with Google",
-    "googleFailed": "Google sign-in failed. Try again."
+    "googleFailed": "Google sign-in failed. Try again.",
+    "tryDemo": "Try the demo",
+    "demoHint": "No sign-up needed: a shared test account.",
+    "demoFailed": "The demo isn't available right now. Try again later."
   },
   "admin": {
     "backToMap": "Back to map",
@@ -167,7 +170,10 @@
     "photoRejected": "This photo isn't allowed (nudity, drugs, violence, ads or personal data). Choose another one.",
     "photoUnclear": "The photo is too dark or blurry to see the spot. Take another one.",
     "photoNotPlace": "The photo has to show the spot itself, not a meme, screenshot or close-up selfie.",
-    "textRejected": "The name or description breaks the community rules (spam, inappropriate content or nonsense)."
+    "textRejected": "The name or description breaks the community rules (spam, inappropriate content or nonsense).",
+    "demoReadonly": "Not available on the demo account. Create your own account to try this.",
+    "notOwner": "You can only change your own posts.",
+    "cannotFollowSelf": "You can’t follow yourself."
   },
   "types": {
     "STREET": "Street",
@@ -231,5 +237,70 @@
   },
   "legal": {
     "link": "Rules & privacy"
+  },
+  "social": {
+    "map": "Map",
+    "feed": "Feed",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "follow": "Follow",
+    "followingState": "Following",
+    "spotsCount": "Spots",
+    "followersCount": "Followers",
+    "followingCount": "Following",
+    "ratingsCount": "Ratings",
+    "commentsCount": "Comments",
+    "memberSince": "Skating with us since {{date}}",
+    "editProfile": "Edit profile",
+    "bio": "Bio",
+    "bioPlaceholder": "Your city, your spots, your style…",
+    "changePhoto": "Change photo",
+    "removePhoto": "Remove photo",
+    "save": "Save",
+    "saved": "Saved",
+    "savedSpots": "Saved spots",
+    "savedEmpty": "No saved spots yet. Tap Save on a spot to keep it here.",
+    "deleteAccount": "Delete account",
+    "deleteAccountHint": "Deleting your account removes your profile, follows and saved spots. Your spots and comments stay, shown as “Deleted user”.",
+    "deleteAccountConfirm": "Delete your account? This can’t be undone.",
+    "deletedUser": "Deleted user",
+    "userNotFound": "This skater doesn’t exist or deleted their account.",
+    "noSpotsYet": "No spots yet.",
+    "nobodyYet": "Nobody here yet.",
+    "feedEmpty": "Your feed is empty. Follow skaters to see the spots they add, rate and comment on.",
+    "signInToSee": "Sign in to see your feed and notifications.",
+    "notificationsEmpty": "No notifications yet.",
+    "unread": "Unread",
+    "loadMore": "Load more",
+    "activity": {
+      "SPOT_CREATED": "added a spot",
+      "COMMENTED": "commented on a spot",
+      "RATED": "rated a spot"
+    },
+    "notif": {
+      "FOLLOW": "started following you",
+      "COMMENT_ON_SPOT": "commented on your spot {{spot}}",
+      "REPLY": "replied to your comment",
+      "COMMENT_LIKE": "liked your comment"
+    },
+    "reply": "Reply",
+    "replyingTo": "Reply to {{username}}",
+    "edit": "Edit",
+    "delete": "Delete",
+    "edited": "edited",
+    "like": "Like",
+    "commentDeleted": "Comment deleted",
+    "deleteCommentConfirm": "Delete this comment?",
+    "writeComment": "Write a comment…",
+    "signInToComment": "Sign in to comment",
+    "commentRejected": "This comment breaks the community rules (spam, inappropriate content or nonsense).",
+    "bioRejected": "This bio breaks the community rules (spam, inappropriate content or nonsense).",
+    "share": "Share",
+    "linkCopied": "Link copied",
+    "addedBy": "Added by",
+    "editSpot": "Edit spot",
+    "deleteSpot": "Delete spot",
+    "deleteSpotConfirm": "Delete this spot? Its photo, ratings and comments go with it.",
+    "loadFailed": "Couldn’t load. Check your connection and try again."
   }
 }

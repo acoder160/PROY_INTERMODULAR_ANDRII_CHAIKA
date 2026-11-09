@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "skatemap-web", "run", "dev", "--", "--port", "5173", "--strictPort"],
       "port": 5173
+    },
+    {
+      "name": "skatemap-web-demo",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "set VITE_DEMO_ENABLED=true&& npm --prefix skatemap-web run dev -- --port 5174 --strictPort"],
+      "port": 5174
     }
   ]
 }

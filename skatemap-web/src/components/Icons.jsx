@@ -86,6 +86,48 @@ export const TrashIcon = make(<>
   <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />
 </>);
 
+export const BellIcon = make(<>
+  <path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z" />
+  <path d="M10 20a2 2 0 0 0 4 0" />
+</>);
+
+// Feed: lines of activity
+export const FeedIcon = make(<>
+  <path d="M4 6h16M4 12h16M4 18h10" />
+</>);
+
+export const HeartIcon = function HeartIcon({ size = 22, filled = false, ...props }) {
+  return (
+    <svg width={size} height={size} {...base} {...props}>
+      <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" fill={filled ? 'currentColor' : 'none'} />
+    </svg>
+  );
+};
+
+export const BookmarkIcon = function BookmarkIcon({ size = 22, filled = false, ...props }) {
+  return (
+    <svg width={size} height={size} {...base} {...props}>
+      <path d="M6 3h12v18l-6-4-6 4z" fill={filled ? 'currentColor' : 'none'} />
+    </svg>
+  );
+};
+
+export const ShareIcon = make(<>
+  <circle cx="18" cy="5" r="2.5" />
+  <circle cx="6" cy="12" r="2.5" />
+  <circle cx="18" cy="19" r="2.5" />
+  <path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4" />
+</>);
+
+export const ReplyIcon = make(<path d="M10 8L5 12l5 4M5 12h9a5 5 0 0 1 5 5v1" />);
+
+export const EditIcon = make(<>
+  <path d="M4 20h4L19 9l-4-4L4 16z" />
+  <path d="M13.5 6.5l4 4" />
+</>);
+
+export const ArrowLeftIcon = make(<path d="M15 5l-7 7 7 7" strokeWidth="2.4" />);
+
 export const STAR_PATH = 'M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z';
 
 export function StarIcon({ size = 22, filled = false }) {

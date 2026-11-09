@@ -9,11 +9,15 @@ import api from '../utils/api';
 import GoogleAuthButton from '../components/GoogleAuthButton';
 import { useAuth } from '../context/AuthContext';
 
+// Shared demo account (POST /api/auth/demo); the button only shows when the backend has it on
+const DEMO_ENABLED = process.env.EXPO_PUBLIC_DEMO_ENABLED === 'true';
+
 export default function LoginScreen() {
   const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   
   const [isWakingUp, setIsWakingUp] = useState(false); 
   
@@ -60,6 +64,21 @@ export default function LoginScreen() {
       clearTimeout(wakeUpTimer);
       setIsLoading(false);
       setIsWakingUp(false);
+    }
+  };
+
+  const handleDemo = async () => {
+    setErrorMessage(null);
+    setIsDemoLoading(true);
+    try {
+      const response = await api.post('/auth/demo');
+      await login(response.data.username, response.data.token, response.data.refreshToken, response.data.role);
+      router.replace('/(tabs)');
+    } catch (error: any) {
+      console.log('Demo login fallido:', error?.response?.status ?? error?.message);
+      setErrorMessage(error?.response ? t('auth.demoFailed') : t('popup.sendErrorConnection'));
+    } finally {
+      setIsDemoLoading(false);
     }
   };
 
@@ -124,6 +143,15 @@ export default function LoginScreen() {
             </View>
           </TouchableOpacity>
 
+          {DEMO_ENABLED && (
+            <TouchableOpacity onPress={handleDemo} disabled={isLoading || isDemoLoading} activeOpacity={0.88} accessibilityRole="button">
+              <View style={styles.demoButton}>
+                {isDemoLoading ? <ActivityIndicator color={Palette.yellow} /> : <Text style={styles.demoButtonText}>{t('auth.tryDemo')}</Text>}
+              </View>
+              <Text style={styles.demoHint}>{t('auth.demoHint')}</Text>
+            </TouchableOpacity>
+          )}
+
           <GoogleAuthButton />
 
           <View style={styles.footer}>
@@ -169,6 +197,9 @@ const styles = StyleSheet.create({
   input: { backgroundColor: Palette.white, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12, minHeight: MIN_TARGET, marginBottom: 18, fontSize: 16, color: Palette.ink, borderWidth: 2, borderColor: Palette.white },
   button: { minHeight: 56, borderRadius: 28, backgroundColor: Palette.pink, borderWidth: 2, borderColor: Palette.ink, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
   buttonText: { color: Palette.ink, fontFamily: DisplayFont.black, fontSize: 24, letterSpacing: 1, textTransform: 'uppercase' },
+  demoButton: { minHeight: 52, borderRadius: 26, borderWidth: 2, borderColor: Palette.yellow, alignItems: 'center', justifyContent: 'center', marginTop: 12 },
+  demoButtonText: { color: Palette.yellow, fontFamily: DisplayFont.black, fontSize: 20, letterSpacing: 1, textTransform: 'uppercase' },
+  demoHint: { color: Palette.onAsphaltMuted, fontSize: 13, textAlign: 'center', marginTop: 6 },
   footer: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', marginTop: 16 },
   footerText: { color: Palette.onAsphaltMuted, fontSize: 15 },
   linkPill: { minHeight: MIN_TARGET, paddingHorizontal: 6, justifyContent: 'center' },

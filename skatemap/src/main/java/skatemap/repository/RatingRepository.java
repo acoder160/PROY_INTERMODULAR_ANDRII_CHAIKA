@@ -22,6 +22,8 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
 
     Optional<Rating> findBySpotAndUser(Spot spot, User user);
 
+    long countByUserId(Long userId);
+
     @Query("SELECT r.user.id AS userId, r.value AS value FROM Rating r WHERE r.spot.id = :spotId")
     List<UserRating> findUserRatingsBySpotId(@Param("spotId") Long spotId);
 

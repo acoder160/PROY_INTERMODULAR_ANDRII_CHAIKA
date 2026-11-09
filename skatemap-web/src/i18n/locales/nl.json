@@ -99,7 +99,10 @@
     "emailTaken": "Dit e-mailadres is al geregistreerd.",
     "emailInvalid": "Controleer het e-mailadres.",
     "continueWithGoogle": "Doorgaan met Google",
-    "googleFailed": "Inloggen met Google is mislukt. Probeer het opnieuw."
+    "googleFailed": "Inloggen met Google is mislukt. Probeer het opnieuw.",
+    "tryDemo": "Probeer de demo",
+    "demoHint": "Zonder registratie: een gedeeld testaccount.",
+    "demoFailed": "De demo is nu niet beschikbaar. Probeer het later opnieuw."
   },
   "admin": {
     "backToMap": "Terug naar de kaart",
@@ -167,7 +170,10 @@
     "photoRejected": "Deze foto is niet toegestaan (naakt, drugs, geweld, reclame of persoonsgegevens). Kies een andere.",
     "photoUnclear": "De foto is te donker of te wazig om de spot te zien. Maak een nieuwe.",
     "photoNotPlace": "De foto moet de spot zelf laten zien, geen meme, screenshot of close-up selfie.",
-    "textRejected": "De naam of beschrijving overtreedt de regels (spam, ongepaste inhoud of onzin)."
+    "textRejected": "De naam of beschrijving overtreedt de regels (spam, ongepaste inhoud of onzin).",
+    "demoReadonly": "Niet beschikbaar met het demo-account. Maak je eigen account om dit te proberen.",
+    "notOwner": "Je kunt alleen je eigen berichten wijzigen.",
+    "cannotFollowSelf": "Je kunt jezelf niet volgen."
   },
   "types": {
     "STREET": "Street",
@@ -231,5 +237,70 @@
   },
   "legal": {
     "link": "Regels & privacy"
+  },
+  "social": {
+    "map": "Kaart",
+    "feed": "Feed",
+    "notifications": "Meldingen",
+    "profile": "Profiel",
+    "follow": "Volgen",
+    "followingState": "Volgend",
+    "spotsCount": "Spots",
+    "followersCount": "Volgers",
+    "followingCount": "Volgend",
+    "ratingsCount": "Beoordelingen",
+    "commentsCount": "Reacties",
+    "memberSince": "Lid sinds {{date}}",
+    "editProfile": "Profiel bewerken",
+    "bio": "Bio",
+    "bioPlaceholder": "Jouw stad, jouw spots, jouw stijl…",
+    "changePhoto": "Foto wijzigen",
+    "removePhoto": "Foto verwijderen",
+    "save": "Opslaan",
+    "saved": "Opgeslagen",
+    "savedSpots": "Opgeslagen spots",
+    "savedEmpty": "Nog geen opgeslagen spots. Tik bij een spot op Opslaan om hem hier te bewaren.",
+    "deleteAccount": "Account verwijderen",
+    "deleteAccountHint": "Als je je account verwijdert, verdwijnen je profiel, de mensen die je volgt en je opgeslagen spots. Je spots en reacties blijven staan als ‘Verwijderde gebruiker’.",
+    "deleteAccountConfirm": "Je account verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "deletedUser": "Verwijderde gebruiker",
+    "userNotFound": "Deze skater bestaat niet of heeft zijn account verwijderd.",
+    "noSpotsYet": "Nog geen spots.",
+    "nobodyYet": "Nog niemand hier.",
+    "feedEmpty": "Je feed is leeg. Volg skaters om de spots te zien die ze toevoegen, beoordelen en becommentariëren.",
+    "signInToSee": "Log in om je feed en meldingen te zien.",
+    "notificationsEmpty": "Nog geen meldingen.",
+    "unread": "Ongelezen",
+    "loadMore": "Meer laden",
+    "activity": {
+      "SPOT_CREATED": "heeft een spot toegevoegd",
+      "COMMENTED": "heeft op een spot gereageerd",
+      "RATED": "heeft een spot beoordeeld"
+    },
+    "notif": {
+      "FOLLOW": "volgt je nu",
+      "COMMENT_ON_SPOT": "heeft op je spot {{spot}} gereageerd",
+      "REPLY": "heeft op je reactie geantwoord",
+      "COMMENT_LIKE": "vindt je reactie leuk"
+    },
+    "reply": "Beantwoorden",
+    "replyingTo": "Antwoord aan {{username}}",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "edited": "bewerkt",
+    "like": "Leuk",
+    "commentDeleted": "Reactie verwijderd",
+    "deleteCommentConfirm": "Deze reactie verwijderen?",
+    "writeComment": "Schrijf een reactie…",
+    "signInToComment": "Log in om te reageren",
+    "commentRejected": "Deze reactie overtreedt de communityregels (spam, ongepaste inhoud of onzintekst).",
+    "bioRejected": "Deze bio overtreedt de communityregels (spam, ongepaste inhoud of onzintekst).",
+    "share": "Delen",
+    "linkCopied": "Link gekopieerd",
+    "addedBy": "Toegevoegd door",
+    "editSpot": "Spot bewerken",
+    "deleteSpot": "Spot verwijderen",
+    "deleteSpotConfirm": "Deze spot verwijderen? De foto, beoordelingen en reacties verdwijnen ook.",
+    "loadFailed": "Laden mislukt. Controleer je verbinding en probeer het opnieuw."
   }
 }

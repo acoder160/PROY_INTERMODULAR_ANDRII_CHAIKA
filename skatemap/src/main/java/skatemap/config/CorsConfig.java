@@ -40,7 +40,7 @@ public class CorsConfig {
         config.setAllowedHeaders(Arrays.asList(
                 "Origin", "Content-Type", "Accept", "Authorization",
                 "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials",
-                "X-Client-Type", "X-Refresh-Token", "ngrok-skip-browser-warning"
+                "X-Client-Type", "X-Refresh-Token"
         ));
         config.setExposedHeaders(List.of("Set-Cookie"));
 

@@ -26,13 +26,18 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     private final RateLimitingService rateLimitingService;
     private final ClientIpResolver clientIpResolver;
     private final boolean enabled;
+    /** Username of the shared demo account, or null when the demo is off. */
+    private final String demoUsername;
 
     public RateLimitInterceptor(RateLimitingService rateLimitingService,
                                 ClientIpResolver clientIpResolver,
-                                @Value("${app.rate-limit.enabled:true}") boolean enabled) {
+                                @Value("${app.rate-limit.enabled:true}") boolean enabled,
+                                @Value("${app.demo.enabled:false}") boolean demoEnabled,
+                                @Value("${app.demo.username:demo}") String demoUsername) {
         this.rateLimitingService = rateLimitingService;
         this.clientIpResolver = clientIpResolver;
         this.enabled = enabled;
+        this.demoUsername = demoEnabled ? demoUsername : null;
     }
 
     @Override
@@ -50,7 +55,14 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             // Unauthenticated writes are rejected by Spring Security before reaching here
             if (auth == null || !auth.isAuthenticated()) return true;
             key = auth.getName();
-            if (isAdmin(auth)) limit = adminVariant(limit);
+            if (isAdmin(auth)) {
+                limit = adminVariant(limit);
+            } else if (key.equals(demoUsername)) {
+                // Everyone shares the demo user: split its budget per visitor (IP) so one
+                // visitor can't use it up for the rest
+                limit = demoVariant(limit);
+                key = key + '@' + clientIpResolver.resolve(request);
+            }
         }
 
         ConsumptionProbe probe = rateLimitingService.bucket(limit, key).tryConsumeAndReturnRemaining(1);
@@ -66,6 +78,19 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     }
 
     static Limit limitFor(String method, String path) {
+        // Social writes first: their paths overlap the comment / spot rules below
+        if (path.startsWith("/api/users/") && path.endsWith("/follow")
+                && ("POST".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method))) return Limit.FOLLOW;
+        if (path.startsWith("/api/comments/") && path.endsWith("/like")) return Limit.LIKE;
+        if (path.startsWith("/api/favorites/") && ("PUT".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method))) {
+            return Limit.FAVORITE;
+        }
+        if ("PATCH".equalsIgnoreCase(method)) {
+            if (path.equals("/api/users/me")) return Limit.PROFILE_UPDATE;
+            if (path.startsWith("/api/comments/")) return Limit.COMMENT;
+            if (path.startsWith("/api/spots/")) return Limit.SPOT_EDIT;
+            return null;
+        }
         if ("POST".equalsIgnoreCase(method)) {
             switch (path) {
                 case "/api/auth/login": return Limit.LOGIN;
@@ -73,6 +98,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                 case "/api/auth/refresh": return Limit.REFRESH;
                 case "/api/auth/google":
                 case "/api/auth/google/exchange": return Limit.GOOGLE;
+                case "/api/auth/demo": return Limit.DEMO_LOGIN;
                 case "/api/spots": return Limit.SPOT_CREATE;
                 default:
                     if (path.startsWith("/api/comments/")) return Limit.COMMENT;
@@ -88,13 +114,24 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     }
 
     private static boolean isPerIp(Limit limit) {
-        return limit == Limit.LOGIN || limit == Limit.REGISTER || limit == Limit.REFRESH || limit == Limit.GOOGLE;
+        return limit == Limit.LOGIN || limit == Limit.REGISTER || limit == Limit.REFRESH || limit == Limit.GOOGLE
+                || limit == Limit.DEMO_LOGIN;
     }
 
     private static Limit adminVariant(Limit limit) {
         if (limit == Limit.SPOT_CREATE) return Limit.SPOT_CREATE_ADMIN;
         if (limit == Limit.COMMENT) return Limit.COMMENT_ADMIN;
         return limit;
+    }
+
+    private static Limit demoVariant(Limit limit) {
+        return switch (limit) {
+            case SPOT_CREATE -> Limit.SPOT_CREATE_DEMO;
+            case COMMENT -> Limit.COMMENT_DEMO;
+            case UPLOAD_SIGNATURE -> Limit.UPLOAD_SIGNATURE_DEMO;
+            case REPORT -> Limit.REPORT_DEMO;
+            default -> limit;
+        };
     }
 
     private static boolean isAdmin(Authentication auth) {

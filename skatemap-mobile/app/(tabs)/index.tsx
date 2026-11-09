@@ -7,7 +7,7 @@ import SkateMap from '../../components/skatemap';
 import SpotFormModal from '../../components/SpotFormModal';
 import CameraOverlay from '../../components/CameraOverlay';
 import { uploadImageToCloudinary } from '../../utils/cloudinary';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,17 +30,16 @@ const MODERATION_ERRORS: Record<string, string> = {
   text_rejected: 'errors.textRejected',
 };
 
+const NO_FAVORITES: number[] = [];
+
 export default function HomeScreen() {
   const { t } = useTranslation();
-  const { user, token, isAdmin, logout } = useAuth(); 
+  const { user, token, isAdmin } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
   
   const { userLocation, handleRecenter } = useLocation();
-  
-  const CLOUDINARY_CLOUD_NAME = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME; 
-  const CLOUDINARY_UPLOAD_PRESET = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
   
   const [permission, requestPermission] = useCameraPermissions();
   const [showCamera, setShowCamera] = useState(false);
@@ -60,6 +59,66 @@ export default function HomeScreen() {
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { spots, fetchSpots, isOffline } = useSpots(token);
+  const [extraSpots, setExtraSpots] = useState<any[]>([]);
+  const [focus, setFocus] = useState<{ lat: number; lng: number; id: number } | null>(null);
+
+  // Saved spots: one list for the map popup and the spot sheet, so both always agree
+  const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+  useEffect(() => {
+    if (!token) return undefined;
+    let cancelled = false;
+    api.get('/favorites')
+      .then((res) => { if (!cancelled && Array.isArray(res.data)) setFavoriteIds(res.data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [token]);
+  const visibleFavoriteIds = token ? favoriteIds : NO_FAVORITES;
+
+  const toggleFavorite = useCallback(async (spotId: number) => {
+    if (!token) {
+      Alert.alert(t('auth.loginRequiredTitle'), undefined, [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.login'), onPress: () => router.push('/login') },
+      ]);
+      return;
+    }
+    const saved = favoriteIds.includes(spotId);
+    const apply = (on: boolean) => setFavoriteIds((prev) => (on ? [...prev.filter((id) => id !== spotId), spotId] : prev.filter((id) => id !== spotId)));
+    apply(!saved);
+    try {
+      if (saved) await api.delete(`/favorites/${spotId}`);
+      else await api.put(`/favorites/${spotId}`);
+    } catch {
+      apply(saved); // put it back
+    }
+  }, [token, favoriteIds, router, t]);
+
+  // ?spot=123 from the feed, a profile, a notification or a push: fly there and open it. A spot the
+  // cached list doesn't have yet (just added, or the list is stale) is fetched on its own.
+  const { spot: spotParam } = useLocalSearchParams<{ spot?: string }>();
+  const linkedSpotId = Number(spotParam) || null;
+  useEffect(() => {
+    if (!linkedSpotId) return undefined;
+    let cancelled = false;
+    const open = (spot: any) => {
+      setSelectedSpot(spot);
+      setFocus({ lat: spot.latitude, lng: spot.longitude, id: spot.id });
+      router.setParams({ spot: undefined } as any);
+    };
+    const known = spots.find((s: any) => s.id === linkedSpotId);
+    if (known) {
+      open(known);
+    } else {
+      api.get(`/spots/${linkedSpotId}`)
+        .then((res) => {
+          if (cancelled) return;
+          setExtraSpots((prev) => (prev.some((s) => s.id === res.data.id) ? prev : [...prev, res.data]));
+          open(res.data);
+        })
+        .catch(() => { if (!cancelled) router.setParams({ spot: undefined } as any); });
+    }
+    return () => { cancelled = true; };
+  }, [linkedSpotId, spots, router]);
 
   // Estados para los filtros
   const [filterModalVisible, setFilterModalVisible] = useState(false);
@@ -161,12 +220,6 @@ export default function HomeScreen() {
     ]);
   };
 
-  const confirmLogout = () => {
-    Alert.alert(t('map.logoutConfirm'), user ?? undefined, [
-      { text: t('common.cancel'), style: 'cancel' },
-      { text: t('map.logout'), style: 'destructive', onPress: logout },
-    ]);
-  };
 
   const takePicture = async () => {
     if (cameraRef.current) {
@@ -187,7 +240,6 @@ export default function HomeScreen() {
     }
     setFormError(null);
     if (!newSpotLocation || !formData.name.trim() || !capturedPhoto) { setFormError(t('errors.missingData')); return; }
-    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) { setFormError(t('errors.cloudinaryConfig')); return; }
 
     setIsUploading(true);
     let finalImageUrl = null;
@@ -202,7 +254,7 @@ export default function HomeScreen() {
     try {
       await api.post(`/spots`, {
         ...formData, latitude: newSpotLocation.lat, longitude: newSpotLocation.lng, mediaUrl: finalImageUrl
-      }, { headers: { Authorization: `Bearer ${token}`, "ngrok-skip-browser-warning": "true" } });
+      }, { headers: { Authorization: `Bearer ${token}` } });
       
       resetAddFlow();
       showStatus(cleanLabel(t('errors.spotCreated')));
@@ -234,7 +286,9 @@ export default function HomeScreen() {
 
   const activeFilterCount = (filters.spotType !== 'ALL' ? 1 : 0) + (filters.minRating > 0 ? 1 : 0) + (filters.maxDistance > 0 ? 1 : 0);
 
-  const filteredSpots = spots.filter((spot: any) => {
+  // Spots opened by link that the cached list does not have yet
+  const allSpots = extraSpots.length ? [...spots, ...extraSpots.filter((x) => !spots.some((s: any) => s.id === x.id))] : spots;
+  const filteredSpots = allSpots.filter((spot: any) => {
     // Filtro por tipo
     if (filters.spotType !== 'ALL' && spot.spotType !== filters.spotType && spot.type !== filters.spotType) return false;
     
@@ -260,14 +314,13 @@ export default function HomeScreen() {
           isAddingMode={isAddingMode} 
           onMapClick={(lat, lng) => { setNewSpotLocation({lat, lng}); setModalVisible(true); }}
           onNotice={showStatus}
+          focus={focus}
           onSpotClick={(spotId) => {
-             const spot = spots.find((s: any) => s.id === spotId);
+             const spot = allSpots.find((s: any) => s.id === spotId);
              if (spot) setSelectedSpot(spot);
           }}
-          onReportSpot={(spotId) => {
-             const spot = spots.find((s: any) => s.id === spotId);
-             if (spot) setReportSpot(spot);
-          }}
+          favoriteIds={token ? favoriteIds : null}
+          onToggleFavorite={toggleFavorite}
         />
       </View>
 
@@ -313,16 +366,15 @@ export default function HomeScreen() {
 
         {user ? (
           <TouchableOpacity
-            onPress={confirmLogout}
+            onPress={() => router.navigate('/(tabs)/profile' as any)}
             activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel={user}
-            accessibilityHint={t('map.logout')}
+            accessibilityHint={t('social.profile')}
             style={[styles.pill, styles.userPill, styles.accountGroup]}
           >
             <Ionicons name="person" size={18} color={Palette.ink} />
             <Text style={[styles.pillText, styles.userPillText]} numberOfLines={1}>{user}</Text>
-            <Ionicons name="log-out-outline" size={20} color={Palette.ink} />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
@@ -414,7 +466,10 @@ export default function HomeScreen() {
         userLocation={userLocation}
         onClose={() => setSelectedSpot(null)} 
         onSpotUpdated={() => { fetchSpots(); }}
+        onSpotDeleted={() => { setExtraSpots([]); fetchSpots(); }}
         onReport={() => { setReportSpot(selectedSpot); setSelectedSpot(null); }}
+        isFavorite={!!selectedSpot && visibleFavoriteIds.includes(selectedSpot.id)}
+        onToggleFavorite={toggleFavorite}
       />
 
       {reportSpot && <ReportModal key={reportSpot.id} spot={reportSpot} onClose={closeReport} />}

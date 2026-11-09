@@ -61,11 +61,18 @@ class ApiSecurityTest {
     @MockBean private GoogleAuthService googleAuthService;
     @MockBean private GoogleBrowserFlowService googleBrowserFlowService;
     @MockBean private SpotService spotService;
+    @MockBean private skatemap.service.CommentService commentService;
 
     @Test
     void writeWithoutTokenReturns401SoClientsRefresh() throws Exception {
         mockMvc.perform(post("/api/spots").contentType(MediaType.APPLICATION_JSON).content(VALID_SPOT))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void demoLoginIsOffUnlessEnabled() throws Exception {
+        mockMvc.perform(post("/api/auth/demo").header("X-Forwarded-For", "10.0.0.9"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -183,7 +190,11 @@ class ApiSecurityTest {
 
     @Test
     @WithMockUser(username = "skater")
-    void nonAdminCannotDeleteSpots() throws Exception {
+    void nonAdminCannotDeleteSomeoneElsesSpot() throws Exception {
+        // Not an admin, so the controller takes the author path; the service refuses a non-author
+        org.mockito.Mockito.doThrow(new skatemap.exception.ApiException(
+                        org.springframework.http.HttpStatus.FORBIDDEN, "not_owner", "You can only change your own spots"))
+                .when(spotService).deleteOwnSpot(1L, "skater");
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/spots/1"))
                 .andExpect(status().isForbidden());
     }

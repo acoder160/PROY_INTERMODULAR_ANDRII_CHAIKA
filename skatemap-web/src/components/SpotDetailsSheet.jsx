@@ -1,24 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import Sheet from './Sheet';
 import { TypeChip, DifficultyMarks, StarRating, PaintStrip } from './PaintBits';
-import { CameraIcon, NavigateIcon, CheckCircleIcon, AlertCircleIcon, ChevronIcon, RefreshIcon, FlagIcon } from './Icons';
+import { CameraIcon, NavigateIcon, CheckCircleIcon, AlertCircleIcon, ChevronIcon, FlagIcon, BookmarkIcon, ShareIcon, EditIcon, TrashIcon } from './Icons';
+import CommentSection from './CommentSection';
+import EditSpotSheet from './EditSpotSheet';
+import { apiErrorText, shareSpot } from '../utils/social';
 import { cleanLabel, directionsUrl, haversineKm } from '../utils/paint';
 
 // Hoja de detalle: equivale a skatemap-mobile/components/SpotDetailsModal.tsx.
 // El padre la monta con key={spot.id}, así el estado se reinicia al cambiar de spot.
-export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onReport, userLocation }) {
+export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onSpotDeleted, onReport, isFavorite, onToggleFavorite, userLocation }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const isLoggedIn = Boolean(user);
 
-  const [comments, setComments] = useState([]);
-  const [isLoadingComments, setIsLoadingComments] = useState(true);
-  const [commentsFailed, setCommentsFailed] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
+  const [editing, setEditing] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
   const [myRating, setMyRating] = useState(0);
   const [currentRating, setCurrentRating] = useState(0);
@@ -29,37 +31,25 @@ export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onRepor
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [reloadKey, setReloadKey] = useState(0);
+  const isOwner = isLoggedIn && spot?.createdBy === user?.username;
   const [imageFailed, setImageFailed] = useState(false);
   const inputRef = useRef(null);
   const spotId = spot?.id;
 
   useEffect(() => {
-    if (spotId === undefined) return undefined;
+    if (spotId === undefined || !isLoggedIn) return undefined;
     let cancelled = false;
-    (async () => {
-      if (isLoggedIn) {
-        try {
-          const res = await api.get(`/ratings/check/${spotId}`);
-          if (cancelled) return;
-          if (res.data && res.data.value > 0) {
-            setMyRating(res.data.value);
-            setHasVoted(true);
-          }
-        } catch { /* sin voto previo */ }
-      }
-      try {
-        const res = await api.get(`/comments/spot/${spotId}`);
-        if (cancelled) return;
-        setComments(Array.isArray(res.data) ? res.data : []);
-        setCommentsFailed(false);
-      } catch {
-        if (!cancelled) setCommentsFailed(true);
-      } finally {
-        if (!cancelled) setIsLoadingComments(false);
-      }
-    })();
+    api.get(`/ratings/check/${spotId}`)
+      .then((res) => {
+        if (cancelled || !(res.data?.value > 0)) return;
+        setMyRating(res.data.value);
+        setHasVoted(true);
+      })
+      .catch(() => { /* sin voto previo */ });
     return () => { cancelled = true; };
-  }, [spotId, isLoggedIn, reloadKey]);
+  }, [spotId, isLoggedIn]);
+
+  const onCountChange = useCallback((count) => setCommentCount(count), []);
 
   useEffect(() => {
     if (!successMessage) return undefined;
@@ -69,9 +59,23 @@ export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onRepor
 
   if (!spot) return null;
 
-  const reload = () => {
-    setIsLoadingComments(true);
-    setReloadKey((k) => k + 1);
+  const reload = () => setReloadKey((k) => k + 1);
+
+
+  const share = async () => {
+    const result = await shareSpot(spot);
+    if (result === 'copied') setSuccessMessage(t('social.linkCopied'));
+  };
+
+  const deleteSpot = async () => {
+    if (!window.confirm(t('social.deleteSpotConfirm'))) return;
+    try {
+      await api.delete(`/spots/${spot.id}`);
+      onSpotDeleted?.(spot.id);
+      onClose();
+    } catch (err) {
+      setErrorMessage(apiErrorText(err, t));
+    }
   };
 
   const goToLogin = () => {
@@ -134,14 +138,44 @@ export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onRepor
       hero={hero}
       closeOnHero
       className="detail-sheet"
-      heroActions={onReport && (
-        <button type="button" className="sheet-close" onClick={() => onReport(spot.id)} aria-label={t('report.title')} title={t('report.title')}>
-          <FlagIcon size={20} />
+      heroActions={onToggleFavorite && (
+        <button
+          type="button"
+          className={`sheet-close${isFavorite ? ' is-on' : ''}`}
+          onClick={() => onToggleFavorite(spot.id)}
+          aria-pressed={isFavorite}
+          aria-label={isFavorite ? t('social.saved') : t('social.save')}
+          title={isFavorite ? t('social.saved') : t('social.save')}
+        >
+          <BookmarkIcon size={20} filled={isFavorite} />
         </button>
       )}
     >
       <h2 className="detail-title">{spot.name || t('webview.unnamed')}</h2>
       <PaintStrip className="detail-strip" />
+      {spot.createdBy && !spot.createdBy.startsWith('deleted_') && (
+        <p className="detail-author">
+          {t('social.addedBy')}{' '}
+          <Link to={`/u/${encodeURIComponent(spot.createdBy)}`} onClick={onClose}>{spot.createdBy}</Link>
+        </p>
+      )}
+
+      <div className="detail-actions">
+        <button type="button" className="btn-outline btn-small" onClick={share}>
+          <ShareIcon size={18} />
+          <span>{t('social.share')}</span>
+        </button>
+        {isOwner && (
+          <>
+            <button type="button" className="btn-outline btn-small" onClick={() => setEditing(true)} aria-label={t('social.editSpot')}>
+              <EditIcon size={18} />
+            </button>
+            <button type="button" className="btn-outline btn-small" onClick={deleteSpot} aria-label={t('social.deleteSpot')}>
+              <TrashIcon size={18} />
+            </button>
+          </>
+        )}
+      </div>
 
       <div className="detail-facts">
         <div className="detail-facts-left">
@@ -211,39 +245,28 @@ export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onRepor
         onClick={() => setShowComments((v) => !v)}
         aria-expanded={showComments}
       >
-        <span>{t('popup.comments', { count: comments.length })}</span>
+        <span>{t('popup.comments', { count: commentCount })}</span>
         <ChevronIcon up={showComments} />
       </button>
 
-      {showComments && (
-        <div className="comments-list">
-          {isLoadingComments ? (
-            <span className="spinner spinner-ink spinner-center" aria-label={t('popup.loading')} />
-          ) : (
-            <>
-              {commentsFailed ? (
-                <div className="comments-failed" role="status">
-                  <p className="no-comments">{t('popup.commentsFailed')}</p>
-                  <button type="button" className="btn-outline btn-small" onClick={reload}>
-                    <RefreshIcon size={18} />
-                    <span>{t('common.retry')}</span>
-                  </button>
-                </div>
-              ) : (
-                comments.length === 0 && <p className="no-comments">{cleanLabel(t('popup.firstComment'))}</p>
-              )}
-              {comments.map((c, index) => (
-                <div key={c.id ?? index} className="comment-item">
-                  <div className="comment-head">
-                    <strong>{c.username || t('common.user')}</strong>
-                    {c.rating > 0 && <StarRating value={c.rating} size={14} label={starLabel} />}
-                  </div>
-                  <p className="comment-text">{c.content}</p>
-                </div>
-              ))}
-            </>
-          )}
-        </div>
+      {/* Mounted while folded too, so the header can show the count */}
+      <div hidden={!showComments}>
+        <CommentSection spotId={spot.id} reloadKey={reloadKey} onCountChange={onCountChange} />
+      </div>
+
+      {onReport && (
+        <button type="button" className="detail-report" onClick={() => onReport(spot.id)}>
+          <FlagIcon size={16} />
+          <span>{t('report.title')}</span>
+        </button>
+      )}
+
+      {editing && (
+        <EditSpotSheet
+          spot={spot}
+          onClose={() => setEditing(false)}
+          onSaved={() => { setEditing(false); setSuccessMessage(t('social.saved')); onSpotUpdated?.(); }}
+        />
       )}
     </Sheet>
   );

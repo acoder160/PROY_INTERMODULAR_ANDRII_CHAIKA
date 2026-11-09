@@ -8,14 +8,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import skatemap.exception.ApiException;
-import skatemap.dto.CommentDto;
-import skatemap.dto.RatingDto;
+import skatemap.dto.SocialDtos.SpotUpdate;
 import skatemap.dto.SpotDto;
-import skatemap.entity.Comment;
 import skatemap.entity.Spot;
 import skatemap.entity.User;
+import skatemap.entity.enums.ActivityType;
 import skatemap.entity.enums.PhotoStatus;
 import skatemap.entity.enums.SpotStatus;
 import skatemap.repository.CommentRepository;
@@ -26,8 +27,8 @@ import skatemap.repository.UserRepository;
 import skatemap.service.ImageModerationService.Verdict;
 
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +44,9 @@ public class SpotService {
     private final ImageModerationService imageModerationService;
     private final CloudinaryAssets cloudinaryAssets;
     private final SpotListCache spotListCache;
+    private final FeedService feedService;
+    private final UserLookup userLookup;
+    private final TransactionTemplate tx;
 
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
@@ -57,7 +61,10 @@ public class SpotService {
                        AiModerationService aiModerationService,
                        ImageModerationService imageModerationService,
                        CloudinaryAssets cloudinaryAssets,
-                       SpotListCache spotListCache) {
+                       SpotListCache spotListCache,
+                       FeedService feedService,
+                       UserLookup userLookup,
+                       PlatformTransactionManager transactionManager) {
         this.spotRepository = spotRepository;
         this.userRepository = userRepository;
         this.ratingRepository = ratingRepository;
@@ -67,6 +74,9 @@ public class SpotService {
         this.imageModerationService = imageModerationService;
         this.cloudinaryAssets = cloudinaryAssets;
         this.spotListCache = spotListCache;
+        this.feedService = feedService;
+        this.userLookup = userLookup;
+        this.tx = new TransactionTemplate(transactionManager);
     }
 
     public SpotDto createSpot(SpotDto spotDto, String username) {
@@ -98,7 +108,12 @@ public class SpotService {
         Point point = geometryFactory.createPoint(new Coordinate(spotDto.getLongitude(), spotDto.getLatitude()));
         spot.setLocation(point);
 
-        SpotDto created = mapToDto(spotRepository.save(spot));
+        // The spot and its feed line commit together; the AI checks above ran outside the transaction
+        SpotDto created = tx.execute(status -> {
+            Spot saved = spotRepository.save(spot);
+            feedService.record(user, ActivityType.SPOT_CREATED, saved, null, null);
+            return mapToDto(saved);
+        });
         spotListCache.invalidate();
         return created;
     }
@@ -125,20 +140,75 @@ public class SpotService {
         throw rejection;
     }
 
+    /** Nearest first. Two queries: ids from PostGIS, then the spots with their authors in one go. */
     public List<SpotDto> findSpotsNearby(double lat, double lng, double distanceMeters) {
-        return spotRepository.findSpotsNearby(lat, lng, distanceMeters)
-                .stream().map(this::mapToDto).collect(Collectors.toList());
+        List<Long> ids = spotRepository.findSpotIdsNearby(lat, lng, distanceMeters);
+        if (ids.isEmpty()) return List.of();
+        Map<Long, Spot> byId = spotRepository.findAllByIdIn(ids).stream()
+                .collect(Collectors.toMap(Spot::getId, s -> s));
+        return ids.stream().map(byId::get).filter(Objects::nonNull).map(SpotService::mapToDto).toList();
     }
 
     /** Served from memory; see {@link SpotListCache}. Hidden spots are left out. */
     public List<SpotDto> getAllSpots() {
         return spotListCache.get(() -> spotRepository.findAllByStatus(SpotStatus.VISIBLE)
-                .stream().map(this::mapToDto).toList());
+                .stream().map(SpotService::mapToDto).toList());
     }
 
+    /** Admin removal (also used by the moderation queue). */
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteSpot(Long spotId, String username) {
+        purge(spotId);
+    }
+
+    /** The author removes their own spot. */
+    @Transactional
+    public void deleteOwnSpot(Long spotId, String username) {
+        ownSpot(spotId, username);
+        purge(spotId);
+    }
+
+    /**
+     * The author fixes name, description, type or level. Location and photo can't change: they
+     * were checked on site when the spot was added.
+     */
+    public SpotDto updateOwnSpot(Long spotId, SpotUpdate update, String username) {
+        ownSpot(spotId, username);
+        String textToAnalyze = update.name() + " - " + update.description();
+        if (!aiModerationService.isContentAllowed(textToAnalyze)) {
+            throw ApiException.contentRejected("text_rejected",
+                    "This spot breaks the community rules (spam, inappropriate content or nonsense text).");
+        }
+        SpotDto updated = tx.execute(status -> {
+            Spot spot = ownSpot(spotId, username);
+            spot.setName(update.name().trim());
+            spot.setDescription(update.description() == null ? null : update.description().trim());
+            spot.setSpotType(update.spotType());
+            spot.setDifficultyLevel(update.difficultyLevel());
+            return mapToDto(spotRepository.save(spot));
+        });
+        spotListCache.invalidate();
+        return updated;
+    }
+
+    /** One visible spot (deep links, feed items). */
+    @Transactional(readOnly = true)
+    public SpotDto getVisibleSpot(Long spotId) {
+        return spotRepository.findById(spotId).filter(Spot::isPublic).map(SpotService::mapToDto)
+                .orElseThrow(() -> ApiException.notFound("Spot"));
+    }
+
+    private Spot ownSpot(Long spotId, String username) {
+        User user = userLookup.require(username);
+        Spot spot = spotRepository.findById(spotId).orElseThrow(() -> ApiException.notFound("Spot"));
+        if (!spot.getCreatedBy().getId().equals(user.getId())) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "not_owner", "You can only change your own spots");
+        }
+        return spot;
+    }
+
+    private void purge(Long spotId) {
         String mediaUrl = spotRepository.findById(spotId).map(Spot::getMediaUrl).orElse(null);
         // Comments, ratings and reports first, because of the foreign keys
         commentRepository.deleteBySpotId(spotId);
@@ -150,59 +220,6 @@ public class SpotService {
         cloudinaryAssets.destroy(mediaUrl);
     }
 
-    public RatingDto getUserRating(Long spotId, String username) {
-        Spot spot = spotRepository.findById(spotId).orElse(null);
-        User user = userRepository.findByUsername(username).orElse(null);
-
-        if (spot == null || user == null) return null;
-
-        return ratingRepository.findBySpotAndUser(spot, user)
-                .map(r -> {
-                    RatingDto dto = new RatingDto();
-                    dto.setValue(r.getValue());
-                    return dto;
-                })
-                .orElse(new RatingDto());
-    }
-
-    public void addComment(Long spotId, String content, String username) {
-        if (!aiModerationService.isContentAllowed(content)) {
-            throw ApiException.contentRejected("text_rejected",
-                    "This comment breaks the community rules (spam, inappropriate content or nonsense text).");
-        }
-
-        Spot spot = spotRepository.findById(spotId)
-                .filter(Spot::isPublic)
-                .orElseThrow(() -> ApiException.notFound("Spot"));
-        User user = userRepository.findByUsername(username).orElseThrow(() -> ApiException.notFound("User"));
-
-        Comment comment = new Comment();
-        comment.setSpot(spot);
-        comment.setUser(user);
-        comment.setContent(content);
-        commentRepository.save(comment);
-    }
-
-    /**
-     * Two queries in total, whatever the number of comments: comments with their authors, and every
-     * rating of the spot (to show each author's stars next to their comment).
-     */
-    public List<CommentDto> getCommentsBySpot(Long spotId) {
-        Map<Long, Integer> ratingByUser = new HashMap<>();
-        for (RatingRepository.UserRating r : ratingRepository.findUserRatingsBySpotId(spotId)) {
-            ratingByUser.put(r.getUserId(), r.getValue());
-        }
-        return commentRepository.findBySpotIdOrderByCreatedAtDesc(spotId).stream()
-                .map(c -> {
-                    CommentDto dto = new CommentDto();
-                    dto.setId(c.getId());
-                    dto.setContent(c.getContent());
-                    dto.setUsername(c.getUser().getUsername());
-                    dto.setCreatedAt(c.getCreatedAt());
-                    dto.setRating(ratingByUser.get(c.getUser().getId()));
-                    return dto;
-                }).collect(Collectors.toList());
-    }
 
     /** Only images uploaded to our own Cloudinary account may be attached to a spot. */
     private void requireOwnCloudinaryUrl(String mediaUrl) {
@@ -220,7 +237,7 @@ public class SpotService {
     }
 
     // --- HELPER ---
-    private SpotDto mapToDto(Spot spot) {
+    public static SpotDto mapToDto(Spot spot) {
         SpotDto dto = new SpotDto();
         dto.setId(spot.getId());
         dto.setName(spot.getName());

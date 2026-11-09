@@ -45,6 +45,13 @@ public class User {
     @Column(name = "reports_rejected", nullable = false)
     private int reportsRejected = 0;
 
+    @Column(length = 280)
+    private String bio;
+
+    /** Account deleted by its owner: the row stays, anonymised, so spots and comments still read. */
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     public User() {}
 
     // AUTOMATIZACIÓN: Antes de guardar, poner la fecha actual
@@ -83,6 +90,13 @@ public class User {
 
     public int getReportsRejected() { return reportsRejected; }
     public void setReportsRejected(int reportsRejected) { this.reportsRejected = reportsRejected; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
+    public LocalDateTime getDeletedAt() { return deletedAt; }
+    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
+    public boolean isDeleted() { return deletedAt != null; }
 
     public boolean isAdmin() { return "ROLE_ADMIN".equals(role); }
 }

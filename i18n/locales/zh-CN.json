@@ -99,7 +99,10 @@
     "emailTaken": "该邮箱已注册。",
     "emailInvalid": "请检查邮箱地址。",
     "continueWithGoogle": "使用 Google 继续",
-    "googleFailed": "Google 登录失败，请重试。"
+    "googleFailed": "Google 登录失败，请重试。",
+    "tryDemo": "试用演示版",
+    "demoHint": "无需注册：共享的测试账号。",
+    "demoFailed": "演示版暂时不可用，请稍后再试。"
   },
   "admin": {
     "backToMap": "返回地图",
@@ -167,7 +170,10 @@
     "photoRejected": "这张照片不允许发布（裸露、毒品、暴力、广告或个人信息）。请换一张。",
     "photoUnclear": "照片太暗或太模糊，看不清地点。请重新拍一张。",
     "photoNotPlace": "照片需要拍到地点本身，不能是表情包、截图或近距离自拍。",
-    "textRejected": "名称或描述违反社区规则（垃圾信息、不当内容或无意义文字）。"
+    "textRejected": "名称或描述违反社区规则（垃圾信息、不当内容或无意义文字）。",
+    "demoReadonly": "演示账号无法使用此功能。请创建自己的账号来试用。",
+    "notOwner": "您只能修改自己发布的内容。",
+    "cannotFollowSelf": "您不能关注自己。"
   },
   "types": {
     "STREET": "街头",
@@ -231,5 +237,70 @@
   },
   "legal": {
     "link": "规则与隐私"
+  },
+  "social": {
+    "map": "地图",
+    "feed": "动态",
+    "notifications": "通知",
+    "profile": "个人主页",
+    "follow": "关注",
+    "followingState": "已关注",
+    "spotsCount": "地点",
+    "followersCount": "粉丝",
+    "followingCount": "关注",
+    "ratingsCount": "评分",
+    "commentsCount": "评论",
+    "memberSince": "{{date}}加入",
+    "editProfile": "编辑资料",
+    "bio": "简介",
+    "bioPlaceholder": "您的城市、您的地点、您的风格…",
+    "changePhoto": "更换照片",
+    "removePhoto": "删除照片",
+    "save": "保存",
+    "saved": "已保存",
+    "savedSpots": "已保存的地点",
+    "savedEmpty": "还没有保存的地点。点击地点上的“保存”即可收藏到这里。",
+    "deleteAccount": "删除账号",
+    "deleteAccountHint": "删除账号会移除您的个人主页、关注和已保存的地点。您发布的地点和评论会保留，显示为“已删除用户”。",
+    "deleteAccountConfirm": "确定删除账号吗？此操作无法撤销。",
+    "deletedUser": "已删除用户",
+    "userNotFound": "该滑手不存在或已删除账号。",
+    "noSpotsYet": "还没有地点。",
+    "nobodyYet": "这里还没有人。",
+    "feedEmpty": "您的动态是空的。关注其他滑手，就能看到他们添加、评分和评论的地点。",
+    "signInToSee": "登录后即可查看动态和通知。",
+    "notificationsEmpty": "还没有通知。",
+    "unread": "未读",
+    "loadMore": "加载更多",
+    "activity": {
+      "SPOT_CREATED": "添加了一个地点",
+      "COMMENTED": "评论了一个地点",
+      "RATED": "给一个地点评了分"
+    },
+    "notif": {
+      "FOLLOW": "开始关注您",
+      "COMMENT_ON_SPOT": "评论了您的地点“{{spot}}”",
+      "REPLY": "回复了您的评论",
+      "COMMENT_LIKE": "赞了您的评论"
+    },
+    "reply": "回复",
+    "replyingTo": "回复 {{username}}",
+    "edit": "编辑",
+    "delete": "删除",
+    "edited": "已编辑",
+    "like": "赞",
+    "commentDeleted": "评论已删除",
+    "deleteCommentConfirm": "删除这条评论？",
+    "writeComment": "写下评论…",
+    "signInToComment": "登录后评论",
+    "commentRejected": "该评论违反了社区规则（垃圾信息、不当内容或无意义文字）。",
+    "bioRejected": "该简介违反了社区规则（垃圾信息、不当内容或无意义文字）。",
+    "share": "分享",
+    "linkCopied": "链接已复制",
+    "addedBy": "添加者",
+    "editSpot": "编辑地点",
+    "deleteSpot": "删除地点",
+    "deleteSpotConfirm": "删除这个地点？它的照片、评分和评论也会一并删除。",
+    "loadFailed": "加载失败。请检查网络连接后重试。"
   }
 }

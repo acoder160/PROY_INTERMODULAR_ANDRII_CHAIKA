@@ -16,6 +16,19 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     long countBySpotId(Long spotId);
 
+    /** One page of top-level comments, newest first (keyset on id; idx_comments_spot_toplevel). */
+    @EntityGraph(attributePaths = "user")
+    List<Comment> findBySpotIdAndParentIsNullAndIdLessThanOrderByIdDesc(Long spotId, Long before,
+                                                                          org.springframework.data.domain.Pageable pageable);
+
+    /** Replies of a page of comments, oldest first, so a thread reads top to bottom. */
+    @EntityGraph(attributePaths = "user")
+    List<Comment> findByParentIdInOrderByIdAsc(java.util.Collection<Long> parentIds);
+
+    boolean existsByParentId(Long parentId);
+
+    long countByUserIdAndDeletedFalse(Long userId);
+
     interface SpotCount {
         Long getSpotId();
         Long getTotal();

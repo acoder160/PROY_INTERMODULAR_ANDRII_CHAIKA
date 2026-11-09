@@ -40,6 +40,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    # The JRE image has no curl: ask /actuator/health through bash's /dev/tcp
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /actuator/health HTTP/1.0\r\n\r\n' >&3 && grep -q UP <&3"]
+      interval: 15s
+      timeout: 5s
+      start_period: 60s
+      retries: 5
     mem_limit: ${APP_MEM_LIMIT:-4g}
     # Only on the VM's loopback, for checks over SSH; the public goes through Caddy
     ports:
@@ -60,7 +67,8 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      - app
+      app:
+        condition: service_healthy
 
 volumes:
   pgdata:

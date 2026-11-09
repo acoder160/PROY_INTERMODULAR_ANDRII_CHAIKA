@@ -2,6 +2,7 @@ package skatemap.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +32,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import skatemap.security.AppReturnPage;
+import skatemap.exception.ApiException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -56,6 +58,13 @@ public class AuthController {
 
     @Autowired
     GoogleBrowserFlowService googleBrowserFlowService;
+
+    /** Shared demo account so visitors (recruiters) can try the app without signing up. */
+    @Value("${app.demo.enabled:false}")
+    boolean demoEnabled;
+
+    @Value("${app.demo.username:demo}")
+    String demoUsername;
 
     // LOGIN
     @PostMapping("/login")
@@ -141,6 +150,16 @@ public class AuthController {
         }
     }
 
+    // DEMO: a normal session for the shared demo user (created by DemoAccountInitializer).
+    // It goes through the same moderation as everyone, with tighter per-IP limits.
+    @PostMapping("/demo")
+    public ResponseEntity<?> demoLogin(@RequestHeader(value = "X-Client-Type", required = false) String clientType) {
+        if (!demoEnabled) throw ApiException.notFound("Demo");
+        User user = userRepository.findByUsername(demoUsername)
+                .orElseThrow(() -> ApiException.unavailable("Demo account is not ready"));
+        return issueSession(user, jwtUtil.generateJwtToken(user.getUsername()), clientType);
+    }
+
     /** Respuesta de login común: access token + refresh (cookie en la web, en el cuerpo para la app). */
     private ResponseEntity<?> issueSession(User user, String jwt, String clientType) {
         RefreshTokenService.IssuedRefreshToken refreshToken = refreshTokenService.createSession(user);
@@ -161,6 +180,11 @@ public class AuthController {
     // REGISTER
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest signUpRequest) {
+        // "me" would clash with /api/users/me; "deleted_*" is how deleted accounts are renamed
+        String wanted = signUpRequest.getUsername().toLowerCase(java.util.Locale.ROOT);
+        if (wanted.equals("me") || wanted.startsWith("deleted_")) {
+            return ResponseEntity.badRequest().body("Error: Username is already taken!");
+        }
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity.badRequest().body("Error: Username is already taken!");
         }
@@ -197,6 +221,10 @@ public class AuthController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> logoutAll(Authentication authentication, HttpServletRequest request) {
         User user = userRepository.findByUsername(authentication.getName()).orElseThrow();
+        // The demo account is shared: one visitor must not sign out everybody else
+        if (demoEnabled && user.getUsername().equals(demoUsername)) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "demo_readonly", "Not available on the demo account");
+        }
         refreshTokenService.revokeAll(user);
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenService.clearCookie().toString())

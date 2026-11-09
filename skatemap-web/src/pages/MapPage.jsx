@@ -7,14 +7,16 @@ import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import FilterSheet from '../components/FilterSheet';
 import SpotDetailsSheet from '../components/SpotDetailsSheet';
 import { TypeChip, DifficultyMarks, StarRating } from '../components/PaintBits';
 import ReportSheet from '../components/ReportSheet';
-import { OptionsIcon, PersonIcon, LogoutIcon, RefreshIcon, LocateIcon, ShieldIcon, CameraIcon, CloseIcon, FlagIcon } from '../components/Icons';
+import { OptionsIcon, PersonIcon, RefreshIcon, LocateIcon, ShieldIcon, CameraIcon, CloseIcon, FeedIcon, BellIcon, BookmarkIcon } from '../components/Icons';
+import Avatar from '../components/Avatar';
+import '../Social.css';
 import { DEFAULT_FILTERS, cleanLabel, directionsUrl, haversineKm } from '../utils/paint';
 import '../MapChrome.css';
 
@@ -118,7 +120,7 @@ const forEachSpotCopyInBounds = (spots, bounds, callback) => {
 // (grupo de clusters) y Leaflet.markercluster solo pinta lo que cabe en pantalla.
 //  - Pocos spots a la vista (< 150): iconos sueltos, nunca burbujas.
 //  - Muchos spots y zoom bajo: burbujas "+N" / "+1". Con zoom >= 15: siempre iconos.
-function DynamicSpotLayer({ spots, onOpenDetails, onReport, myPosition }) {
+function DynamicSpotLayer({ spots, onOpenDetails, favoriteIds, onToggleFavorite, myPosition }) {
     const map = useMap();
     const positionRef = useRef(myPosition);
     const selectedRef = useRef(null);   // marcador con el popup abierto
@@ -377,14 +379,14 @@ function DynamicSpotLayer({ spots, onOpenDetails, onReport, myPosition }) {
     const currentSpot = openPopup ? spotsById.get(openPopup.spotId) : null;
     return currentSpot
         ? createPortal(
-            <SpotPopup spot={currentSpot} onOpenDetails={onOpenDetails} onReport={onReport} onClose={closePopup} />,
+            <SpotPopup spot={currentSpot} onOpenDetails={onOpenDetails} isFavorite={favoriteIds.has(currentSpot.id)} onToggleFavorite={onToggleFavorite} onClose={closePopup} />,
             openPopup.container
         )
         : null;
 }
 
 // POPUP DEL SPOT: misma tarjeta que el popup de la app móvil (skatemap-mobile/components/skatemap.tsx)
-function SpotPopup({ spot, onOpenDetails, onReport, onClose }) {
+function SpotPopup({ spot, onOpenDetails, isFavorite, onToggleFavorite, onClose }) {
     const { t } = useTranslation();
     const [imageFailed, setImageFailed] = useState(false);
     const spotType = (spot.spotType || spot.type || 'STREET').toUpperCase();
@@ -405,12 +407,13 @@ function SpotPopup({ spot, onOpenDetails, onReport, onClose }) {
                 <div className="popup-actions">
                     <button
                         type="button"
-                        className="popup-icon-btn"
-                        onClick={() => onReport(spot.id)}
-                        aria-label={t('report.title')}
-                        title={t('report.title')}
+                        className={`popup-icon-btn${isFavorite ? ' is-on' : ''}`}
+                        onClick={() => onToggleFavorite(spot.id)}
+                        aria-pressed={isFavorite}
+                        aria-label={isFavorite ? t('social.saved') : t('social.save')}
+                        title={isFavorite ? t('social.saved') : t('social.save')}
                     >
-                        <FlagIcon size={18} />
+                        <BookmarkIcon size={18} filled={isFavorite} />
                     </button>
                     <button type="button" className="popup-icon-btn" onClick={onClose} aria-label={cleanLabel(t('form.close'))}>
                         <CloseIcon size={18} />
@@ -589,6 +592,40 @@ function UserLocation({ position }) {
     return null;
 }
 
+// Vuela al spot abierto desde un enlace (?spot=) o desde la lista de un perfil / la actividad
+function FocusSpot({ focus }) {
+    const map = useMap();
+    useEffect(() => {
+        if (!focus) return;
+        map.flyTo([focus.lat, focus.lng], Math.max(map.getZoom(), 16), { duration: 1.2 });
+    }, [focus, map]);
+    return null;
+}
+
+// Contador de notificaciones sin leer: se consulta al entrar y cada minuto mientras la pestaña está visible
+function useUnreadCount(enabled) {
+    const [unread, setUnread] = useState(0);
+    useEffect(() => {
+        if (!enabled) return undefined;
+        let cancelled = false;
+        const check = () => {
+            if (document.visibilityState !== 'visible') return;
+            api.get('/notifications/unread-count')
+                .then((res) => { if (!cancelled) setUnread(res.data.unread ?? 0); })
+                .catch(() => {});
+        };
+        check();
+        const timer = setInterval(check, 60000);
+        document.addEventListener('visibilitychange', check);
+        return () => {
+            cancelled = true;
+            clearInterval(timer);
+            document.removeEventListener('visibilitychange', check);
+        };
+    }, [enabled]);
+    return enabled ? unread : 0;
+}
+
 // BOTÓN GEOLOCALIZACIÓN (abajo a la derecha) + aviso de estado
 function LocationButton({ setMyPosition }) {
     const { t } = useTranslation();
@@ -664,6 +701,8 @@ function LocationButton({ setMyPosition }) {
     );
 }
 
+const EMPTY_SET = new Set();
+
 export default function MapPage() {
     const { t } = useTranslation();
     const [spots, setSpots] = useState([]);
@@ -673,9 +712,41 @@ export default function MapPage() {
     const [selectedSpotId, setSelectedSpotId] = useState(null);
     const [reportSpotId, setReportSpotId] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
+    const [focus, setFocus] = useState(null);
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const { logout, user, isAdmin } = useAuth();
+    const { user, isAdmin } = useAuth();
     const navigate = useNavigate();
+    const unread = useUnreadCount(Boolean(user));
+
+    // Saved spots: one list for the whole map, so the popup and the spot sheet always agree
+    const [favoriteIds, setFavoriteIds] = useState(() => new Set());
+    useEffect(() => {
+        if (!user) return undefined;
+        let cancelled = false;
+        api.get('/favorites')
+            .then((res) => { if (!cancelled) setFavoriteIds(new Set(res.data)); })
+            .catch(() => {});
+        return () => { cancelled = true; };
+    }, [user]);
+    const visibleFavoriteIds = user ? favoriteIds : EMPTY_SET;
+
+    const toggleFavorite = useCallback(async (spotId) => {
+        if (!user) { navigate('/login'); return; }
+        const saved = favoriteIds.has(spotId);
+        const flip = (prev, on) => {
+            const next = new Set(prev);
+            if (on) next.add(spotId); else next.delete(spotId);
+            return next;
+        };
+        setFavoriteIds((prev) => flip(prev, !saved));
+        try {
+            if (saved) await api.delete(`/favorites/${spotId}`);
+            else await api.put(`/favorites/${spotId}`);
+        } catch {
+            setFavoriteIds((prev) => flip(prev, saved)); // put it back
+        }
+    }, [user, favoriteIds, navigate]);
     const initialCenter = [41.3874, 2.1686]; // Barcelona
     const username = user?.username;
 
@@ -703,9 +774,33 @@ export default function MapPage() {
         setRefreshing(false);
     };
 
-    const confirmLogout = () => {
-        if (window.confirm(`${t('map.logoutConfirm')}\n${username ?? ''}`)) logout();
-    };
+    // ?spot=123 (enlace compartido, actividad, perfil): abre el spot y vuela a él. Si el mapa aún no lo
+    // tiene (recién creado, o la lista llegó antes) se pide suelto.
+    const linkedSpotId = Number(searchParams.get('spot')) || null;
+    useEffect(() => {
+        if (!linkedSpotId) return undefined;
+        let cancelled = false;
+        const open = (spot) => {
+            setSelectedSpotId(spot.id);
+            setFocus({ lat: spot.latitude, lng: spot.longitude, id: spot.id });
+            setSearchParams({}, { replace: true });
+        };
+        const known = spots.find((s) => s.id === linkedSpotId);
+        if (known) {
+            open(known);
+        } else {
+            api.get(`/spots/${linkedSpotId}`)
+                .then((res) => {
+                    if (cancelled) return;
+                    setSpots((prev) => (prev.some((s) => s.id === res.data.id) ? prev : [...prev, res.data]));
+                    open(res.data);
+                })
+                .catch(() => { if (!cancelled) setSearchParams({}, { replace: true }); });
+        }
+        return () => { cancelled = true; };
+    }, [linkedSpotId, spots, setSearchParams]);
+
+    const removeSpot = useCallback((id) => setSpots((prev) => prev.filter((s) => s.id !== id)), []);
 
     const activeFilterCount = (filters.spotType !== 'ALL' ? 1 : 0) + (filters.minRating > 0 ? 1 : 0) + (filters.maxDistance > 0 ? 1 : 0);
 
@@ -748,11 +843,27 @@ export default function MapPage() {
                         </button>
                     )}
                     <LanguageSwitcher />
+                    {user && (
+                        <>
+                            <button type="button" onClick={() => navigate('/feed')} className="bar-pill" aria-label={t('social.feed')}>
+                                <FeedIcon size={20} />
+                                <span className="bar-pill-text bar-hide-narrow">{t('social.feed')}</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/notifications')}
+                                className="bar-pill"
+                                aria-label={unread > 0 ? `${t('social.notifications')}: ${unread}` : t('social.notifications')}
+                            >
+                                <BellIcon size={20} />
+                                {unread > 0 && <span className="count-badge is-alert" aria-hidden="true">{unread > 99 ? '99+' : unread}</span>}
+                            </button>
+                        </>
+                    )}
                     {user ? (
-                        <button type="button" onClick={confirmLogout} className="bar-pill bar-pill-account" aria-label={`${username}. ${t('map.logout')}`}>
-                            <PersonIcon size={18} />
-                            <span className="bar-pill-text">{username}</span>
-                            <LogoutIcon size={20} />
+                        <button type="button" onClick={() => navigate(`/u/${encodeURIComponent(username)}`)} className="bar-pill bar-pill-account" aria-label={`${username}. ${t('social.profile')}`}>
+                            <Avatar username={username} size={24} />
+                            <span className="bar-pill-text bar-hide-narrow">{username}</span>
                         </button>
                     ) : (
                         <button type="button" onClick={() => navigate('/login')} className="bar-pill bar-pill-account">
@@ -787,8 +898,9 @@ export default function MapPage() {
                 <ZoomLimit />
                 <PrerenderedTiles />
                 <LocationButton setMyPosition={setMyPosition} />
-                <DynamicSpotLayer spots={filteredSpots} onOpenDetails={setSelectedSpotId} onReport={setReportSpotId} myPosition={myPosition} />
+                <DynamicSpotLayer spots={filteredSpots} onOpenDetails={setSelectedSpotId} favoriteIds={visibleFavoriteIds} onToggleFavorite={toggleFavorite} myPosition={myPosition} />
                 <UserLocation position={myPosition} />
+                <FocusSpot focus={focus} />
             </MapContainer>
 
             <FilterSheet
@@ -807,7 +919,10 @@ export default function MapPage() {
                     userLocation={myPosition}
                     onClose={closeDetails}
                     onSpotUpdated={fetchSpots}
+                    onSpotDeleted={removeSpot}
                     onReport={setReportSpotId}
+                    isFavorite={visibleFavoriteIds.has(selectedSpot.id)}
+                    onToggleFavorite={toggleFavorite}
                 />
             )}
 

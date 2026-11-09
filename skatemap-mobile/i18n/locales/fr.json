@@ -99,7 +99,10 @@
     "emailTaken": "Cet e-mail est déjà enregistré.",
     "emailInvalid": "Vérifiez l’adresse e-mail.",
     "continueWithGoogle": "Continuer avec Google",
-    "googleFailed": "La connexion avec Google a échoué. Réessayez."
+    "googleFailed": "La connexion avec Google a échoué. Réessayez.",
+    "tryDemo": "Essayer la démo",
+    "demoHint": "Sans inscription : un compte de test partagé.",
+    "demoFailed": "La démo n'est pas disponible pour le moment. Réessayez plus tard."
   },
   "admin": {
     "backToMap": "Retour à la carte",
@@ -167,7 +170,10 @@
     "photoRejected": "Cette photo n'est pas autorisée (nudité, drogue, violence, publicité ou données personnelles). Choisissez-en une autre.",
     "photoUnclear": "La photo est trop sombre ou floue pour voir le spot. Prenez-en une autre.",
     "photoNotPlace": "La photo doit montrer le spot lui-même, pas un mème, une capture d'écran ou un selfie en gros plan.",
-    "textRejected": "Le nom ou la description enfreint les règles (spam, contenu inapproprié ou texte sans sens)."
+    "textRejected": "Le nom ou la description enfreint les règles (spam, contenu inapproprié ou texte sans sens).",
+    "demoReadonly": "Indisponible avec le compte démo. Créez votre propre compte pour l’essayer.",
+    "notOwner": "Vous ne pouvez modifier que vos propres publications.",
+    "cannotFollowSelf": "Vous ne pouvez pas vous suivre vous-même."
   },
   "types": {
     "STREET": "Street",
@@ -231,5 +237,70 @@
   },
   "legal": {
     "link": "Règles et confidentialité"
+  },
+  "social": {
+    "map": "Carte",
+    "feed": "Fil",
+    "notifications": "Notifications",
+    "profile": "Profil",
+    "follow": "Suivre",
+    "followingState": "Abonné",
+    "spotsCount": "Spots",
+    "followersCount": "Abonnés",
+    "followingCount": "Abonnements",
+    "ratingsCount": "Notes",
+    "commentsCount": "Commentaires",
+    "memberSince": "Membre depuis {{date}}",
+    "editProfile": "Modifier le profil",
+    "bio": "Bio",
+    "bioPlaceholder": "Votre ville, vos spots, votre style…",
+    "changePhoto": "Changer la photo",
+    "removePhoto": "Supprimer la photo",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "savedSpots": "Spots enregistrés",
+    "savedEmpty": "Aucun spot enregistré pour l’instant. Touchez Enregistrer sur un spot pour le retrouver ici.",
+    "deleteAccount": "Supprimer le compte",
+    "deleteAccountHint": "Supprimer votre compte efface votre profil, vos abonnements et vos spots enregistrés. Vos spots et commentaires restent, affichés comme « Utilisateur supprimé ».",
+    "deleteAccountConfirm": "Supprimer votre compte ? C’est irréversible.",
+    "deletedUser": "Utilisateur supprimé",
+    "userNotFound": "Ce skater n’existe pas ou a supprimé son compte.",
+    "noSpotsYet": "Aucun spot pour l’instant.",
+    "nobodyYet": "Personne pour l’instant.",
+    "feedEmpty": "Votre fil est vide. Suivez des skaters pour voir les spots qu’ils ajoutent, notent et commentent.",
+    "signInToSee": "Connectez-vous pour voir votre fil et vos notifications.",
+    "notificationsEmpty": "Aucune notification pour l’instant.",
+    "unread": "Non lu",
+    "loadMore": "Voir plus",
+    "activity": {
+      "SPOT_CREATED": "a ajouté un spot",
+      "COMMENTED": "a commenté un spot",
+      "RATED": "a noté un spot"
+    },
+    "notif": {
+      "FOLLOW": "vous suit désormais",
+      "COMMENT_ON_SPOT": "a commenté votre spot {{spot}}",
+      "REPLY": "a répondu à votre commentaire",
+      "COMMENT_LIKE": "a aimé votre commentaire"
+    },
+    "reply": "Répondre",
+    "replyingTo": "Réponse à {{username}}",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "edited": "modifié",
+    "like": "J’aime",
+    "commentDeleted": "Commentaire supprimé",
+    "deleteCommentConfirm": "Supprimer ce commentaire ?",
+    "writeComment": "Écrivez un commentaire…",
+    "signInToComment": "Connectez-vous pour commenter",
+    "commentRejected": "Ce commentaire enfreint les règles de la communauté (spam, contenu inapproprié ou texte absurde).",
+    "bioRejected": "Cette bio enfreint les règles de la communauté (spam, contenu inapproprié ou texte absurde).",
+    "share": "Partager",
+    "linkCopied": "Lien copié",
+    "addedBy": "Ajouté par",
+    "editSpot": "Modifier le spot",
+    "deleteSpot": "Supprimer le spot",
+    "deleteSpotConfirm": "Supprimer ce spot ? Sa photo, ses notes et ses commentaires seront supprimés aussi.",
+    "loadFailed": "Chargement impossible. Vérifiez votre connexion et réessayez."
   }
 }

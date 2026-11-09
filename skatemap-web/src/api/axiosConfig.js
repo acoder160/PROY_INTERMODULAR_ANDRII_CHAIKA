@@ -30,6 +30,25 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
+/**
+ * One refresh at a time. Refresh tokens rotate and the server treats a reused one as stolen
+ * (it revokes the whole session family), so two parallel refreshes with the same cookie (React
+ * StrictMode running the restore effect twice, or a 401 arriving while the restore is in flight)
+ * would sign the user out. Everyone waiting shares the same request instead.
+ */
+let refreshInFlight = null;
+export const refreshSession = () => {
+    if (!refreshInFlight) {
+        refreshInFlight = api.post('/auth/refresh')
+            .then((response) => {
+                setAccessToken(response.data.token);
+                return response;
+            })
+            .finally(() => { refreshInFlight = null; });
+    }
+    return refreshInFlight;
+};
+
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -72,9 +91,8 @@ api.interceptors.response.use(
         isRefreshing = true;
 
         try {
-            const response = await api.post('/auth/refresh');
+            const response = await refreshSession();
             const token = response.data.token;
-            setAccessToken(token);
             processQueue(null, token);
             originalRequest.headers = originalRequest.headers || {};
             originalRequest.headers.Authorization = `Bearer ${token}`;

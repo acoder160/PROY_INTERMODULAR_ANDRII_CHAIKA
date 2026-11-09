@@ -99,7 +99,10 @@
     "emailTaken": "Diese E-Mail ist bereits registriert.",
     "emailInvalid": "Überprüfe die E-Mail-Adresse.",
     "continueWithGoogle": "Weiter mit Google",
-    "googleFailed": "Anmeldung mit Google fehlgeschlagen. Versuch es erneut."
+    "googleFailed": "Anmeldung mit Google fehlgeschlagen. Versuch es erneut.",
+    "tryDemo": "Demo ausprobieren",
+    "demoHint": "Ohne Registrierung: ein gemeinsames Testkonto.",
+    "demoFailed": "Die Demo ist gerade nicht verfügbar. Bitte später erneut versuchen."
   },
   "admin": {
     "backToMap": "Zurück zur Karte",
@@ -167,7 +170,10 @@
     "photoRejected": "Dieses Foto ist nicht erlaubt (Nacktheit, Drogen, Gewalt, Werbung oder persönliche Daten). Wähle ein anderes.",
     "photoUnclear": "Das Foto ist zu dunkel oder unscharf, um den Spot zu erkennen. Mach ein neues.",
     "photoNotPlace": "Das Foto muss den Spot selbst zeigen, kein Meme, keinen Screenshot und kein Nahaufnahme-Selfie.",
-    "textRejected": "Name oder Beschreibung verstoßen gegen die Regeln (Spam, unangemessene Inhalte oder Unsinn)."
+    "textRejected": "Name oder Beschreibung verstoßen gegen die Regeln (Spam, unangemessene Inhalte oder Unsinn).",
+    "demoReadonly": "Mit dem Demo-Konto nicht möglich. Erstelle ein eigenes Konto, um das auszuprobieren.",
+    "notOwner": "Du kannst nur deine eigenen Beiträge ändern.",
+    "cannotFollowSelf": "Du kannst dir nicht selbst folgen."
   },
   "types": {
     "STREET": "Street",
@@ -231,5 +237,70 @@
   },
   "legal": {
     "link": "Regeln & Datenschutz"
+  },
+  "social": {
+    "map": "Karte",
+    "feed": "Feed",
+    "notifications": "Mitteilungen",
+    "profile": "Profil",
+    "follow": "Folgen",
+    "followingState": "Gefolgt",
+    "spotsCount": "Spots",
+    "followersCount": "Follower",
+    "followingCount": "Folgt",
+    "ratingsCount": "Bewertungen",
+    "commentsCount": "Kommentare",
+    "memberSince": "Dabei seit {{date}}",
+    "editProfile": "Profil bearbeiten",
+    "bio": "Über mich",
+    "bioPlaceholder": "Deine Stadt, deine Spots, dein Style…",
+    "changePhoto": "Foto ändern",
+    "removePhoto": "Foto entfernen",
+    "save": "Speichern",
+    "saved": "Gespeichert",
+    "savedSpots": "Gespeicherte Spots",
+    "savedEmpty": "Noch keine gespeicherten Spots. Tippe bei einem Spot auf Speichern, um ihn hier zu sammeln.",
+    "deleteAccount": "Konto löschen",
+    "deleteAccountHint": "Wenn du dein Konto löschst, verschwinden Profil, gefolgte Skater und gespeicherte Spots. Deine Spots und Kommentare bleiben – als „Gelöschter Nutzer“.",
+    "deleteAccountConfirm": "Konto wirklich löschen? Das lässt sich nicht rückgängig machen.",
+    "deletedUser": "Gelöschter Nutzer",
+    "userNotFound": "Diesen Skater gibt es nicht, oder das Konto wurde gelöscht.",
+    "noSpotsYet": "Noch keine Spots.",
+    "nobodyYet": "Noch niemand hier.",
+    "feedEmpty": "Dein Feed ist leer. Folge Skatern, um zu sehen, welche Spots sie hinzufügen, bewerten und kommentieren.",
+    "signInToSee": "Melde dich an, um deinen Feed und deine Mitteilungen zu sehen.",
+    "notificationsEmpty": "Noch keine Mitteilungen.",
+    "unread": "Ungelesen",
+    "loadMore": "Mehr laden",
+    "activity": {
+      "SPOT_CREATED": "hat einen Spot hinzugefügt",
+      "COMMENTED": "hat einen Spot kommentiert",
+      "RATED": "hat einen Spot bewertet"
+    },
+    "notif": {
+      "FOLLOW": "folgt dir jetzt",
+      "COMMENT_ON_SPOT": "hat deinen Spot {{spot}} kommentiert",
+      "REPLY": "hat auf deinen Kommentar geantwortet",
+      "COMMENT_LIKE": "gefällt dein Kommentar"
+    },
+    "reply": "Antworten",
+    "replyingTo": "Antwort an {{username}}",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "edited": "bearbeitet",
+    "like": "Gefällt mir",
+    "commentDeleted": "Kommentar gelöscht",
+    "deleteCommentConfirm": "Diesen Kommentar löschen?",
+    "writeComment": "Schreib einen Kommentar…",
+    "signInToComment": "Melde dich an, um zu kommentieren",
+    "commentRejected": "Dieser Kommentar verstößt gegen die Community-Regeln (Spam, unangemessene Inhalte oder sinnloser Text).",
+    "bioRejected": "Dieser Text verstößt gegen die Community-Regeln (Spam, unangemessene Inhalte oder sinnloser Text).",
+    "share": "Teilen",
+    "linkCopied": "Link kopiert",
+    "addedBy": "Hinzugefügt von",
+    "editSpot": "Spot bearbeiten",
+    "deleteSpot": "Spot löschen",
+    "deleteSpotConfirm": "Diesen Spot löschen? Foto, Bewertungen und Kommentare werden mit gelöscht.",
+    "loadFailed": "Laden fehlgeschlagen. Prüfe deine Verbindung und versuch es noch einmal."
   }
 }

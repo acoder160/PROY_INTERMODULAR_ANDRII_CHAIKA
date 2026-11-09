@@ -18,6 +18,8 @@ interface SpotFormModalProps {
   isUploading: boolean;
   /** Save failure from the server or upload, shown inside the sheet. */
   errorMessage?: string | null;
+  /** Header text; "New spot" by default. Editing an existing spot passes its own. */
+  title?: string;
 }
 
 const TYPES = ['STREET', 'PARK', 'RAMPS', 'RAIL', 'LEDGE'];
@@ -31,7 +33,8 @@ export default function SpotFormModal({
   setFormData,
   capturedPhoto,
   isUploading,
-  errorMessage
+  errorMessage,
+  title
 }: SpotFormModalProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -63,7 +66,7 @@ export default function SpotFormModal({
       >
         <View style={styles.sheet}>
           <View style={styles.header}>
-            <Text style={styles.title} accessibilityRole="header">{cleanLabel(t('form.newSpot'))}</Text>
+            <Text style={styles.title} accessibilityRole="header">{title ?? cleanLabel(t('form.newSpot'))}</Text>
             <TouchableOpacity
               onPress={handleClose}
               disabled={isUploading}
