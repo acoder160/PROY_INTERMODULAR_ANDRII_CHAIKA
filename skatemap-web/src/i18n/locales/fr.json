@@ -102,17 +102,49 @@
     "googleFailed": "La connexion avec Google a échoué. Réessayez."
   },
   "admin": {
-    "title": "Panneau d'administration",
     "backToMap": "Retour à la carte",
-    "id": "ID",
-    "name": "Nom",
-    "creator": "Créateur",
-    "actions": "Actions",
-    "loadingSpots": "Chargement des spots...",
-    "delete": "Supprimer",
-    "confirmDelete": "Voulez-vous vraiment supprimer le spot « {{name}} » et tous ses commentaires ?",
-    "deleted": "Spot supprimé avec succès",
-    "deleteError": "Erreur lors de la suppression. Vérifiez vos droits ou la console."
+    "moderation": "Modération",
+    "empty": "Tout est en ordre. Rien à vérifier ici.",
+    "loadFailed": "Impossible de charger la file.",
+    "loadMore": "Charger plus",
+    "keep": "Garder",
+    "remove": "Supprimer",
+    "removePhoto": "Retirer la photo",
+    "restorePhoto": "Afficher la photo",
+    "skip": "Passer",
+    "comments": "Commentaires",
+    "undo": "Annuler",
+    "removed": "Spot supprimé",
+    "photoRemoved": "Photo supprimée",
+    "kept": "Spot conservé",
+    "actionFailed": "Ça n'a pas marché. Réessayez.",
+    "by": "par {{user}}",
+    "openMap": "Ouvrir dans Maps",
+    "aiVerdict": "Avis de l'IA",
+    "aiNone": "L'IA n'a pas encore examiné ce spot.",
+    "reportsCount": "Signalements ({{count}})",
+    "commentsCount": "Commentaires ({{count}})",
+    "weight": "poids {{weight}}",
+    "noComments": "Aucun commentaire.",
+    "deleteComment": "Supprimer le commentaire",
+    "confirmDeleteComment": "Supprimer ce commentaire ?",
+    "shortcuts": "Touches : → garder · ← supprimer · ↑ commentaires · P retirer la photo · Espace passer · Z annuler",
+    "swipeHint": "Glissez → garder · ← supprimer · ↑ commentaires · ↓ passer",
+    "tabs": {
+      "REPORTED": "Signalements",
+      "NEW": "Nouveaux",
+      "HIDDEN": "Masqués",
+      "ALL": "Tous"
+    },
+    "status": {
+      "HIDDEN": "Masqué sur la carte",
+      "PHOTO_HIDDEN": "Photo masquée"
+    },
+    "verdict": {
+      "VIOLATION": "Enfreint les règles",
+      "OK": "Semble correct",
+      "UNSURE": "Pas sûre"
+    }
   },
   "status": {
     "preparingCamera": "📸 Préparation de la caméra...",
@@ -131,7 +163,11 @@
     "spotCreated": "Spot créé avec succès !",
     "saveFailed": "Erreur lors de l'enregistrement du spot. Vérifiez votre connexion.",
     "gpsWaiting": "Veuillez attendre que le GPS détecte votre position.",
-    "tooFar": "Vous êtes à {{meters}} m. Vous devez être à moins de 200 m du spot pour l'ajouter."
+    "tooFar": "Vous êtes à {{meters}} m. Vous devez être à moins de 200 m du spot pour l'ajouter.",
+    "photoRejected": "Cette photo n'est pas autorisée (nudité, drogue, violence, publicité ou données personnelles). Choisissez-en une autre.",
+    "photoUnclear": "La photo est trop sombre ou floue pour voir le spot. Prenez-en une autre.",
+    "photoNotPlace": "La photo doit montrer le spot lui-même, pas un mème, une capture d'écran ou un selfie en gros plan.",
+    "textRejected": "Le nom ou la description enfreint les règles (spam, contenu inapproprié ou texte sans sens)."
   },
   "types": {
     "STREET": "Street",
@@ -169,5 +205,31 @@
     "route": "🗺️ Itinéraire",
     "unnamed": "Spot sans nom",
     "noDescription": "Aucune description détaillée pour ce spot."
+  },
+  "report": {
+    "title": "Signaler",
+    "subtitle": "Quel est le problème avec {{name}} ?",
+    "reasonLabel": "Motif",
+    "commentLabel": "Détails (facultatif)",
+    "commentPlaceholder": "Que devons-nous vérifier ?",
+    "send": "Envoyer le signalement",
+    "sent": "Merci ! Nous allons vérifier ce spot.",
+    "already": "Vous avez déjà signalé ce spot.",
+    "own": "Vous ne pouvez pas signaler votre propre spot.",
+    "tooMany": "Trop de signalements. Réessayez dans quelques minutes.",
+    "failed": "Le signalement n'a pas pu être envoyé. Réessayez.",
+    "loginText": "Connectez-vous pour signaler un spot. Sans compte, vous pouvez nous écrire depuis la page des règles.",
+    "howItWorks": "Comment fonctionne la modération",
+    "reasons": {
+      "SPAM": "Spam ou publicité",
+      "INAPPROPRIATE": "Photo ou texte inapproprié (nudité, drogue, violence)",
+      "FAKE": "Pas un spot de skate / faux",
+      "WRONG_LOCATION": "Mauvais endroit ou le spot n'existe plus",
+      "DANGEROUS": "Dangereux ou illégal",
+      "OTHER": "Autre chose"
+    }
+  },
+  "legal": {
+    "link": "Règles et confidentialité"
   }
 }

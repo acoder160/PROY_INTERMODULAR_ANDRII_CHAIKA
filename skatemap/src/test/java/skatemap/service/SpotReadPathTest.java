@@ -10,7 +10,9 @@ import skatemap.entity.Comment;
 import skatemap.entity.Spot;
 import skatemap.entity.User;
 import skatemap.repository.CommentRepository;
+import skatemap.entity.enums.SpotStatus;
 import skatemap.repository.RatingRepository;
+import skatemap.repository.SpotReportRepository;
 import skatemap.repository.SpotRepository;
 import skatemap.repository.UserRepository;
 
@@ -35,8 +37,9 @@ class SpotReadPathTest {
         ratingRepository = mock(RatingRepository.class);
         cache = new SpotListCache();
         service = new SpotService(spotRepository, mock(UserRepository.class), ratingRepository,
-                commentRepository, mock(AiModerationService.class), cache);
-        when(spotRepository.findAll()).thenReturn(List.of(spot(1L), spot(2L)));
+                commentRepository, mock(SpotReportRepository.class), mock(AiModerationService.class),
+                mock(ImageModerationService.class), mock(CloudinaryAssets.class), cache);
+        when(spotRepository.findAllByStatus(SpotStatus.VISIBLE)).thenReturn(List.of(spot(1L), spot(2L)));
     }
 
     @AfterEach
@@ -51,7 +54,7 @@ class SpotReadPathTest {
         for (int i = 0; i < 100; i++) {
             assertEquals(2, service.getAllSpots().size());
         }
-        verify(spotRepository, times(1)).findAll();
+        verify(spotRepository, times(1)).findAllByStatus(SpotStatus.VISIBLE);
     }
 
     @Test
@@ -59,7 +62,7 @@ class SpotReadPathTest {
         service.getAllSpots();
         cache.invalidate();
         service.getAllSpots();
-        verify(spotRepository, times(2)).findAll();
+        verify(spotRepository, times(2)).findAllByStatus(SpotStatus.VISIBLE);
     }
 
     @Test
@@ -69,13 +72,13 @@ class SpotReadPathTest {
 
         cache.invalidate();
         service.getAllSpots(); // before commit: still the cached list
-        verify(spotRepository, times(1)).findAll();
+        verify(spotRepository, times(1)).findAllByStatus(SpotStatus.VISIBLE);
 
         for (TransactionSynchronization sync : TransactionSynchronizationManager.getSynchronizations()) {
             sync.afterCommit();
         }
         service.getAllSpots();
-        verify(spotRepository, times(2)).findAll();
+        verify(spotRepository, times(2)).findAllByStatus(SpotStatus.VISIBLE);
     }
 
     @Test

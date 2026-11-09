@@ -16,10 +16,14 @@ import skatemap.dto.SpotDto;
 import skatemap.entity.Comment;
 import skatemap.entity.Spot;
 import skatemap.entity.User;
+import skatemap.entity.enums.PhotoStatus;
+import skatemap.entity.enums.SpotStatus;
 import skatemap.repository.CommentRepository;
 import skatemap.repository.RatingRepository;
+import skatemap.repository.SpotReportRepository;
 import skatemap.repository.SpotRepository;
 import skatemap.repository.UserRepository;
+import skatemap.service.ImageModerationService.Verdict;
 
 import java.util.List;
 import java.util.HashMap;
@@ -33,8 +37,11 @@ public class SpotService {
     private final UserRepository userRepository;
     private final RatingRepository ratingRepository;
     private final CommentRepository commentRepository;
+    private final SpotReportRepository spotReportRepository;
 
     private final AiModerationService aiModerationService;
+    private final ImageModerationService imageModerationService;
+    private final CloudinaryAssets cloudinaryAssets;
     private final SpotListCache spotListCache;
 
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
@@ -46,13 +53,19 @@ public class SpotService {
                        UserRepository userRepository,
                        RatingRepository ratingRepository,
                        CommentRepository commentRepository,
+                       SpotReportRepository spotReportRepository,
                        AiModerationService aiModerationService,
+                       ImageModerationService imageModerationService,
+                       CloudinaryAssets cloudinaryAssets,
                        SpotListCache spotListCache) {
         this.spotRepository = spotRepository;
         this.userRepository = userRepository;
         this.ratingRepository = ratingRepository;
         this.commentRepository = commentRepository;
+        this.spotReportRepository = spotReportRepository;
         this.aiModerationService = aiModerationService;
+        this.imageModerationService = imageModerationService;
+        this.cloudinaryAssets = cloudinaryAssets;
         this.spotListCache = spotListCache;
     }
 
@@ -60,20 +73,26 @@ public class SpotService {
         // Moderate before anything is stored
         String textToAnalyze = spotDto.getName() + " - " + spotDto.getDescription();
         if (!aiModerationService.isContentAllowed(textToAnalyze)) {
-            throw ApiException.contentRejected("This spot breaks the community rules (spam, inappropriate content or nonsense text).");
+            throw ApiException.contentRejected("text_rejected",
+                    "This spot breaks the community rules (spam, inappropriate content or nonsense text).");
         }
 
-        requireOwnCloudinaryUrl(spotDto.getMediaUrl());
+        String mediaUrl = blankToNull(spotDto.getMediaUrl());
+        requireOwnCloudinaryUrl(mediaUrl);
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> ApiException.notFound("User"));
+
+        if (mediaUrl != null) {
+            moderatePhoto(mediaUrl, spotDto, user);
+        }
 
         Spot spot = new Spot();
         spot.setName(spotDto.getName());
         spot.setDescription(spotDto.getDescription());
         spot.setSpotType(spotDto.getSpotType());
         spot.setDifficultyLevel(spotDto.getDifficultyLevel());
-        spot.setMediaUrl(spotDto.getMediaUrl());
+        spot.setMediaUrl(mediaUrl);
         spot.setCreatedBy(user);
 
         Point point = geometryFactory.createPoint(new Coordinate(spotDto.getLongitude(), spotDto.getLatitude()));
@@ -84,24 +103,51 @@ public class SpotService {
         return created;
     }
 
+    /**
+     * Rejected or unusable photos are deleted from Cloudinary right away (only from the uploader's own
+     * folder, so a crafted URL can't delete someone else's photo) and the user is asked for another one.
+     */
+    private void moderatePhoto(String mediaUrl, SpotDto spotDto, User user) {
+        Verdict verdict = imageModerationService.checkUpload(mediaUrl, spotDto.getName(), spotDto.getDescription());
+        ApiException rejection = switch (verdict.outcome()) {
+            case ALLOW -> null;
+            case REJECT -> ApiException.contentRejected("photo_rejected",
+                    "This photo isn't allowed (nudity, drugs, violence, ads or personal data). Please choose another one.");
+            case UNCLEAR -> ApiException.contentRejected("photo_unclear",
+                    "The photo is too dark or blurry to see the spot. Please take another one.");
+            case NOT_PLACE -> ApiException.contentRejected("photo_not_place",
+                    "The photo has to show the spot itself (not a meme, screenshot or close-up selfie).");
+        };
+        if (rejection == null) return;
+        if (CloudinaryAssets.isInUserFolder(mediaUrl, user.getId())) {
+            cloudinaryAssets.destroy(mediaUrl);
+        }
+        throw rejection;
+    }
+
     public List<SpotDto> findSpotsNearby(double lat, double lng, double distanceMeters) {
         return spotRepository.findSpotsNearby(lat, lng, distanceMeters)
                 .stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
-    /** Served from memory; see {@link SpotListCache}. */
+    /** Served from memory; see {@link SpotListCache}. Hidden spots are left out. */
     public List<SpotDto> getAllSpots() {
-        return spotListCache.get(() -> spotRepository.findAll().stream().map(this::mapToDto).toList());
+        return spotListCache.get(() -> spotRepository.findAllByStatus(SpotStatus.VISIBLE)
+                .stream().map(this::mapToDto).toList());
     }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteSpot(Long spotId, String username) {
-        // Comments and ratings first, because of the foreign keys
+        String mediaUrl = spotRepository.findById(spotId).map(Spot::getMediaUrl).orElse(null);
+        // Comments, ratings and reports first, because of the foreign keys
         commentRepository.deleteBySpotId(spotId);
         ratingRepository.deleteBySpotId(spotId);
+        spotReportRepository.deleteBySpotId(spotId);
         spotRepository.deleteById(spotId);
         spotListCache.invalidate();
+        // The photo would otherwise stay public at its URL
+        cloudinaryAssets.destroy(mediaUrl);
     }
 
     public RatingDto getUserRating(Long spotId, String username) {
@@ -121,10 +167,13 @@ public class SpotService {
 
     public void addComment(Long spotId, String content, String username) {
         if (!aiModerationService.isContentAllowed(content)) {
-            throw ApiException.contentRejected("This comment breaks the community rules (spam, inappropriate content or nonsense text).");
+            throw ApiException.contentRejected("text_rejected",
+                    "This comment breaks the community rules (spam, inappropriate content or nonsense text).");
         }
 
-        Spot spot = spotRepository.findById(spotId).orElseThrow(() -> ApiException.notFound("Spot"));
+        Spot spot = spotRepository.findById(spotId)
+                .filter(Spot::isPublic)
+                .orElseThrow(() -> ApiException.notFound("Spot"));
         User user = userRepository.findByUsername(username).orElseThrow(() -> ApiException.notFound("User"));
 
         Comment comment = new Comment();
@@ -157,13 +206,17 @@ public class SpotService {
 
     /** Only images uploaded to our own Cloudinary account may be attached to a spot. */
     private void requireOwnCloudinaryUrl(String mediaUrl) {
-        if (mediaUrl == null || mediaUrl.isBlank()) return;
+        if (mediaUrl == null) return;
         String prefix = cloudinaryCloudName == null || cloudinaryCloudName.isBlank()
                 ? "https://res.cloudinary.com/"
                 : "https://res.cloudinary.com/" + cloudinaryCloudName + "/";
         if (!mediaUrl.startsWith(prefix)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "mediaUrl: only images uploaded through the app are allowed");
         }
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value;
     }
 
     // --- HELPER ---
@@ -174,7 +227,8 @@ public class SpotService {
         dto.setDescription(spot.getDescription());
         dto.setSpotType(spot.getSpotType());
         dto.setDifficultyLevel(spot.getDifficultyLevel());
-        dto.setMediaUrl(spot.getMediaUrl());
+        // A photo hidden by moderation is never served, even while the spot stays on the map
+        dto.setMediaUrl(spot.getPhotoStatus() == PhotoStatus.HIDDEN ? null : spot.getMediaUrl());
 
         Double cachedRating = spot.getSurfaceRating();
         double rating = cachedRating != null ? cachedRating : 0.0;

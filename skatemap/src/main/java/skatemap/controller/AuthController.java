@@ -154,6 +154,7 @@ public class AuthController {
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
+                user.getRole(),
                 isMobileClient(clientType) ? refreshToken.rawToken() : null));
     }
 
@@ -223,6 +224,7 @@ public class AuthController {
                             user.getId(),
                             user.getUsername(),
                             user.getEmail(),
+                            user.getRole(),
                             tokenInput.fromCookie() ? null : rotated.rawToken()));
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(401)

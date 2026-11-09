@@ -132,6 +132,7 @@ export default function RegisterPage() {
           <Link to="/login" className="auth-link">{t('auth.loginLink')}</Link>
         </div>
         <Link to="/map" className="auth-guest">{t('auth.backToMap')}</Link>
+        <Link to="/legal" className="auth-legal">{t('legal.link')}</Link>
       </div>
     </div>
   );

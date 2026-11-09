@@ -9,7 +9,7 @@ import { cleanLabel } from '../utils/text';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-export default function SpotDetailsModal({ visible, onClose, spot, token, onSpotUpdated, userLocation }: any) {
+export default function SpotDetailsModal({ visible, onClose, spot, token, onSpotUpdated, onReport, userLocation }: any) {
   const { t } = useTranslation();
   const router = useRouter();
   // El estado se reinicia al cambiar de spot: el padre monta este componente con key={spot.id}
@@ -187,6 +187,16 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
           >
             <Ionicons name="close" size={22} color={Palette.white} />
           </TouchableOpacity>
+          {onReport && (
+            <TouchableOpacity
+              style={[styles.closeBtn, styles.reportBtn]}
+              onPress={() => onReport(spot.id)}
+              accessibilityRole="button"
+              accessibilityLabel={t('report.title')}
+            >
+              <Ionicons name="flag-outline" size={20} color={Palette.white} />
+            </TouchableOpacity>
+          )}
 
           <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
             {spot.mediaUrl ? (
@@ -341,6 +351,8 @@ const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(28,28,28,0.6)', justifyContent: 'flex-end' },
   card: { backgroundColor: Palette.sheet, borderTopLeftRadius: Radius.sheet, borderTopRightRadius: Radius.sheet, maxHeight: '92%', overflow: 'hidden' },
   closeBtn: { position: 'absolute', top: 12, right: 12, zIndex: 10, backgroundColor: Palette.asphalt, width: MIN_TARGET, height: MIN_TARGET, borderRadius: 24, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: Palette.white },
+  // Denunciar: mismo botón, a la izquierda de la X
+  reportBtn: { right: 12 + MIN_TARGET + 8 },
   image: { width: '100%', height: 200 },
   imagePlaceholder: { backgroundColor: Palette.concrete, alignItems: 'center', justifyContent: 'center' },
   content: { padding: 20, paddingBottom: 32 },

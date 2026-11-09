@@ -78,6 +78,8 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.GET, "/api/spots/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll();
                     auth.requestMatchers("/error").permitAll();
+                    // Moderation queue and decisions (also guarded with @PreAuthorize)
+                    auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
                     if (swaggerEnabled) {
                         auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
                     }

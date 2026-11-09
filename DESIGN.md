@@ -187,8 +187,15 @@ Pills and rounded sheets, always outlined. Controls are fully round pills (24-28
 - **Difficulty:** 1-3 slanted marks plus uppercase text label.
 
 ### Cards / Containers
-- **Sheet:** white, 28px top radius, 200px photo on top, concrete placeholder if no photo, asphalt close button (48px, white ring).
+- **Sheet:** white, 28px top radius, 200px photo on top, concrete placeholder if no photo, asphalt close button (48px, white ring). Report (flag) button sits to its left, same style.
+- **Popup actions:** report and close over the popup photo, top-end corner: 40px asphalt circles with a 2px white ring and an 18px SVG icon centred with grid. Never a text "×" (font glyphs sit off-centre).
+- **Report sheet:** reasons as full-width body-face choice pills (one column), optional 300-character note with a counter, pink "Send report". Guests see a log-in action instead.
 - **Rate box:** 2px ink border, 16px radius. Comments: 1px hairline border, 12px radius.
+
+### Moderation (admin)
+- **Mobile deck:** one white card (28px radius, 2px ink border) per spot. Swipe right = keep (green stamp), left = remove (red stamp, 5 s undo), up = reports and comments sheet, down = skip. Stamps fade in with the drag and a haptic tick marks each threshold. The same actions sit in a 56px round button row under the card (keep is the larger green one), for tapping and screen readers.
+- **Web console:** filter tabs (Reports / New / Hidden / All) as pills with counts (pink count on Reports), list on the left, the same card on the right with a sticky action bar. Keys mirror the swipes: → keep, ← remove, ↑ comments, P remove photo, Space skip, Z undo. Single card on phones.
+- **Report score:** pink badge `score / threshold`. Hidden states use danger-tint flags, never a paint.
 
 ### Inputs / Fields
 - 2px border (ink on white sheets, white on the asphalt auth card), white fill, 14-16px radius, min height 48. Auth labels are display-face caps on asphalt.
@@ -199,6 +206,7 @@ Pills and rounded sheets, always outlined. Controls are fully round pills (24-28
 
 ### Painted Route (signature)
 - Pink 6px line, round dashes (`2 12`), from user to selected spot. User dot: asphalt with white ring and pulsing ring. Search radius uses a dark dashed ring (`4 6`).
+- Vector layers (route, radius) are only added when no zoom animation is running: Leaflet scales the whole SVG layer during a zoom, so a shape added mid-flight is drawn at double scale (a big black or pink blob). Wait for `zoomend`/`moveend`.
 
 ### Notices
 - Offline / waking server: yellow pill with ink border and ink text. Add-mode hint: asphalt pill with white border.

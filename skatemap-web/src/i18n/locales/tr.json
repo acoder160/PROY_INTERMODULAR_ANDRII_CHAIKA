@@ -102,17 +102,49 @@
     "googleFailed": "Google ile giriş başarısız. Tekrar dene."
   },
   "admin": {
-    "title": "Yönetim paneli",
     "backToMap": "Haritaya dön",
-    "id": "ID",
-    "name": "Ad",
-    "creator": "Oluşturan",
-    "actions": "İşlemler",
-    "loadingSpots": "Spotlar yükleniyor...",
-    "delete": "Sil",
-    "confirmDelete": "\"{{name}}\" spotunu ve tüm yorumlarını silmek istediğinizden emin misiniz?",
-    "deleted": "Spot başarıyla silindi",
-    "deleteError": "Silme hatası. İzinlerinizi veya konsolu kontrol edin."
+    "moderation": "Moderasyon",
+    "empty": "Her şey yolunda. Burada kontrol edilecek bir şey yok.",
+    "loadFailed": "Kuyruk yüklenemedi.",
+    "loadMore": "Daha fazla yükle",
+    "keep": "Tut",
+    "remove": "Sil",
+    "removePhoto": "Fotoğrafı kaldır",
+    "restorePhoto": "Fotoğrafı göster",
+    "skip": "Atla",
+    "comments": "Yorumlar",
+    "undo": "Geri al",
+    "removed": "Spot silindi",
+    "photoRemoved": "Fotoğraf kaldırıldı",
+    "kept": "Spot tutuldu",
+    "actionFailed": "Olmadı. Tekrar deneyin.",
+    "by": "ekleyen: {{user}}",
+    "openMap": "Haritalar'da aç",
+    "aiVerdict": "Yapay zekâ kararı",
+    "aiNone": "Yapay zekâ bu spotu henüz incelemedi.",
+    "reportsCount": "Bildirimler ({{count}})",
+    "commentsCount": "Yorumlar ({{count}})",
+    "weight": "ağırlık {{weight}}",
+    "noComments": "Yorum yok.",
+    "deleteComment": "Yorumu sil",
+    "confirmDeleteComment": "Bu yorum silinsin mi?",
+    "shortcuts": "Tuşlar: → tut · ← sil · ↑ yorumlar · P fotoğrafı kaldır · Boşluk atla · Z geri al",
+    "swipeHint": "Kaydır → tut · ← sil · ↑ yorumlar · ↓ atla",
+    "tabs": {
+      "REPORTED": "Bildirimler",
+      "NEW": "Yeni",
+      "HIDDEN": "Gizli",
+      "ALL": "Tümü"
+    },
+    "status": {
+      "HIDDEN": "Haritada gizli",
+      "PHOTO_HIDDEN": "Fotoğraf gizli"
+    },
+    "verdict": {
+      "VIOLATION": "Kurallara aykırı",
+      "OK": "Sorun yok gibi",
+      "UNSURE": "Emin değil"
+    }
   },
   "status": {
     "preparingCamera": "📸 Kamera hazırlanıyor...",
@@ -131,7 +163,11 @@
     "spotCreated": "Spot başarıyla oluşturuldu!",
     "saveFailed": "Spot kaydedilirken hata oluştu. Bağlantınızı kontrol edin.",
     "gpsWaiting": "Lütfen GPS'in konumunuzu bulmasını bekleyin.",
-    "tooFar": "{{meters}} m uzaktasınız. Spotu eklemek için 200 m'den yakın olmalısınız."
+    "tooFar": "{{meters}} m uzaktasınız. Spotu eklemek için 200 m'den yakın olmalısınız.",
+    "photoRejected": "Bu fotoğrafa izin verilmiyor (çıplaklık, uyuşturucu, şiddet, reklam veya kişisel veri). Başka bir tane seçin.",
+    "photoUnclear": "Fotoğraf spotu görmek için fazla karanlık veya bulanık. Yeni bir tane çekin.",
+    "photoNotPlace": "Fotoğraf spotun kendisini göstermeli; meme, ekran görüntüsü veya yakın çekim selfie olmamalı.",
+    "textRejected": "Ad veya açıklama kurallara aykırı (spam, uygunsuz içerik veya anlamsız metin)."
   },
   "types": {
     "STREET": "Sokak",
@@ -169,5 +205,31 @@
     "route": "🗺️ Rota",
     "unnamed": "Adsız spot",
     "noDescription": "Bu spot için ayrıntılı açıklama yok."
+  },
+  "report": {
+    "title": "Bildir",
+    "subtitle": "{{name}} ile ilgili sorun ne?",
+    "reasonLabel": "Neden",
+    "commentLabel": "Ayrıntılar (isteğe bağlı)",
+    "commentPlaceholder": "Neye bakmamız gerekiyor?",
+    "send": "Bildirimi gönder",
+    "sent": "Teşekkürler! Bu spotu kontrol edeceğiz.",
+    "already": "Bu spotu zaten bildirdiniz.",
+    "own": "Kendi spotunuzu bildiremezsiniz.",
+    "tooMany": "Çok fazla bildirim. Birkaç dakika sonra tekrar deneyin.",
+    "failed": "Bildirim gönderilemedi. Tekrar deneyin.",
+    "loginText": "Bir spotu bildirmek için giriş yapın. Hesabınız yoksa kurallar sayfasından bize yazabilirsiniz.",
+    "howItWorks": "Moderasyon nasıl işliyor",
+    "reasons": {
+      "SPAM": "Spam veya reklam",
+      "INAPPROPRIATE": "Uygunsuz fotoğraf veya metin (çıplaklık, uyuşturucu, şiddet)",
+      "FAKE": "Kaykay spotu değil / sahte",
+      "WRONG_LOCATION": "Yanlış yer veya spot artık yok",
+      "DANGEROUS": "Tehlikeli veya yasa dışı",
+      "OTHER": "Başka bir şey"
+    }
+  },
+  "legal": {
+    "link": "Kurallar ve gizlilik"
   }
 }

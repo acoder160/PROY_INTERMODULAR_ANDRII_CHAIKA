@@ -75,6 +75,11 @@ export const AlertCircleIcon = make(<>
   <circle cx="12" cy="16.5" r="1.2" fill="#fff" stroke="none" />
 </>);
 
+export const FlagIcon = make(<>
+  <path d="M5 21V3.5" />
+  <path d="M5 4h12.5l-2.6 4.5 2.6 4.5H5" />
+</>);
+
 export const ShieldIcon = make(<path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z" />);
 
 export const TrashIcon = make(<>

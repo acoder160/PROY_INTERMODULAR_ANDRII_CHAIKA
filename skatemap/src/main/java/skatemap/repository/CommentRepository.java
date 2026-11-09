@@ -16,6 +16,16 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     long countBySpotId(Long spotId);
 
+    interface SpotCount {
+        Long getSpotId();
+        Long getTotal();
+    }
+
+    /** Comment count of several spots in one query (admin queue). */
+    @org.springframework.data.jpa.repository.Query(
+            "SELECT c.spot.id AS spotId, COUNT(c) AS total FROM Comment c WHERE c.spot.id IN :ids GROUP BY c.spot.id")
+    List<SpotCount> countBySpotIds(@org.springframework.data.repository.query.Param("ids") java.util.Collection<Long> ids);
+
     @org.springframework.data.jpa.repository.Modifying
     @org.springframework.transaction.annotation.Transactional
     @org.springframework.data.jpa.repository.Query("DELETE FROM #{#entityName} e WHERE e.spot.id = :spotId")

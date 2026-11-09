@@ -102,17 +102,49 @@
     "googleFailed": "Google 登录失败，请重试。"
   },
   "admin": {
-    "title": "管理面板",
     "backToMap": "返回地图",
-    "id": "ID",
-    "name": "名称",
-    "creator": "创建者",
-    "actions": "操作",
-    "loadingSpots": "正在加载地点...",
-    "delete": "删除",
-    "confirmDelete": "确定要删除地点“{{name}}”及其所有评论吗？",
-    "deleted": "地点已成功删除",
-    "deleteError": "删除出错。请检查您的权限或控制台。"
+    "moderation": "审核",
+    "empty": "一切正常，暂无需要审核的内容。",
+    "loadFailed": "无法加载审核队列。",
+    "loadMore": "加载更多",
+    "keep": "保留",
+    "remove": "删除",
+    "removePhoto": "删除照片",
+    "restorePhoto": "显示照片",
+    "skip": "跳过",
+    "comments": "评论",
+    "undo": "撤销",
+    "removed": "地点已删除",
+    "photoRemoved": "照片已删除",
+    "kept": "地点已保留",
+    "actionFailed": "操作失败，请重试。",
+    "by": "来自 {{user}}",
+    "openMap": "在地图中打开",
+    "aiVerdict": "AI 判断",
+    "aiNone": "AI 还没有审核这个地点。",
+    "reportsCount": "举报（{{count}}）",
+    "commentsCount": "评论（{{count}}）",
+    "weight": "权重 {{weight}}",
+    "noComments": "暂无评论。",
+    "deleteComment": "删除评论",
+    "confirmDeleteComment": "删除这条评论？",
+    "shortcuts": "按键：→ 保留 · ← 删除 · ↑ 评论 · P 删除照片 · 空格 跳过 · Z 撤销",
+    "swipeHint": "滑动 → 保留 · ← 删除 · ↑ 评论 · ↓ 跳过",
+    "tabs": {
+      "REPORTED": "举报",
+      "NEW": "新增",
+      "HIDDEN": "已隐藏",
+      "ALL": "全部"
+    },
+    "status": {
+      "HIDDEN": "已从地图隐藏",
+      "PHOTO_HIDDEN": "照片已隐藏"
+    },
+    "verdict": {
+      "VIOLATION": "违反规则",
+      "OK": "看起来没问题",
+      "UNSURE": "不确定"
+    }
   },
   "status": {
     "preparingCamera": "📸 正在准备相机...",
@@ -131,7 +163,11 @@
     "spotCreated": "地点创建成功！",
     "saveFailed": "保存地点出错。请检查您的网络连接。",
     "gpsWaiting": "请等待 GPS 定位到您的位置。",
-    "tooFar": "您距离该地点 {{meters}} 米。必须在 200 米以内才能添加。"
+    "tooFar": "您距离该地点 {{meters}} 米。必须在 200 米以内才能添加。",
+    "photoRejected": "这张照片不允许发布（裸露、毒品、暴力、广告或个人信息）。请换一张。",
+    "photoUnclear": "照片太暗或太模糊，看不清地点。请重新拍一张。",
+    "photoNotPlace": "照片需要拍到地点本身，不能是表情包、截图或近距离自拍。",
+    "textRejected": "名称或描述违反社区规则（垃圾信息、不当内容或无意义文字）。"
   },
   "types": {
     "STREET": "街头",
@@ -169,5 +205,31 @@
     "route": "🗺️ 路线",
     "unnamed": "未命名地点",
     "noDescription": "该地点暂无详细描述。"
+  },
+  "report": {
+    "title": "举报",
+    "subtitle": "“{{name}}”有什么问题？",
+    "reasonLabel": "原因",
+    "commentLabel": "详细说明（可选）",
+    "commentPlaceholder": "我们需要查看什么？",
+    "send": "提交举报",
+    "sent": "谢谢！我们会核查这个地点。",
+    "already": "你已经举报过这个地点。",
+    "own": "不能举报自己的地点。",
+    "tooMany": "举报过于频繁，请几分钟后再试。",
+    "failed": "举报发送失败，请重试。",
+    "loginText": "登录后才能举报地点。没有账号也可以通过规则页面联系我们。",
+    "howItWorks": "审核如何运作",
+    "reasons": {
+      "SPAM": "垃圾信息或广告",
+      "INAPPROPRIATE": "不当照片或文字（裸露、毒品、暴力）",
+      "FAKE": "不是滑板地点 / 虚假信息",
+      "WRONG_LOCATION": "位置错误或地点已不存在",
+      "DANGEROUS": "危险或违法",
+      "OTHER": "其他"
+    }
+  },
+  "legal": {
+    "link": "规则与隐私"
   }
 }

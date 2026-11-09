@@ -102,17 +102,49 @@
     "googleFailed": "Inloggen met Google is mislukt. Probeer het opnieuw."
   },
   "admin": {
-    "title": "Beheerpaneel",
     "backToMap": "Terug naar de kaart",
-    "id": "ID",
-    "name": "Naam",
-    "creator": "Aangemaakt door",
-    "actions": "Acties",
-    "loadingSpots": "Spots laden...",
-    "delete": "Verwijderen",
-    "confirmDelete": "Weet je zeker dat je de spot \"{{name}}\" en alle reacties wilt verwijderen?",
-    "deleted": "Spot succesvol verwijderd",
-    "deleteError": "Fout bij het verwijderen. Controleer je rechten of de console."
+    "moderation": "Moderatie",
+    "empty": "Alles in orde. Hier valt niets te controleren.",
+    "loadFailed": "De wachtrij kon niet worden geladen.",
+    "loadMore": "Meer laden",
+    "keep": "Houden",
+    "remove": "Verwijderen",
+    "removePhoto": "Foto verwijderen",
+    "restorePhoto": "Foto tonen",
+    "skip": "Overslaan",
+    "comments": "Reacties",
+    "undo": "Ongedaan maken",
+    "removed": "Spot verwijderd",
+    "photoRemoved": "Foto verwijderd",
+    "kept": "Spot behouden",
+    "actionFailed": "Dat lukte niet. Probeer het opnieuw.",
+    "by": "door {{user}}",
+    "openMap": "Openen in Maps",
+    "aiVerdict": "Oordeel van de AI",
+    "aiNone": "De AI heeft deze spot nog niet beoordeeld.",
+    "reportsCount": "Meldingen ({{count}})",
+    "commentsCount": "Reacties ({{count}})",
+    "weight": "gewicht {{weight}}",
+    "noComments": "Geen reacties.",
+    "deleteComment": "Reactie verwijderen",
+    "confirmDeleteComment": "Deze reactie verwijderen?",
+    "shortcuts": "Toetsen: → houden · ← verwijderen · ↑ reacties · P foto verwijderen · Spatie overslaan · Z ongedaan maken",
+    "swipeHint": "Veeg → houden · ← verwijderen · ↑ reacties · ↓ overslaan",
+    "tabs": {
+      "REPORTED": "Meldingen",
+      "NEW": "Nieuw",
+      "HIDDEN": "Verborgen",
+      "ALL": "Alle"
+    },
+    "status": {
+      "HIDDEN": "Verborgen op de kaart",
+      "PHOTO_HIDDEN": "Foto verborgen"
+    },
+    "verdict": {
+      "VIOLATION": "Overtreedt de regels",
+      "OK": "Lijkt in orde",
+      "UNSURE": "Niet zeker"
+    }
   },
   "status": {
     "preparingCamera": "📸 Camera voorbereiden...",
@@ -131,7 +163,11 @@
     "spotCreated": "Spot succesvol aangemaakt!",
     "saveFailed": "Fout bij het opslaan van de spot. Controleer je verbinding.",
     "gpsWaiting": "Wacht tot de GPS je locatie heeft gevonden.",
-    "tooFar": "Je bent {{meters}} m verwijderd. Je moet binnen 200 m van de spot zijn om deze toe te voegen."
+    "tooFar": "Je bent {{meters}} m verwijderd. Je moet binnen 200 m van de spot zijn om deze toe te voegen.",
+    "photoRejected": "Deze foto is niet toegestaan (naakt, drugs, geweld, reclame of persoonsgegevens). Kies een andere.",
+    "photoUnclear": "De foto is te donker of te wazig om de spot te zien. Maak een nieuwe.",
+    "photoNotPlace": "De foto moet de spot zelf laten zien, geen meme, screenshot of close-up selfie.",
+    "textRejected": "De naam of beschrijving overtreedt de regels (spam, ongepaste inhoud of onzin)."
   },
   "types": {
     "STREET": "Street",
@@ -169,5 +205,31 @@
     "route": "🗺️ Route",
     "unnamed": "Spot zonder naam",
     "noDescription": "Geen uitgebreide beschrijving voor deze spot."
+  },
+  "report": {
+    "title": "Melden",
+    "subtitle": "Wat is er mis met {{name}}?",
+    "reasonLabel": "Reden",
+    "commentLabel": "Details (optioneel)",
+    "commentPlaceholder": "Waar moeten we naar kijken?",
+    "send": "Melding versturen",
+    "sent": "Bedankt! We bekijken deze spot.",
+    "already": "Je hebt deze spot al gemeld.",
+    "own": "Je kunt je eigen spot niet melden.",
+    "tooMany": "Te veel meldingen. Probeer het over een paar minuten opnieuw.",
+    "failed": "De melding kon niet worden verstuurd. Probeer het opnieuw.",
+    "loginText": "Log in om een spot te melden. Zonder account kun je ons schrijven via de regelspagina.",
+    "howItWorks": "Zo werkt de moderatie",
+    "reasons": {
+      "SPAM": "Spam of reclame",
+      "INAPPROPRIATE": "Ongepaste foto of tekst (naakt, drugs, geweld)",
+      "FAKE": "Geen skatespot / nep",
+      "WRONG_LOCATION": "Verkeerde plek of de spot bestaat niet meer",
+      "DANGEROUS": "Gevaarlijk of illegaal",
+      "OTHER": "Iets anders"
+    }
+  },
+  "legal": {
+    "link": "Regels & privacy"
   }
 }

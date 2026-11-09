@@ -1,0 +1,84 @@
+/* Normas y privacidad: hoja blanca de lectura sobre hormigón */
+.legal-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--concrete);
+  color: var(--ink);
+}
+
+.legal-main {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 20px 16px calc(40px + env(safe-area-inset-bottom));
+}
+
+.legal-lang {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.legal-sheet {
+  padding: 24px clamp(18px, 4vw, 40px) 28px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sheet);
+  background: var(--sheet);
+}
+
+.legal-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 18px 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.legal-toc a,
+.legal-section a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--paint-pink);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.legal-section {
+  scroll-margin-top: 16px;
+}
+
+.legal-section h2 {
+  margin: 30px 0 10px;
+  font: 900 28px/1.1 var(--display);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.legal-section p,
+.legal-section li {
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 68ch;
+}
+
+.legal-section p {
+  margin: 0 0 12px;
+}
+
+.legal-section ul {
+  margin: 0 0 12px;
+  padding-inline-start: 22px;
+}
+
+.legal-section li::marker {
+  color: var(--paint-pink);
+}
+
+.legal-updated {
+  margin: 28px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+  font-size: 14px;
+  color: var(--ink-muted);
+}

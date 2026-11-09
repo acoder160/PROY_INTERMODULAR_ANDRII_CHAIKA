@@ -76,6 +76,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                 case "/api/spots": return Limit.SPOT_CREATE;
                 default:
                     if (path.startsWith("/api/comments/")) return Limit.COMMENT;
+                    if (path.startsWith("/api/spots/") && path.endsWith("/reports")) return Limit.REPORT;
                     return null;
             }
         }

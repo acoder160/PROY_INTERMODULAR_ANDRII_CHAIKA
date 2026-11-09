@@ -102,17 +102,49 @@
     "googleFailed": "Google でのログインに失敗しました。もう一度お試しください。"
   },
   "admin": {
-    "title": "管理パネル",
     "backToMap": "地図に戻る",
-    "id": "ID",
-    "name": "名前",
-    "creator": "作成者",
-    "actions": "操作",
-    "loadingSpots": "スポットを読み込み中...",
-    "delete": "削除",
-    "confirmDelete": "スポット「{{name}}」とそのコメントをすべて削除してもよろしいですか？",
-    "deleted": "スポットを削除しました",
-    "deleteError": "削除に失敗しました。権限またはコンソールを確認してください。"
+    "moderation": "モデレーション",
+    "empty": "問題ありません。確認するものはありません。",
+    "loadFailed": "キューを読み込めませんでした。",
+    "loadMore": "さらに読み込む",
+    "keep": "残す",
+    "remove": "削除",
+    "removePhoto": "写真を削除",
+    "restorePhoto": "写真を表示",
+    "skip": "スキップ",
+    "comments": "コメント",
+    "undo": "元に戻す",
+    "removed": "スポットを削除しました",
+    "photoRemoved": "写真を削除しました",
+    "kept": "スポットを残しました",
+    "actionFailed": "うまくいきませんでした。もう一度お試しください。",
+    "by": "{{user}} さん",
+    "openMap": "マップで開く",
+    "aiVerdict": "AIの判定",
+    "aiNone": "AIはまだこのスポットを確認していません。",
+    "reportsCount": "報告（{{count}}）",
+    "commentsCount": "コメント（{{count}}）",
+    "weight": "重み {{weight}}",
+    "noComments": "コメントはありません。",
+    "deleteComment": "コメントを削除",
+    "confirmDeleteComment": "このコメントを削除しますか？",
+    "shortcuts": "キー: → 残す · ← 削除 · ↑ コメント · P 写真を削除 · Space スキップ · Z 元に戻す",
+    "swipeHint": "スワイプ → 残す · ← 削除 · ↑ コメント · ↓ スキップ",
+    "tabs": {
+      "REPORTED": "報告",
+      "NEW": "新着",
+      "HIDDEN": "非表示",
+      "ALL": "すべて"
+    },
+    "status": {
+      "HIDDEN": "地図で非表示",
+      "PHOTO_HIDDEN": "写真は非表示"
+    },
+    "verdict": {
+      "VIOLATION": "ルール違反",
+      "OK": "問題なさそう",
+      "UNSURE": "判断できない"
+    }
   },
   "status": {
     "preparingCamera": "📸 カメラを準備中...",
@@ -131,7 +163,11 @@
     "spotCreated": "スポットを作成しました！",
     "saveFailed": "スポットの保存に失敗しました。接続を確認してください。",
     "gpsWaiting": "GPSが現在地を検出するまでお待ちください。",
-    "tooFar": "現在、スポットから{{meters}} m離れています。追加するにはスポットから200 m以内にいる必要があります。"
+    "tooFar": "現在、スポットから{{meters}} m離れています。追加するにはスポットから200 m以内にいる必要があります。",
+    "photoRejected": "この写真は使えません（ヌード、薬物、暴力、広告、個人情報）。別の写真を選んでください。",
+    "photoUnclear": "写真が暗すぎるかぼやけていて、スポットが見えません。撮り直してください。",
+    "photoNotPlace": "写真にはスポットそのものを写してください。ミーム、スクリーンショット、近距離の自撮りは使えません。",
+    "textRejected": "名前または説明がルールに違反しています（スパム、不適切な内容、意味のない文章）。"
   },
   "types": {
     "STREET": "ストリート",
@@ -169,5 +205,31 @@
     "route": "🗺️ ルート",
     "unnamed": "名称未設定のスポット",
     "noDescription": "このスポットの詳しい説明はありません。"
+  },
+  "report": {
+    "title": "報告する",
+    "subtitle": "「{{name}}」の何が問題ですか？",
+    "reasonLabel": "理由",
+    "commentLabel": "詳細（任意）",
+    "commentPlaceholder": "何を確認すればよいですか？",
+    "send": "報告を送信",
+    "sent": "ありがとうございます！このスポットを確認します。",
+    "already": "このスポットはすでに報告済みです。",
+    "own": "自分のスポットは報告できません。",
+    "tooMany": "報告が多すぎます。数分後にもう一度お試しください。",
+    "failed": "報告を送信できませんでした。もう一度お試しください。",
+    "loginText": "スポットを報告するにはログインしてください。アカウントがない場合は、ルールのページから連絡できます。",
+    "howItWorks": "モデレーションの仕組み",
+    "reasons": {
+      "SPAM": "スパム・広告",
+      "INAPPROPRIATE": "不適切な写真や文章（ヌード、薬物、暴力）",
+      "FAKE": "スケートスポットではない／偽物",
+      "WRONG_LOCATION": "場所が違う、またはスポットがもうない",
+      "DANGEROUS": "危険または違法",
+      "OTHER": "その他"
+    }
+  },
+  "legal": {
+    "link": "ルールとプライバシー"
   }
 }

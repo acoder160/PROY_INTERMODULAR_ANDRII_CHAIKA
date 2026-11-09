@@ -20,10 +20,19 @@ import FilterModal, { DEFAULT_FILTERS, type FilterState } from '../../components
 import LanguageModal from '../../components/LanguageModal';
 import { useTranslation } from 'react-i18next';
 import MapFab from '../../components/MapFab';
+import ReportModal from '../../components/ReportModal';
+
+// Errores de moderación que el backend envía con un código: se muestran traducidos
+const MODERATION_ERRORS: Record<string, string> = {
+  photo_rejected: 'errors.photoRejected',
+  photo_unclear: 'errors.photoUnclear',
+  photo_not_place: 'errors.photoNotPlace',
+  text_rejected: 'errors.textRejected',
+};
 
 export default function HomeScreen() {
   const { t } = useTranslation();
-  const { user, token, logout } = useAuth(); 
+  const { user, token, isAdmin, logout } = useAuth(); 
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
@@ -46,6 +55,8 @@ export default function HomeScreen() {
   const [formData, setFormData] = useState({ name: '', description: '', spotType: 'STREET', difficultyLevel: 'INTERMEDIATE' });
   
   const [selectedSpot, setSelectedSpot] = useState<any | null>(null);
+  const [reportSpot, setReportSpot] = useState<any | null>(null);
+  const closeReport = useCallback(() => setReportSpot(null), []);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { spots, fetchSpots, isOffline } = useSpots(token);
@@ -199,8 +210,10 @@ export default function HomeScreen() {
     } catch (error: any) {
       const serverError = error.response?.data?.error; // Captura errores de Bucket4j
       const serverMessage = error.response?.data?.message; // Captura errores de IA o Validación
+      const moderationKey = MODERATION_ERRORS[error.response?.data?.code];
 
-      const finalMsg = serverError || serverMessage || (typeof error.response?.data === 'string' ? error.response?.data : null);
+      const finalMsg = (moderationKey && t(moderationKey)) || serverError || serverMessage ||
+        (typeof error.response?.data === 'string' ? error.response?.data : null);
 
       // El formulario sigue abierto con los datos y la foto: el usuario puede reintentar
       setFormError(finalMsg || t('errors.saveFailed'));
@@ -251,6 +264,10 @@ export default function HomeScreen() {
              const spot = spots.find((s: any) => s.id === spotId);
              if (spot) setSelectedSpot(spot);
           }}
+          onReportSpot={(spotId) => {
+             const spot = spots.find((s: any) => s.id === spotId);
+             if (spot) setReportSpot(spot);
+          }}
         />
       </View>
 
@@ -281,6 +298,18 @@ export default function HomeScreen() {
         >
           <Ionicons name="globe-outline" size={22} color={Palette.white} />
         </TouchableOpacity>
+
+        {isAdmin && (
+          <TouchableOpacity
+            onPress={() => router.push('/admin')}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={t('admin.moderation')}
+            style={styles.globeBtn}
+          >
+            <Ionicons name="shield-checkmark-outline" size={22} color={Palette.white} />
+          </TouchableOpacity>
+        )}
 
         {user ? (
           <TouchableOpacity
@@ -385,7 +414,10 @@ export default function HomeScreen() {
         userLocation={userLocation}
         onClose={() => setSelectedSpot(null)} 
         onSpotUpdated={() => { fetchSpots(); }}
+        onReport={() => { setReportSpot(selectedSpot); setSelectedSpot(null); }}
       />
+
+      {reportSpot && <ReportModal key={reportSpot.id} spot={reportSpot} onClose={closeReport} />}
 
       <FilterModal 
         visible={filterModalVisible}

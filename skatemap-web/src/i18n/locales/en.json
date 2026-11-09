@@ -102,17 +102,49 @@
     "googleFailed": "Google sign-in failed. Try again."
   },
   "admin": {
-    "title": "Admin panel",
     "backToMap": "Back to map",
-    "id": "ID",
-    "name": "Name",
-    "creator": "Creator",
-    "actions": "Actions",
-    "loadingSpots": "Loading spots...",
-    "delete": "Delete",
-    "confirmDelete": "Are you sure you want to delete the spot \"{{name}}\" and all its comments?",
-    "deleted": "Spot deleted successfully",
-    "deleteError": "Error deleting. Check your permissions or the console."
+    "moderation": "Moderation",
+    "empty": "All clear. Nothing to review here.",
+    "loadFailed": "Couldn't load the queue.",
+    "loadMore": "Load more",
+    "keep": "Keep",
+    "remove": "Remove",
+    "removePhoto": "Remove photo",
+    "restorePhoto": "Show photo",
+    "skip": "Skip",
+    "comments": "Comments",
+    "undo": "Undo",
+    "removed": "Spot removed",
+    "photoRemoved": "Photo removed",
+    "kept": "Spot kept",
+    "actionFailed": "That didn't work. Try again.",
+    "by": "by {{user}}",
+    "openMap": "Open in Maps",
+    "aiVerdict": "AI verdict",
+    "aiNone": "The AI hasn't reviewed this spot yet.",
+    "reportsCount": "Reports ({{count}})",
+    "commentsCount": "Comments ({{count}})",
+    "weight": "weight {{weight}}",
+    "noComments": "No comments.",
+    "deleteComment": "Delete comment",
+    "confirmDeleteComment": "Delete this comment?",
+    "shortcuts": "Keys: → keep · ← remove · ↑ comments · P remove photo · Space skip · Z undo",
+    "swipeHint": "Swipe → keep · ← remove · ↑ comments · ↓ skip",
+    "tabs": {
+      "REPORTED": "Reports",
+      "NEW": "New",
+      "HIDDEN": "Hidden",
+      "ALL": "All"
+    },
+    "status": {
+      "HIDDEN": "Hidden from map",
+      "PHOTO_HIDDEN": "Photo hidden"
+    },
+    "verdict": {
+      "VIOLATION": "Breaks the rules",
+      "OK": "Looks fine",
+      "UNSURE": "Not sure"
+    }
   },
   "status": {
     "preparingCamera": "📸 Preparing the camera...",
@@ -131,7 +163,11 @@
     "spotCreated": "Spot created successfully!",
     "saveFailed": "Error saving the spot. Check your connection.",
     "gpsWaiting": "Please wait for the GPS to detect your location.",
-    "tooFar": "You are {{meters}} m away. You must be within 200 m of the spot to add it."
+    "tooFar": "You are {{meters}} m away. You must be within 200 m of the spot to add it.",
+    "photoRejected": "This photo isn't allowed (nudity, drugs, violence, ads or personal data). Choose another one.",
+    "photoUnclear": "The photo is too dark or blurry to see the spot. Take another one.",
+    "photoNotPlace": "The photo has to show the spot itself, not a meme, screenshot or close-up selfie.",
+    "textRejected": "The name or description breaks the community rules (spam, inappropriate content or nonsense)."
   },
   "types": {
     "STREET": "Street",
@@ -169,5 +205,31 @@
     "route": "🗺️ Route",
     "unnamed": "Unnamed spot",
     "noDescription": "No detailed description for this spot."
+  },
+  "report": {
+    "title": "Report",
+    "subtitle": "What's wrong with {{name}}?",
+    "reasonLabel": "Reason",
+    "commentLabel": "Details (optional)",
+    "commentPlaceholder": "What should we look at?",
+    "send": "Send report",
+    "sent": "Thanks! We'll check this spot.",
+    "already": "You've already reported this spot.",
+    "own": "You can't report your own spot.",
+    "tooMany": "Too many reports. Try again in a few minutes.",
+    "failed": "The report couldn't be sent. Try again.",
+    "loginText": "Log in to report a spot. Without an account, you can write to us from the rules page.",
+    "howItWorks": "How moderation works",
+    "reasons": {
+      "SPAM": "Spam or advertising",
+      "INAPPROPRIATE": "Inappropriate photo or text (nudity, drugs, violence)",
+      "FAKE": "Not a skate spot / fake",
+      "WRONG_LOCATION": "Wrong place or the spot is gone",
+      "DANGEROUS": "Dangerous or illegal",
+      "OTHER": "Something else"
+    }
+  },
+  "legal": {
+    "link": "Rules & privacy"
   }
 }

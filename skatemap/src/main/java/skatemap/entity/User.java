@@ -38,6 +38,13 @@ public class User {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    /** Reputación como denunciante: solo cambia con decisiones de un admin (V3). */
+    @Column(name = "reports_upheld", nullable = false)
+    private int reportsUpheld = 0;
+
+    @Column(name = "reports_rejected", nullable = false)
+    private int reportsRejected = 0;
+
     public User() {}
 
     // AUTOMATIZACIÓN: Antes de guardar, poner la fecha actual
@@ -67,4 +74,15 @@ public class User {
 
     public Long getTokenVersion() { return tokenVersion; }
     public void setTokenVersion(Long tokenVersion) { this.tokenVersion = tokenVersion; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public int getReportsUpheld() { return reportsUpheld; }
+    public void setReportsUpheld(int reportsUpheld) { this.reportsUpheld = reportsUpheld; }
+
+    public int getReportsRejected() { return reportsRejected; }
+    public void setReportsRejected(int reportsRejected) { this.reportsRejected = reportsRejected; }
+
+    public boolean isAdmin() { return "ROLE_ADMIN".equals(role); }
 }

@@ -5,12 +5,12 @@ import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import Sheet from './Sheet';
 import { TypeChip, DifficultyMarks, StarRating, PaintStrip } from './PaintBits';
-import { CameraIcon, NavigateIcon, CheckCircleIcon, AlertCircleIcon, ChevronIcon, RefreshIcon } from './Icons';
+import { CameraIcon, NavigateIcon, CheckCircleIcon, AlertCircleIcon, ChevronIcon, RefreshIcon, FlagIcon } from './Icons';
 import { cleanLabel, directionsUrl, haversineKm } from '../utils/paint';
 
 // Hoja de detalle: equivale a skatemap-mobile/components/SpotDetailsModal.tsx.
 // El padre la monta con key={spot.id}, así el estado se reinicia al cambiar de spot.
-export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, userLocation }) {
+export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onReport, userLocation }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -128,7 +128,18 @@ export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, userLoc
   );
 
   return (
-    <Sheet open onClose={onClose} hero={hero} closeOnHero className="detail-sheet">
+    <Sheet
+      open
+      onClose={onClose}
+      hero={hero}
+      closeOnHero
+      className="detail-sheet"
+      heroActions={onReport && (
+        <button type="button" className="sheet-close" onClick={() => onReport(spot.id)} aria-label={t('report.title')} title={t('report.title')}>
+          <FlagIcon size={20} />
+        </button>
+      )}
+    >
       <h2 className="detail-title">{spot.name || t('webview.unnamed')}</h2>
       <PaintStrip className="detail-strip" />
 

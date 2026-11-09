@@ -310,28 +310,50 @@
   margin-top: -2px;
 }
 
-.leaflet-container a.leaflet-popup-close-button {
-  top: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--asphalt);
-  border: 2px solid var(--sheet);
-  color: var(--sheet);
-  font: 700 20px/28px var(--body);
-  text-align: center;
-}
-
-.leaflet-container a.leaflet-popup-close-button:hover {
-  color: var(--sheet);
-  background: #333;
-}
-
 .popup-card {
   width: 240px;
   color: var(--ink);
   font-family: var(--body);
+}
+
+.popup-media {
+  position: relative;
+}
+
+/* Denunciar + cerrar, sobre la foto. Iconos SVG centrados con grid (no un carácter de fuente). */
+.popup-actions {
+  position: absolute;
+  top: 8px;
+  inset-inline-end: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.popup-icon-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--sheet);
+  border-radius: 50%;
+  background: var(--asphalt);
+  color: var(--sheet);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.15s ease;
+}
+
+.popup-icon-btn svg {
+  display: block;
+}
+
+.popup-icon-btn:hover {
+  background: #333;
+}
+
+.popup-icon-btn:active {
+  transform: scale(0.94);
 }
 
 .popup-image {
@@ -731,11 +753,13 @@
   color: var(--sheet);
 }
 
-.sheet.has-hero .sheet-close {
+.sheet-hero-actions {
   position: absolute;
   top: 12px;
   inset-inline-end: 12px;
   z-index: 2;
+  display: flex;
+  gap: 8px;
 }
 
 .sheet-strip {
@@ -1026,6 +1050,66 @@
 .spinner-center {
   display: block;
   margin: 10px auto;
+}
+
+/* ---------- Hoja de denuncia ---------- */
+.report-subtitle {
+  margin: 14px 0 0;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.report-text {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--ink-muted);
+  max-width: 60ch;
+}
+
+.report-reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.report-reasons .choice-pill {
+  justify-content: flex-start;
+  text-align: start;
+  border-radius: var(--radius-card);
+  padding: 10px 16px;
+}
+
+.report-comment-label {
+  display: block;
+}
+
+.report-comment {
+  display: block;
+  width: 100%;
+  max-height: 140px;
+}
+
+.report-counter {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--ink-muted);
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.report-legal-link {
+  display: inline-block;
+  margin-top: 18px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--paint-pink);
+  text-decoration-thickness: 2px;
 }
 
 /* Barra de desplazamiento con la paleta */

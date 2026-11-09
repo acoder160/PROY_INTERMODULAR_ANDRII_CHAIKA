@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { hasLegalPage, openLegalPage } from '../utils/legal';
 import { Palette, DisplayFont, Radius, MIN_TARGET } from '../constants/theme';
 import GradientFill from '../components/ui/GradientFill';
 import { useRouter } from 'expo-router';
@@ -47,7 +48,8 @@ export default function LoginScreen() {
       await login(
         response.data.username || username,
         response.data.token,
-        response.data.refreshToken
+        response.data.refreshToken,
+        response.data.role
       );
       router.replace('/(tabs)');
     } catch (error: any) {
@@ -136,6 +138,11 @@ export default function LoginScreen() {
           <TouchableOpacity style={styles.guestButton} onPress={() => router.replace('/(tabs)')}>
             <Text style={styles.guestButtonText}>{t('auth.backToMap')}</Text>
           </TouchableOpacity>
+          {hasLegalPage && (
+            <TouchableOpacity style={styles.legalButton} onPress={openLegalPage} accessibilityRole="link">
+              <Text style={styles.legalButtonText}>{t('legal.link')}</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -167,5 +174,7 @@ const styles = StyleSheet.create({
   linkPill: { minHeight: MIN_TARGET, paddingHorizontal: 6, justifyContent: 'center' },
   link: { color: Palette.pink, fontWeight: '800', fontSize: 16, textDecorationLine: 'underline' },
   guestButton: { marginTop: 4, alignItems: 'center', justifyContent: 'center', minHeight: MIN_TARGET },
-  guestButtonText: { color: Palette.onAsphaltMuted, fontSize: 15, textDecorationLine: 'underline' }
+  guestButtonText: { color: Palette.onAsphaltMuted, fontSize: 15, textDecorationLine: 'underline' },
+  legalButton: { alignItems: 'center', justifyContent: 'center', minHeight: 40 },
+  legalButtonText: { color: Palette.onAsphaltMuted, fontSize: 13, textDecorationLine: 'underline' }
 });

@@ -8,9 +8,12 @@ import { cleanLabel } from '../utils/paint';
 /**
  * Hoja inferior blanca sobre velo de asfalto (como los Modal de la app móvil).
  * En pantallas anchas queda centrada con un ancho máximo. Esc o clic en el velo la cierran.
+ * Con varias hojas abiertas (detalle + denuncia) Esc solo cierra la de arriba.
+ * `heroActions`: botones extra que van junto a la X sobre la foto (p. ej. denunciar).
  */
-export default function Sheet({ open, onClose, title, children, footer, className = '', hero = null, closeOnHero = false }) {
+export default function Sheet({ open, onClose, title, children, footer, className = '', hero = null, closeOnHero = false, heroActions = null }) {
   const { t } = useTranslation();
+  const overlayRef = useRef(null);
   const panelRef = useRef(null);
   const titleId = useId();
 
@@ -19,12 +22,15 @@ export default function Sheet({ open, onClose, title, children, footer, classNam
     const previous = document.activeElement;
     panelRef.current?.focus();
     const onKeyDown = (event) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key !== 'Escape') return;
+      const overlays = document.querySelectorAll('.sheet-overlay');
+      if (overlays[overlays.length - 1] !== overlayRef.current) return;
+      onClose();
     };
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      if (previous instanceof HTMLElement) previous.focus();
+      if (previous instanceof HTMLElement && document.contains(previous)) previous.focus();
     };
   }, [open, onClose]);
 
@@ -37,7 +43,7 @@ export default function Sheet({ open, onClose, title, children, footer, classNam
   );
 
   return createPortal(
-    <div className="sheet-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div ref={overlayRef} className="sheet-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div
         ref={panelRef}
         className={`sheet ${hero ? 'has-hero' : ''} ${className}`}
@@ -48,7 +54,12 @@ export default function Sheet({ open, onClose, title, children, footer, classNam
       >
         {hero ? (
           <div className="sheet-scroll">
-            {closeOnHero && closeButton}
+            {closeOnHero && (
+              <div className="sheet-hero-actions">
+                {heroActions}
+                {closeButton}
+              </div>
+            )}
             {hero}
             <div className="sheet-body">{children}</div>
           </div>

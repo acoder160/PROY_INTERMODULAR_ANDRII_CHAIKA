@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import MapPage from './pages/MapPage';
 import AdminPage from './pages/AdminPage';
+import LegalPage from './pages/LegalPage';
 
 function App() {
   return (
@@ -20,8 +21,9 @@ function App() {
           {/* El mapa y la consulta de spots son públicos; las interacciones requieren sesión. */}
           <Route path="/map" element={<MapPage />} />
 
-          <Route path="*" element={<Navigate to="/map" />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/legal" element={<LegalPage />} />
+          <Route path="*" element={<Navigate to="/map" />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

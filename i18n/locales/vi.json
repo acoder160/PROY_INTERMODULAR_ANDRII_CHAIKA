@@ -102,17 +102,49 @@
     "googleFailed": "Đăng nhập bằng Google thất bại. Hãy thử lại."
   },
   "admin": {
-    "title": "Bảng quản trị",
     "backToMap": "Quay lại bản đồ",
-    "id": "ID",
-    "name": "Tên",
-    "creator": "Người tạo",
-    "actions": "Thao tác",
-    "loadingSpots": "Đang tải các spot...",
-    "delete": "Xóa",
-    "confirmDelete": "Bạn có chắc muốn xóa spot \"{{name}}\" và tất cả bình luận của nó không?",
-    "deleted": "Đã xóa spot thành công",
-    "deleteError": "Lỗi khi xóa. Hãy kiểm tra quyền của bạn hoặc console."
+    "moderation": "Kiểm duyệt",
+    "empty": "Mọi thứ đều ổn. Không có gì cần xem.",
+    "loadFailed": "Không tải được hàng đợi.",
+    "loadMore": "Tải thêm",
+    "keep": "Giữ lại",
+    "remove": "Xóa",
+    "removePhoto": "Xóa ảnh",
+    "restorePhoto": "Hiện ảnh",
+    "skip": "Bỏ qua",
+    "comments": "Bình luận",
+    "undo": "Hoàn tác",
+    "removed": "Đã xóa spot",
+    "photoRemoved": "Đã xóa ảnh",
+    "kept": "Đã giữ spot",
+    "actionFailed": "Không thành công. Hãy thử lại.",
+    "by": "bởi {{user}}",
+    "openMap": "Mở trong Maps",
+    "aiVerdict": "Đánh giá của AI",
+    "aiNone": "AI chưa xem xét spot này.",
+    "reportsCount": "Báo cáo ({{count}})",
+    "commentsCount": "Bình luận ({{count}})",
+    "weight": "trọng số {{weight}}",
+    "noComments": "Chưa có bình luận.",
+    "deleteComment": "Xóa bình luận",
+    "confirmDeleteComment": "Xóa bình luận này?",
+    "shortcuts": "Phím: → giữ · ← xóa · ↑ bình luận · P xóa ảnh · Space bỏ qua · Z hoàn tác",
+    "swipeHint": "Vuốt → giữ · ← xóa · ↑ bình luận · ↓ bỏ qua",
+    "tabs": {
+      "REPORTED": "Báo cáo",
+      "NEW": "Mới",
+      "HIDDEN": "Đã ẩn",
+      "ALL": "Tất cả"
+    },
+    "status": {
+      "HIDDEN": "Đã ẩn khỏi bản đồ",
+      "PHOTO_HIDDEN": "Ảnh đã ẩn"
+    },
+    "verdict": {
+      "VIOLATION": "Vi phạm quy định",
+      "OK": "Có vẻ ổn",
+      "UNSURE": "Không chắc"
+    }
   },
   "status": {
     "preparingCamera": "📸 Đang chuẩn bị camera...",
@@ -131,7 +163,11 @@
     "spotCreated": "Đã tạo spot thành công!",
     "saveFailed": "Lỗi khi lưu spot. Hãy kiểm tra kết nối của bạn.",
     "gpsWaiting": "Vui lòng đợi GPS xác định vị trí của bạn.",
-    "tooFar": "Bạn đang cách {{meters}} m. Bạn phải ở trong phạm vi 200 m quanh spot để thêm nó."
+    "tooFar": "Bạn đang cách {{meters}} m. Bạn phải ở trong phạm vi 200 m quanh spot để thêm nó.",
+    "photoRejected": "Ảnh này không được phép (khỏa thân, ma túy, bạo lực, quảng cáo hoặc dữ liệu cá nhân). Hãy chọn ảnh khác.",
+    "photoUnclear": "Ảnh quá tối hoặc mờ, không thấy được spot. Hãy chụp ảnh khác.",
+    "photoNotPlace": "Ảnh phải cho thấy chính spot, không phải meme, ảnh chụp màn hình hay ảnh tự sướng cận cảnh.",
+    "textRejected": "Tên hoặc mô tả vi phạm quy định (spam, nội dung không phù hợp hoặc vô nghĩa)."
   },
   "types": {
     "STREET": "Đường phố",
@@ -169,5 +205,31 @@
     "route": "🗺️ Lộ trình",
     "unnamed": "Spot chưa đặt tên",
     "noDescription": "Spot này chưa có mô tả chi tiết."
+  },
+  "report": {
+    "title": "Báo cáo",
+    "subtitle": "{{name}} có vấn đề gì?",
+    "reasonLabel": "Lý do",
+    "commentLabel": "Chi tiết (không bắt buộc)",
+    "commentPlaceholder": "Chúng tôi nên xem điều gì?",
+    "send": "Gửi báo cáo",
+    "sent": "Cảm ơn! Chúng tôi sẽ kiểm tra spot này.",
+    "already": "Bạn đã báo cáo spot này rồi.",
+    "own": "Bạn không thể báo cáo spot của chính mình.",
+    "tooMany": "Quá nhiều báo cáo. Hãy thử lại sau vài phút.",
+    "failed": "Không gửi được báo cáo. Hãy thử lại.",
+    "loginText": "Đăng nhập để báo cáo spot. Nếu không có tài khoản, bạn có thể viết cho chúng tôi từ trang quy định.",
+    "howItWorks": "Cách kiểm duyệt hoạt động",
+    "reasons": {
+      "SPAM": "Spam hoặc quảng cáo",
+      "INAPPROPRIATE": "Ảnh hoặc nội dung không phù hợp (khỏa thân, ma túy, bạo lực)",
+      "FAKE": "Không phải spot trượt ván / giả",
+      "WRONG_LOCATION": "Sai địa điểm hoặc spot không còn nữa",
+      "DANGEROUS": "Nguy hiểm hoặc bất hợp pháp",
+      "OTHER": "Lý do khác"
+    }
+  },
+  "legal": {
+    "link": "Quy định & quyền riêng tư"
   }
 }

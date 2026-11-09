@@ -102,17 +102,49 @@
     "googleFailed": "Google 로그인에 실패했습니다. 다시 시도하세요."
   },
   "admin": {
-    "title": "관리자 패널",
     "backToMap": "지도로 돌아가기",
-    "id": "ID",
-    "name": "이름",
-    "creator": "작성자",
-    "actions": "작업",
-    "loadingSpots": "스팟을 불러오는 중...",
-    "delete": "삭제",
-    "confirmDelete": "\"{{name}}\" 스팟과 모든 댓글을 삭제하시겠습니까?",
-    "deleted": "스팟이 삭제되었습니다",
-    "deleteError": "삭제 오류. 권한 또는 콘솔을 확인해 주세요."
+    "moderation": "검토",
+    "empty": "모두 정리됐어요. 검토할 항목이 없어요.",
+    "loadFailed": "목록을 불러오지 못했어요.",
+    "loadMore": "더 불러오기",
+    "keep": "유지",
+    "remove": "삭제",
+    "removePhoto": "사진 삭제",
+    "restorePhoto": "사진 표시",
+    "skip": "건너뛰기",
+    "comments": "댓글",
+    "undo": "실행 취소",
+    "removed": "스팟을 삭제했어요",
+    "photoRemoved": "사진을 삭제했어요",
+    "kept": "스팟을 유지했어요",
+    "actionFailed": "실패했어요. 다시 시도하세요.",
+    "by": "작성자 {{user}}",
+    "openMap": "지도에서 열기",
+    "aiVerdict": "AI 판단",
+    "aiNone": "AI가 아직 이 스팟을 검토하지 않았어요.",
+    "reportsCount": "신고 ({{count}})",
+    "commentsCount": "댓글 ({{count}})",
+    "weight": "가중치 {{weight}}",
+    "noComments": "댓글이 없어요.",
+    "deleteComment": "댓글 삭제",
+    "confirmDeleteComment": "이 댓글을 삭제할까요?",
+    "shortcuts": "키: → 유지 · ← 삭제 · ↑ 댓글 · P 사진 삭제 · Space 건너뛰기 · Z 실행 취소",
+    "swipeHint": "스와이프 → 유지 · ← 삭제 · ↑ 댓글 · ↓ 건너뛰기",
+    "tabs": {
+      "REPORTED": "신고",
+      "NEW": "새 스팟",
+      "HIDDEN": "숨김",
+      "ALL": "전체"
+    },
+    "status": {
+      "HIDDEN": "지도에서 숨김",
+      "PHOTO_HIDDEN": "사진 숨김"
+    },
+    "verdict": {
+      "VIOLATION": "규칙 위반",
+      "OK": "문제 없어 보임",
+      "UNSURE": "확실하지 않음"
+    }
   },
   "status": {
     "preparingCamera": "📸 카메라 준비 중...",
@@ -131,7 +163,11 @@
     "spotCreated": "스팟이 생성되었습니다!",
     "saveFailed": "스팟 저장 오류. 연결 상태를 확인해 주세요.",
     "gpsWaiting": "GPS가 위치를 확인할 때까지 기다려 주세요.",
-    "tooFar": "스팟에서 {{meters}} m 떨어져 있습니다. 스팟을 추가하려면 200 m 이내에 있어야 합니다."
+    "tooFar": "스팟에서 {{meters}} m 떨어져 있습니다. 스팟을 추가하려면 200 m 이내에 있어야 합니다.",
+    "photoRejected": "이 사진은 사용할 수 없어요 (노출, 마약, 폭력, 광고 또는 개인정보). 다른 사진을 골라 주세요.",
+    "photoUnclear": "사진이 너무 어둡거나 흐려서 스팟이 보이지 않아요. 다시 찍어 주세요.",
+    "photoNotPlace": "사진에는 스팟 자체가 보여야 해요. 밈, 스크린샷, 가까이 찍은 셀카는 안 돼요.",
+    "textRejected": "이름이나 설명이 규칙을 어겨요 (스팸, 부적절한 내용 또는 의미 없는 글)."
   },
   "types": {
     "STREET": "스트리트",
@@ -169,5 +205,31 @@
     "route": "🗺️ 경로",
     "unnamed": "이름 없는 스팟",
     "noDescription": "이 스팟에는 자세한 설명이 없습니다."
+  },
+  "report": {
+    "title": "신고하기",
+    "subtitle": "{{name}}에 어떤 문제가 있나요?",
+    "reasonLabel": "사유",
+    "commentLabel": "자세한 내용 (선택)",
+    "commentPlaceholder": "무엇을 확인하면 될까요?",
+    "send": "신고 보내기",
+    "sent": "감사합니다! 이 스팟을 확인할게요.",
+    "already": "이미 이 스팟을 신고했어요.",
+    "own": "내 스팟은 신고할 수 없어요.",
+    "tooMany": "신고가 너무 많아요. 몇 분 후에 다시 시도하세요.",
+    "failed": "신고를 보내지 못했어요. 다시 시도하세요.",
+    "loginText": "스팟을 신고하려면 로그인하세요. 계정이 없다면 규칙 페이지에서 연락할 수 있어요.",
+    "howItWorks": "검토 방식 안내",
+    "reasons": {
+      "SPAM": "스팸 또는 광고",
+      "INAPPROPRIATE": "부적절한 사진이나 글 (노출, 마약, 폭력)",
+      "FAKE": "스케이트 스팟이 아님 / 가짜",
+      "WRONG_LOCATION": "잘못된 위치이거나 스팟이 없어짐",
+      "DANGEROUS": "위험하거나 불법",
+      "OTHER": "기타"
+    }
+  },
+  "legal": {
+    "link": "규칙 및 개인정보"
   }
 }

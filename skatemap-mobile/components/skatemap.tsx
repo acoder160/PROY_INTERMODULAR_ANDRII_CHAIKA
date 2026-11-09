@@ -23,6 +23,8 @@ interface SkateMapProps {
   isAddingMode?: boolean;
   onMapClick?: (lat: number, lng: number) => void;
   onSpotClick?: (spotId: number) => void; 
+  /** The flag button in a spot popup. */
+  onReportSpot?: (spotId: number) => void;
   /** Short notice for map-side problems while placing a spot (too far, no GPS). */
   onNotice?: (message: string) => void;
 }
@@ -33,6 +35,7 @@ export default function SkateMap({
   isAddingMode = false,
   onMapClick,
   onSpotClick,
+  onReportSpot,
   onNotice = (message: string) => alert(message)
 }: SkateMapProps) {
   const { t } = useTranslation();
@@ -43,6 +46,8 @@ export default function SkateMap({
   const strings = {
     rate: cleanLabel(t('webview.rate')),
     route: cleanLabel(t('webview.route')),
+    report: t('report.title'),
+    close: cleanLabel(t('form.close')),
     unnamed: t('webview.unnamed'),
     noDescription: t('webview.noDescription'),
     noImage: t('popup.noImage'),
@@ -203,16 +208,20 @@ export default function SkateMap({
           .leaflet-popup-tip { background: var(--sheet); border: 2px solid var(--asphalt); box-shadow: none; }
           .leaflet-popup-tip-container { margin-top: -2px; }
           .leaflet-popup-content { margin: 0; }
-          .leaflet-container a.leaflet-popup-close-button {
-            top: 8px; right: 8px;
-            width: 32px; height: 32px;
+          /* Denunciar + cerrar sobre la foto: iconos SVG centrados con grid (el carácter "×" quedaba descentrado) */
+          .popup-media { position: relative; }
+          .popup-actions { position: absolute; top: 8px; inset-inline-end: 8px; display: flex; gap: 8px; }
+          .popup-icon-btn {
+            width: 40px; height: 40px; padding: 0;
+            display: grid; place-items: center;
             border-radius: 50%;
             background: var(--asphalt);
             border: 2px solid var(--sheet);
             color: var(--sheet);
-            font: 700 20px/28px system-ui, sans-serif;
-            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
           }
+          .popup-icon-btn svg { display: block; }
+          .popup-icon-btn:active { transform: scale(0.94); }
           .popup-card { width: 240px; font-family: system-ui, Roboto, sans-serif; color: var(--asphalt); }
           .popup-image { display: block; width: 100%; height: 112px; object-fit: cover; background: var(--concrete) linear-gradient(160deg, #D3D3CE, var(--concrete)); }
           .popup-image-empty { display: flex; align-items: center; justify-content: center; }
@@ -551,6 +560,9 @@ export default function SkateMap({
             return out;
           }
 
+          var FLAG_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V3.5"/><path d="M5 4h12.5l-2.6 4.5 2.6 4.5H5"/></svg>';
+          var CLOSE_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+          window.__closePopup = function() { map.closePopup(); };
           var CAMERA_SVG = '<svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="var(--ink-muted)" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
 
           function createSpotMarker(spot, showAsPlusOneBubble, lngOffset) {
@@ -576,7 +588,13 @@ export default function SkateMap({
               for (var i = 1; i <= 3; i++) marks += '<i class="' + (i <= level ? '' : 'off') + '"></i>';
               var diffLabel = escapeHtml(window.I18N.difficulty[diff] || diff);
 
-              return '<div class="popup-card">' + image +
+              var spotId = Number(spot.id) || 0;
+              var actions = '<div class="popup-actions">' +
+                '<button class="popup-icon-btn" aria-label="' + escapeHtml(window.I18N.report) + '" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({ type: \\'reportSpot\\', spotId: ' + spotId + ' }))">' + FLAG_SVG + '</button>' +
+                '<button class="popup-icon-btn" aria-label="' + escapeHtml(window.I18N.close) + '" onclick="window.__closePopup()">' + CLOSE_SVG + '</button>' +
+              '</div>';
+
+              return '<div class="popup-card"><div class="popup-media">' + image + actions + '</div>' +
                 '<div class="popup-info">' +
                   '<h3 class="popup-title">' + escapeHtml(spot.name || window.I18N.unnamed) + '</h3>' +
                   '<div class="popup-facts">' +
@@ -597,7 +615,7 @@ export default function SkateMap({
 
             var marker = L.marker([spot.latitude, spot.longitude + (lngOffset || 0)], {
               icon: showAsPlusOneBubble ? singleSpotClusterIcon : icon
-            }).bindPopup(buildPopup, { maxWidth: 260, minWidth: 240, autoPanPaddingTopLeft: L.point(16, 96), autoPanPaddingBottomRight: L.point(16, 120) });
+            }).bindPopup(buildPopup, { closeButton: false, maxWidth: 260, minWidth: 240, autoPanPaddingTopLeft: L.point(16, 96), autoPanPaddingBottomRight: L.point(16, 120) });
             marker.spotId = spot.id;
             return marker;
           }
@@ -919,6 +937,10 @@ export default function SkateMap({
           else if (data.type === 'openDetails' &&
             Number.isSafeInteger(data.spotId) && data.spotId > 0 && onSpotClick) {
              onSpotClick(data.spotId);
+          }
+          else if (data.type === 'reportSpot' &&
+            Number.isSafeInteger(data.spotId) && data.spotId > 0 && onReportSpot) {
+             onReportSpot(data.spotId);
           }
           else if (data.type === 'openDirections' &&
             Number.isFinite(data.lat) && Number.isFinite(data.lng) &&

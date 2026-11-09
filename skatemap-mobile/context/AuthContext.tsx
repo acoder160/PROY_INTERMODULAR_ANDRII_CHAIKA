@@ -13,7 +13,9 @@ import api, {
 interface AuthContextType {
   user: string | null;
   token: string | null;
-  login: (username: string, token: string, refreshToken?: string) => Promise<void>;
+  /** Solo decide qué pantallas se muestran: el backend comprueba el rol en cada petición de admin. */
+  isAdmin: boolean;
+  login: (username: string, token: string, refreshToken?: string, role?: string) => Promise<void>;
   logout: () => Promise<void>;
   isLoading: boolean;
 }
@@ -23,6 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -34,6 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const response = await refreshSession();
         setToken(response.data.token);
         setUser(response.data.username);
+        setRole(response.data.role ?? null);
       } catch {
         await clearSession();
       } finally {
@@ -44,13 +48,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     restoreSession();
   }, []);
 
-  const login = async (username: string, jwtToken: string, refreshToken?: string) => {
+  const login = async (username: string, jwtToken: string, refreshToken?: string, userRole?: string) => {
     setAccessToken(jwtToken);
     if (refreshToken) {
       await saveRefreshToken(refreshToken);
     }
     setUser(username);
     setToken(jwtToken);
+    setRole(userRole ?? null);
   };
 
   const logout = async () => {
@@ -64,11 +69,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await clearSession();
       setUser(null);
       setToken(null);
+      setRole(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, token, isAdmin: role === 'ROLE_ADMIN', login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

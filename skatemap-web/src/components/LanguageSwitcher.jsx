@@ -69,6 +69,7 @@ export default function LanguageSwitcher({ variant = 'inline' }) {
             />
           ))}
         </div>
+        <a className="report-legal-link" href="/legal">{t('legal.link')}</a>
       </Sheet>
     </>
   );

@@ -102,17 +102,49 @@
     "googleFailed": "Ezin izan da Googlerekin sartu. Saiatu berriro."
   },
   "admin": {
-    "title": "Administrazio panela",
     "backToMap": "Itzuli mapara",
-    "id": "ID",
-    "name": "Izena",
-    "creator": "Sortzailea",
-    "actions": "Ekintzak",
-    "loadingSpots": "Spotak kargatzen...",
-    "delete": "Ezabatu",
-    "confirmDelete": "Ziur zaude \"{{name}}\" spota eta bere iruzkin guztiak ezabatu nahi dituzula?",
-    "deleted": "Spota ondo ezabatu da",
-    "deleteError": "Errorea ezabatzean. Egiaztatu baimenak edo kontsola."
+    "moderation": "Moderazioa",
+    "empty": "Dena ondo. Ez dago ezer berrikusteko.",
+    "loadFailed": "Ezin izan da ilara kargatu.",
+    "loadMore": "Kargatu gehiago",
+    "keep": "Mantendu",
+    "remove": "Ezabatu",
+    "removePhoto": "Kendu argazkia",
+    "restorePhoto": "Erakutsi argazkia",
+    "skip": "Saltatu",
+    "comments": "Iruzkinak",
+    "undo": "Desegin",
+    "removed": "Spota ezabatu da",
+    "photoRemoved": "Argazkia ezabatu da",
+    "kept": "Spota mantendu da",
+    "actionFailed": "Ez du funtzionatu. Saiatu berriro.",
+    "by": "egilea: {{user}}",
+    "openMap": "Ireki Mapetan",
+    "aiVerdict": "AAren iritzia",
+    "aiNone": "AAk oraindik ez du spot hau berrikusi.",
+    "reportsCount": "Salaketak ({{count}})",
+    "commentsCount": "Iruzkinak ({{count}})",
+    "weight": "pisua {{weight}}",
+    "noComments": "Ez dago iruzkinik.",
+    "deleteComment": "Ezabatu iruzkina",
+    "confirmDeleteComment": "Iruzkin hau ezabatu?",
+    "shortcuts": "Teklak: → mantendu · ← ezabatu · ↑ iruzkinak · P kendu argazkia · Zuriunea saltatu · Z desegin",
+    "swipeHint": "Irristatu → mantendu · ← ezabatu · ↑ iruzkinak · ↓ saltatu",
+    "tabs": {
+      "REPORTED": "Salaketak",
+      "NEW": "Berriak",
+      "HIDDEN": "Ezkutatuak",
+      "ALL": "Guztiak"
+    },
+    "status": {
+      "HIDDEN": "Mapatik ezkutatuta",
+      "PHOTO_HIDDEN": "Argazkia ezkutatuta"
+    },
+    "verdict": {
+      "VIOLATION": "Arauak urratzen ditu",
+      "OK": "Ondo dirudi",
+      "UNSURE": "Ez dago ziur"
+    }
   },
   "status": {
     "preparingCamera": "📸 Kamera prestatzen...",
@@ -131,7 +163,11 @@
     "spotCreated": "Spota ondo sortu da!",
     "saveFailed": "Errorea spota gordetzean. Egiaztatu konexioa.",
     "gpsWaiting": "Mesedez, itxaron GPSak zure kokapena detektatu arte.",
-    "tooFar": "{{meters}} m-ra zaude. Spotetik 200 m baino gutxiagora egon behar duzu hura gehitzeko."
+    "tooFar": "{{meters}} m-ra zaude. Spotetik 200 m baino gutxiagora egon behar duzu hura gehitzeko.",
+    "photoRejected": "Argazki hau ez dago baimenduta (biluztasuna, drogak, indarkeria, iragarkiak edo datu pertsonalak). Aukeratu beste bat.",
+    "photoUnclear": "Argazkia ilunegia edo lausoegia dago spota ikusteko. Atera beste bat.",
+    "photoNotPlace": "Argazkiak spota bera erakutsi behar du, ez meme bat, pantaila-argazki bat edo gertuko selfie bat.",
+    "textRejected": "Izenak edo deskribapenak arauak urratzen ditu (spama, eduki desegokia edo zentzugabekeria)."
   },
   "types": {
     "STREET": "Kalea",
@@ -169,5 +205,31 @@
     "route": "🗺️ Ibilbidea",
     "unnamed": "Izenik gabeko spota",
     "noDescription": "Spot honek ez du deskribapen zehatzik."
+  },
+  "report": {
+    "title": "Salatu",
+    "subtitle": "Zer dago gaizki spot honetan: {{name}}?",
+    "reasonLabel": "Arrazoia",
+    "commentLabel": "Xehetasunak (aukerakoa)",
+    "commentPlaceholder": "Zer begiratu beharko genuke?",
+    "send": "Bidali salaketa",
+    "sent": "Eskerrik asko! Spot hau berrikusiko dugu.",
+    "already": "Dagoeneko salatu duzu spot hau.",
+    "own": "Ezin duzu zure spota salatu.",
+    "tooMany": "Salaketa gehiegi. Saiatu berriro minutu batzuk barru.",
+    "failed": "Ezin izan da salaketa bidali. Saiatu berriro.",
+    "loginText": "Hasi saioa spot bat salatzeko. Konturik gabe, arauen orritik idatz diezagukezu.",
+    "howItWorks": "Nola egiten dugun moderazioa",
+    "reasons": {
+      "SPAM": "Spama edo publizitatea",
+      "INAPPROPRIATE": "Argazki edo testu desegokia (biluztasuna, drogak, indarkeria)",
+      "FAKE": "Ez da skate spot bat / faltsua da",
+      "WRONG_LOCATION": "Leku okerra edo spota jada ez dago",
+      "DANGEROUS": "Arriskutsua edo legez kanpokoa",
+      "OTHER": "Beste zerbait"
+    }
+  },
+  "legal": {
+    "link": "Arauak eta pribatutasuna"
   }
 }

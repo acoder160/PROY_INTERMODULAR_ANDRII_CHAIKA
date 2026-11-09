@@ -5,18 +5,31 @@ import org.springframework.http.HttpStatus;
 /**
  * Error whose message is safe to show to the client. Anything that is not an ApiException is
  * reported as a generic 500 so internal details never leak.
+ *
+ * {@code code} is an optional stable identifier (e.g. "photo_unclear") that clients map to a
+ * translated text; {@code message} stays as the English fallback.
  */
 public class ApiException extends RuntimeException {
 
     private final HttpStatus status;
+    private final String code;
 
     public ApiException(HttpStatus status, String message) {
+        this(status, null, message);
+    }
+
+    public ApiException(HttpStatus status, String code, String message) {
         super(message);
         this.status = status;
+        this.code = code;
     }
 
     public HttpStatus getStatus() {
         return status;
+    }
+
+    public String getCode() {
+        return code;
     }
 
     public static ApiException notFound(String what) {
@@ -30,6 +43,11 @@ public class ApiException extends RuntimeException {
     /** Content blocked by moderation; the message is shown to the user as-is. */
     public static ApiException contentRejected(String message) {
         return new ApiException(HttpStatus.BAD_REQUEST, message);
+    }
+
+    /** Content blocked by moderation, with a code the clients translate. */
+    public static ApiException contentRejected(String code, String message) {
+        return new ApiException(HttpStatus.BAD_REQUEST, code, message);
     }
 
     public static ApiException unavailable(String message) {

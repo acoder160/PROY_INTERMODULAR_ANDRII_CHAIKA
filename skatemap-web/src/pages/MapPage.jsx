@@ -13,7 +13,8 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 import FilterSheet from '../components/FilterSheet';
 import SpotDetailsSheet from '../components/SpotDetailsSheet';
 import { TypeChip, DifficultyMarks, StarRating } from '../components/PaintBits';
-import { OptionsIcon, PersonIcon, LogoutIcon, RefreshIcon, LocateIcon, ShieldIcon, CameraIcon } from '../components/Icons';
+import ReportSheet from '../components/ReportSheet';
+import { OptionsIcon, PersonIcon, LogoutIcon, RefreshIcon, LocateIcon, ShieldIcon, CameraIcon, CloseIcon, FlagIcon } from '../components/Icons';
 import { DEFAULT_FILTERS, cleanLabel, directionsUrl, haversineKm } from '../utils/paint';
 import '../MapChrome.css';
 
@@ -86,6 +87,7 @@ const createSpotMarker = (spot, offset, icon) => {
         spotType: spot.spotType,
     });
     marker.bindPopup(() => getPopupContainer(marker), {
+        closeButton: false, // botones propios (denunciar + cerrar) dentro de SpotPopup
         maxWidth: 260,
         minWidth: 240,
         autoPanPaddingTopLeft: L.point(16, 96),
@@ -116,11 +118,13 @@ const forEachSpotCopyInBounds = (spots, bounds, callback) => {
 // (grupo de clusters) y Leaflet.markercluster solo pinta lo que cabe en pantalla.
 //  - Pocos spots a la vista (< 150): iconos sueltos, nunca burbujas.
 //  - Muchos spots y zoom bajo: burbujas "+N" / "+1". Con zoom >= 15: siempre iconos.
-function DynamicSpotLayer({ spots, onOpenDetails, myPosition }) {
+function DynamicSpotLayer({ spots, onOpenDetails, onReport, myPosition }) {
     const map = useMap();
     const positionRef = useRef(myPosition);
     const selectedRef = useRef(null);   // marcador con el popup abierto
     const routeRef = useRef([]);        // [contorno de tinta, puntos rosas]
+    const zoomingRef = useRef(false);   // hay un zoom animado en curso (flyTo, rueda, pellizco)
+    const pendingRouteRef = useRef(false);
     const clusterRef = useRef(null);
     const looseRef = useRef(null);
     const clusterMarkersRef = useRef([]);
@@ -144,6 +148,13 @@ function DynamicSpotLayer({ spots, onOpenDetails, myPosition }) {
         const from = positionRef.current;
         const marker = selectedRef.current;
         if (!from || !marker) return;
+        // Una línea añadida a mitad de un zoom animado se pinta con doble escala (una mancha rosa y
+        // negra enorme): la dibujamos cuando el zoom termina.
+        if (zoomingRef.current) {
+            pendingRouteRef.current = true;
+            return;
+        }
+        pendingRouteRef.current = false;
         const points = [from, marker.getLatLng()];
         const style = { dashArray: '2 12', lineCap: 'round', lineJoin: 'round', interactive: false };
         routeRef.current = [
@@ -279,6 +290,16 @@ function DynamicSpotLayer({ spots, onOpenDetails, myPosition }) {
         };
         map.on('moveend zoomend', scheduleEvaluate);
 
+        // moveend también cierra el estado: un arrastre que corta un flyTo no emite zoomend
+        const onZoomStart = () => { zoomingRef.current = true; };
+        const onZoomDone = () => {
+            if (!zoomingRef.current) return;
+            zoomingRef.current = false;
+            if (pendingRouteRef.current) drawRoute();
+        };
+        map.on('zoomstart', onZoomStart);
+        map.on('zoomend moveend', onZoomDone);
+
         clusterRef.current = cluster;
         looseRef.current = loose;
         modeRef.current = 'cluster';
@@ -289,6 +310,8 @@ function DynamicSpotLayer({ spots, onOpenDetails, myPosition }) {
         return () => {
             clearTimeout(timer);
             map.off('moveend zoomend', scheduleEvaluate);
+            map.off('zoomstart', onZoomStart);
+            map.off('zoomend moveend', onZoomDone);
             // Si aún queda una carga por bloques en marcha, que no intente añadir a un mapa sin capa
             cluster._addLayer = () => {};
             map.removeLayer(cluster);
@@ -350,14 +373,18 @@ function DynamicSpotLayer({ spots, onOpenDetails, myPosition }) {
         return () => observer.disconnect();
     }, [openPopup]);
 
+    const closePopup = useCallback(() => map.closePopup(), [map]);
     const currentSpot = openPopup ? spotsById.get(openPopup.spotId) : null;
     return currentSpot
-        ? createPortal(<SpotPopup spot={currentSpot} onOpenDetails={onOpenDetails} />, openPopup.container)
+        ? createPortal(
+            <SpotPopup spot={currentSpot} onOpenDetails={onOpenDetails} onReport={onReport} onClose={closePopup} />,
+            openPopup.container
+        )
         : null;
 }
 
 // POPUP DEL SPOT: misma tarjeta que el popup de la app móvil (skatemap-mobile/components/skatemap.tsx)
-function SpotPopup({ spot, onOpenDetails }) {
+function SpotPopup({ spot, onOpenDetails, onReport, onClose }) {
     const { t } = useTranslation();
     const [imageFailed, setImageFailed] = useState(false);
     const spotType = (spot.spotType || spot.type || 'STREET').toUpperCase();
@@ -366,13 +393,30 @@ function SpotPopup({ spot, onOpenDetails }) {
 
     return (
         <div className="popup-card">
-            {spot.mediaUrl && !imageFailed ? (
-                <img src={spot.mediaUrl} className="popup-image" alt="" onError={() => setImageFailed(true)} />
-            ) : (
-                <div className="popup-image popup-image-empty" role="img" aria-label={t('popup.noImage')}>
-                    <CameraIcon size={32} />
+            <div className="popup-media">
+                {spot.mediaUrl && !imageFailed ? (
+                    <img src={spot.mediaUrl} className="popup-image" alt="" onError={() => setImageFailed(true)} />
+                ) : (
+                    <div className="popup-image popup-image-empty" role="img" aria-label={t('popup.noImage')}>
+                        <CameraIcon size={32} />
+                    </div>
+                )}
+                {/* Iconos SVG centrados con grid: el carácter "×" de la fuente quedaba 3px por debajo del centro */}
+                <div className="popup-actions">
+                    <button
+                        type="button"
+                        className="popup-icon-btn"
+                        onClick={() => onReport(spot.id)}
+                        aria-label={t('report.title')}
+                        title={t('report.title')}
+                    >
+                        <FlagIcon size={18} />
+                    </button>
+                    <button type="button" className="popup-icon-btn" onClick={onClose} aria-label={cleanLabel(t('form.close'))}>
+                        <CloseIcon size={18} />
+                    </button>
                 </div>
-            )}
+            </div>
             <div className="popup-info">
                 <h3 className="popup-title">{spot.name || t('webview.unnamed')}</h3>
                 <div className="popup-facts">
@@ -455,10 +499,11 @@ function ZoomLimit() {
     return null;
 }
 
-// PUNTO AZUL DE UBICACIÓN + RADIO
-// El punto es un marcador DOM (no se deforma al hacer zoom). El radio es un círculo vectorial, que
-// Leaflet escala de golpe durante un zoom animado; por eso lo quitamos al empezar el zoom y lo
-// volvemos a mostrar con un fundido al terminar.
+// PUNTO DE UBICACIÓN + RADIO
+// El punto es un marcador DOM (no se deforma al hacer zoom). El radio es un círculo vectorial:
+// durante un zoom animado Leaflet escala la capa SVG entera, así que un círculo añadido a mitad
+// del zoom sale con doble escala (la mancha negra). Lo quitamos al empezar el zoom y solo lo
+// volvemos a pintar cuando el zoom ha terminado.
 const userDotIcon = L.divIcon({
     className: 'user-dot',
     html: '<div class="user-dot-inner"></div>',
@@ -473,6 +518,7 @@ function UserLocation({ position }) {
     const timerRef = useRef(null);
     const positionRef = useRef(null);
     const controlsRef = useRef(null);
+    const zoomingRef = useRef(false);
 
     useEffect(() => {
         const hideRadius = () => {
@@ -486,7 +532,7 @@ function UserLocation({ position }) {
             clearTimeout(timerRef.current);
             timerRef.current = setTimeout(() => {
                 const pos = positionRef.current;
-                if (!pos || circleRef.current) return;
+                if (!pos || circleRef.current || zoomingRef.current) return;
                 const radius = Math.min(Math.max(pos.accuracy || 100, 40), 500);
                 circleRef.current = L.circle(pos, {
                     color: ASPHALT,
@@ -501,13 +547,24 @@ function UserLocation({ position }) {
             }, 150);
         };
 
-        map.on('zoomstart', hideRadius);
-        map.on('zoomend', showRadius);
+        const onZoomStart = () => {
+            zoomingRef.current = true;
+            hideRadius();
+        };
+        // moveend también cuenta: un arrastre que corta un flyTo no emite zoomend
+        const onZoomDone = () => {
+            if (!zoomingRef.current) return;
+            zoomingRef.current = false;
+            showRadius();
+        };
+
+        map.on('zoomstart', onZoomStart);
+        map.on('zoomend moveend', onZoomDone);
         controlsRef.current = { hideRadius, showRadius };
 
         return () => {
-            map.off('zoomstart', hideRadius);
-            map.off('zoomend', showRadius);
+            map.off('zoomstart', onZoomStart);
+            map.off('zoomend moveend', onZoomDone);
             hideRadius();
             if (markerRef.current) {
                 map.removeLayer(markerRef.current);
@@ -525,7 +582,8 @@ function UserLocation({ position }) {
             markerRef.current = L.marker(position, { icon: userDotIcon, zIndexOffset: 1000, interactive: false }).addTo(map);
         }
         controlsRef.current?.hideRadius();
-        controlsRef.current?.showRadius();
+        // Si el mapa está volando hacia la posición, el radio aparece al terminar (onZoomDone)
+        if (!zoomingRef.current) controlsRef.current?.showRadius();
     }, [map, position]);
 
     return null;
@@ -562,10 +620,11 @@ function LocationButton({ setMyPosition }) {
             (pos) => {
                 const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
                 latlng.accuracy = pos.coords.accuracy;
-                setMyPosition(latlng);
                 setMessage(null);
 
-                // Vuelo suave: más largo si el destino está lejos; si ya estamos cerca, solo desplazamos
+                // Vuelo suave: más largo si el destino está lejos; si ya estamos cerca, solo desplazamos.
+                // Primero arranca el vuelo (emite zoomstart en el acto) y después se guarda la posición:
+                // así el radio y la ruta saben que hay un zoom en curso y esperan a que termine.
                 const distance = map.getCenter().distanceTo(latlng);
                 if (map.getZoom() >= 15 && distance < 80) {
                     map.panTo(latlng, { animate: true, duration: 0.5 });
@@ -576,6 +635,7 @@ function LocationButton({ setMyPosition }) {
                         easeLinearity: 0.25,
                     });
                 }
+                setMyPosition(latlng);
             },
             (err) => {
                 console.error('Error de geolocalización:', err);
@@ -611,13 +671,13 @@ export default function MapPage() {
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState(DEFAULT_FILTERS);
     const [selectedSpotId, setSelectedSpotId] = useState(null);
+    const [reportSpotId, setReportSpotId] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
 
-    const { logout, user } = useAuth();
+    const { logout, user, isAdmin } = useAuth();
     const navigate = useNavigate();
     const initialCenter = [41.3874, 2.1686]; // Barcelona
     const username = user?.username;
-    const isAdmin = username === 'a';
 
     const fetchSpots = useCallback(async () => {
         try {
@@ -660,8 +720,10 @@ export default function MapPage() {
     }), [spots, filters, myPosition]);
 
     const selectedSpot = selectedSpotId === null ? null : spots.find((s) => s.id === selectedSpotId) ?? null;
+    const reportSpot = reportSpotId === null ? null : spots.find((s) => s.id === reportSpotId) ?? null;
     const closeDetails = useCallback(() => setSelectedSpotId(null), []);
     const closeFilters = useCallback(() => setShowFilters(false), []);
+    const closeReport = useCallback(() => setReportSpotId(null), []);
 
     return (
         <div className="map-page">
@@ -725,7 +787,7 @@ export default function MapPage() {
                 <ZoomLimit />
                 <PrerenderedTiles />
                 <LocationButton setMyPosition={setMyPosition} />
-                <DynamicSpotLayer spots={filteredSpots} onOpenDetails={setSelectedSpotId} myPosition={myPosition} />
+                <DynamicSpotLayer spots={filteredSpots} onOpenDetails={setSelectedSpotId} onReport={setReportSpotId} myPosition={myPosition} />
                 <UserLocation position={myPosition} />
             </MapContainer>
 
@@ -745,7 +807,12 @@ export default function MapPage() {
                     userLocation={myPosition}
                     onClose={closeDetails}
                     onSpotUpdated={fetchSpots}
+                    onReport={setReportSpotId}
                 />
+            )}
+
+            {reportSpot && (
+                <ReportSheet key={reportSpot.id} spot={reportSpot} onClose={closeReport} />
             )}
         </div>
     );

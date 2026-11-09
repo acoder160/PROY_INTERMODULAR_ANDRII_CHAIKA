@@ -102,17 +102,49 @@
     "googleFailed": "Gagal masuk dengan Google. Coba lagi."
   },
   "admin": {
-    "title": "Panel admin",
     "backToMap": "Kembali ke peta",
-    "id": "ID",
-    "name": "Nama",
-    "creator": "Pembuat",
-    "actions": "Aksi",
-    "loadingSpots": "Memuat spot...",
-    "delete": "Hapus",
-    "confirmDelete": "Yakin ingin menghapus spot \"{{name}}\" beserta semua komentarnya?",
-    "deleted": "Spot berhasil dihapus",
-    "deleteError": "Gagal menghapus. Periksa izin Anda atau konsol."
+    "moderation": "Moderasi",
+    "empty": "Semua beres. Tidak ada yang perlu diperiksa.",
+    "loadFailed": "Antrean tidak dapat dimuat.",
+    "loadMore": "Muat lagi",
+    "keep": "Pertahankan",
+    "remove": "Hapus",
+    "removePhoto": "Hapus foto",
+    "restorePhoto": "Tampilkan foto",
+    "skip": "Lewati",
+    "comments": "Komentar",
+    "undo": "Urungkan",
+    "removed": "Spot dihapus",
+    "photoRemoved": "Foto dihapus",
+    "kept": "Spot dipertahankan",
+    "actionFailed": "Tidak berhasil. Coba lagi.",
+    "by": "oleh {{user}}",
+    "openMap": "Buka di Maps",
+    "aiVerdict": "Penilaian AI",
+    "aiNone": "AI belum memeriksa spot ini.",
+    "reportsCount": "Laporan ({{count}})",
+    "commentsCount": "Komentar ({{count}})",
+    "weight": "bobot {{weight}}",
+    "noComments": "Belum ada komentar.",
+    "deleteComment": "Hapus komentar",
+    "confirmDeleteComment": "Hapus komentar ini?",
+    "shortcuts": "Tombol: → pertahankan · ← hapus · ↑ komentar · P hapus foto · Spasi lewati · Z urungkan",
+    "swipeHint": "Geser → pertahankan · ← hapus · ↑ komentar · ↓ lewati",
+    "tabs": {
+      "REPORTED": "Laporan",
+      "NEW": "Baru",
+      "HIDDEN": "Tersembunyi",
+      "ALL": "Semua"
+    },
+    "status": {
+      "HIDDEN": "Disembunyikan dari peta",
+      "PHOTO_HIDDEN": "Foto disembunyikan"
+    },
+    "verdict": {
+      "VIOLATION": "Melanggar aturan",
+      "OK": "Tampak baik",
+      "UNSURE": "Tidak yakin"
+    }
   },
   "status": {
     "preparingCamera": "📸 Menyiapkan kamera...",
@@ -131,7 +163,11 @@
     "spotCreated": "Spot berhasil dibuat!",
     "saveFailed": "Gagal menyimpan spot. Periksa koneksi Anda.",
     "gpsWaiting": "Harap tunggu hingga GPS mendeteksi lokasi Anda.",
-    "tooFar": "Anda berjarak {{meters}} m. Anda harus berada dalam jarak 200 m dari spot untuk menambahkannya."
+    "tooFar": "Anda berjarak {{meters}} m. Anda harus berada dalam jarak 200 m dari spot untuk menambahkannya.",
+    "photoRejected": "Foto ini tidak diizinkan (ketelanjangan, narkoba, kekerasan, iklan, atau data pribadi). Pilih foto lain.",
+    "photoUnclear": "Foto terlalu gelap atau buram untuk melihat spot. Ambil foto lain.",
+    "photoNotPlace": "Foto harus menunjukkan spotnya sendiri, bukan meme, tangkapan layar, atau swafoto jarak dekat.",
+    "textRejected": "Nama atau deskripsi melanggar aturan (spam, konten tidak pantas, atau teks tak bermakna)."
   },
   "types": {
     "STREET": "Jalanan",
@@ -169,5 +205,31 @@
     "route": "🗺️ Rute",
     "unnamed": "Spot tanpa nama",
     "noDescription": "Tidak ada deskripsi rinci untuk spot ini."
+  },
+  "report": {
+    "title": "Laporkan",
+    "subtitle": "Apa masalahnya dengan {{name}}?",
+    "reasonLabel": "Alasan",
+    "commentLabel": "Detail (opsional)",
+    "commentPlaceholder": "Apa yang perlu kami periksa?",
+    "send": "Kirim laporan",
+    "sent": "Terima kasih! Kami akan memeriksa spot ini.",
+    "already": "Anda sudah melaporkan spot ini.",
+    "own": "Anda tidak bisa melaporkan spot milik sendiri.",
+    "tooMany": "Terlalu banyak laporan. Coba lagi beberapa menit lagi.",
+    "failed": "Laporan tidak dapat dikirim. Coba lagi.",
+    "loginText": "Masuk untuk melaporkan spot. Tanpa akun, Anda bisa menulis kepada kami dari halaman aturan.",
+    "howItWorks": "Cara kerja moderasi",
+    "reasons": {
+      "SPAM": "Spam atau iklan",
+      "INAPPROPRIATE": "Foto atau teks tidak pantas (ketelanjangan, narkoba, kekerasan)",
+      "FAKE": "Bukan spot skate / palsu",
+      "WRONG_LOCATION": "Tempat salah atau spotnya sudah tidak ada",
+      "DANGEROUS": "Berbahaya atau ilegal",
+      "OTHER": "Lainnya"
+    }
+  },
+  "legal": {
+    "link": "Aturan & privasi"
   }
 }

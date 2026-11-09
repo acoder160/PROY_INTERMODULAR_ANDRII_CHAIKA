@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import { hasLegalPage, openLegalPage } from '../utils/legal';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -51,6 +52,11 @@ export default function LanguageModal({ visible, onClose }: { visible: boolean; 
                 display={false}
               />
             ))}
+            {hasLegalPage && (
+              <TouchableOpacity onPress={openLegalPage} accessibilityRole="link" style={styles.legalLink}>
+                <Text style={styles.legalText}>{t('legal.link')}</Text>
+              </TouchableOpacity>
+            )}
           </ScrollView>
         </View>
       </View>
@@ -91,4 +97,6 @@ const styles = StyleSheet.create({
   strip: { marginTop: 12 },
   scroll: { flexGrow: 0, marginTop: 16 },
   list: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  legalLink: { marginTop: 8, minHeight: 40, justifyContent: 'center', alignSelf: 'flex-start' },
+  legalText: { fontSize: 14, fontWeight: '700', color: Palette.ink, textDecorationLine: 'underline', textDecorationColor: Palette.pink },
 });

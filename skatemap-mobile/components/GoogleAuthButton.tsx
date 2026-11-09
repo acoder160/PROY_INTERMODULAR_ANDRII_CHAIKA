@@ -43,7 +43,7 @@ export default function GoogleAuthButton() {
     try {
       const response = await signIn();
       if (!response) return;
-      await login(response.data.username, response.data.token, response.data.refreshToken);
+      await login(response.data.username, response.data.token, response.data.refreshToken, response.data.role);
       router.replace('/(tabs)');
     } catch (e: any) {
       console.log('Google sign-in failed:', e?.response?.status ?? e?.code ?? e?.message, e?.response?.data ?? '');

@@ -20,7 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Every error response has the shape {"message": "..."} (plus "errors" for validation).
+ * Every error response has the shape {"message": "..."} (plus "errors" for validation, and "code"
+ * for errors the clients translate, such as moderation rejections).
  * Standard Spring MVC errors (404, 405, malformed JSON, missing params...) keep their proper
  * status via ResponseEntityExceptionHandler; unexpected exceptions become a generic 500.
  */
@@ -31,7 +32,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<Map<String, Object>> handleApi(ApiException ex) {
-        return body(ex.getStatus(), ex.getMessage());
+        if (ex.getCode() == null) return body(ex.getStatus(), ex.getMessage());
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("message", ex.getMessage());
+        body.put("code", ex.getCode());
+        return ResponseEntity.status(ex.getStatus()).body(body);
     }
 
     @ExceptionHandler(AuthenticationException.class)

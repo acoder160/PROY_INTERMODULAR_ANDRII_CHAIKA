@@ -196,6 +196,21 @@
   color: var(--sheet);
 }
 
+.auth-legal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  color: var(--on-asphalt-muted);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-legal:hover {
+  color: var(--sheet);
+}
+
 /* "Despertando el servidor": asfalto con contorno amarillo (aviso, igual que en móvil) */
 .loading-message {
   margin-bottom: 16px;

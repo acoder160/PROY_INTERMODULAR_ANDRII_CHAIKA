@@ -22,6 +22,7 @@ public class RateLimitingService {
         COMMENT(10, Duration.ofMinutes(30)),
         COMMENT_ADMIN(100, Duration.ofMinutes(30)),
         UPLOAD_SIGNATURE(20, Duration.ofHours(1)),
+        REPORT(5, Duration.ofMinutes(10)),
         // Per client IP
         LOGIN(10, Duration.ofMinutes(1)),
         REGISTER(5, Duration.ofHours(1)),

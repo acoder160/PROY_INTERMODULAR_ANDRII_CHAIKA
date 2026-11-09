@@ -5,6 +5,14 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
+// La respuesta de sesión (login, Google, refresh) trae el rol: ROLE_USER o ROLE_ADMIN
+const toUser = (data, fallbackUsername) => ({
+    id: data.id,
+    username: data.username || fallbackUsername,
+    email: data.email,
+    role: data.role || 'ROLE_USER',
+});
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -13,11 +21,7 @@ export const AuthProvider = ({ children }) => {
         api.post('/auth/refresh')
             .then((response) => {
                 setAccessToken(response.data.token);
-                setUser({
-                    id: response.data.id,
-                    username: response.data.username,
-                    email: response.data.email,
-                });
+                setUser(toUser(response.data));
             })
             .catch((error) => {
                 clearAccessToken();
@@ -38,11 +42,7 @@ export const AuthProvider = ({ children }) => {
             }
 
             setAccessToken(token);
-            setUser({
-                id: response.data.id,
-                username: response.data.username || username,
-                email: response.data.email,
-            });
+            setUser(toUser(response.data, username));
             return true;
         } catch (error) {
             console.error('Error login:', error);
@@ -54,11 +54,7 @@ export const AuthProvider = ({ children }) => {
     const loginWithGoogle = async (idToken) => {
         const response = await api.post('/auth/google', { idToken });
         setAccessToken(response.data.token);
-        setUser({
-            id: response.data.id,
-            username: response.data.username,
-            email: response.data.email,
-        });
+        setUser(toUser(response.data));
         return true;
     };
 
@@ -74,8 +70,11 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Solo decide qué pantallas se muestran: el backend comprueba el rol en cada petición de admin
+    const isAdmin = user?.role === 'ROLE_ADMIN';
+
     return (
-        <AuthContext.Provider value={{ user, login, loginWithGoogle, logout, loading }}>
+        <AuthContext.Provider value={{ user, isAdmin, login, loginWithGoogle, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );

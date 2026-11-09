@@ -102,17 +102,49 @@
     "googleFailed": "No se pudo entrar con Google. Inténtalo de nuevo."
   },
   "admin": {
-    "title": "Panel de administración",
     "backToMap": "Volver al mapa",
-    "id": "ID",
-    "name": "Nombre",
-    "creator": "Creador",
-    "actions": "Acciones",
-    "loadingSpots": "Cargando spots...",
-    "delete": "Borrar",
-    "confirmDelete": "¿Estás seguro de que quieres borrar el spot \"{{name}}\" y todos sus comentarios?",
-    "deleted": "Spot borrado correctamente",
-    "deleteError": "Error al borrar. Revisa tus permisos o la consola."
+    "moderation": "Moderación",
+    "empty": "Todo en orden. No hay nada que revisar.",
+    "loadFailed": "No se pudo cargar la cola.",
+    "loadMore": "Cargar más",
+    "keep": "Mantener",
+    "remove": "Eliminar",
+    "removePhoto": "Quitar foto",
+    "restorePhoto": "Mostrar foto",
+    "skip": "Saltar",
+    "comments": "Comentarios",
+    "undo": "Deshacer",
+    "removed": "Spot eliminado",
+    "photoRemoved": "Foto eliminada",
+    "kept": "Spot mantenido",
+    "actionFailed": "No ha funcionado. Inténtalo de nuevo.",
+    "by": "de {{user}}",
+    "openMap": "Abrir en Maps",
+    "aiVerdict": "Veredicto de la IA",
+    "aiNone": "La IA aún no ha revisado este spot.",
+    "reportsCount": "Denuncias ({{count}})",
+    "commentsCount": "Comentarios ({{count}})",
+    "weight": "peso {{weight}}",
+    "noComments": "Sin comentarios.",
+    "deleteComment": "Eliminar comentario",
+    "confirmDeleteComment": "¿Eliminar este comentario?",
+    "shortcuts": "Teclas: → mantener · ← eliminar · ↑ comentarios · P quitar foto · Espacio saltar · Z deshacer",
+    "swipeHint": "Desliza → mantener · ← eliminar · ↑ comentarios · ↓ saltar",
+    "tabs": {
+      "REPORTED": "Denuncias",
+      "NEW": "Nuevos",
+      "HIDDEN": "Ocultos",
+      "ALL": "Todos"
+    },
+    "status": {
+      "HIDDEN": "Oculto del mapa",
+      "PHOTO_HIDDEN": "Foto oculta"
+    },
+    "verdict": {
+      "VIOLATION": "Incumple las normas",
+      "OK": "Parece correcto",
+      "UNSURE": "No está segura"
+    }
   },
   "status": {
     "preparingCamera": "📸 Preparando la cámara...",
@@ -131,7 +163,11 @@
     "spotCreated": "¡Spot creado correctamente!",
     "saveFailed": "Error al guardar el spot. Revisa tu conexión.",
     "gpsWaiting": "Por favor, espera a que el GPS detecte tu ubicación.",
-    "tooFar": "Estás a {{meters}} m. Debes estar a menos de 200 m del spot para añadirlo."
+    "tooFar": "Estás a {{meters}} m. Debes estar a menos de 200 m del spot para añadirlo.",
+    "photoRejected": "Esta foto no está permitida (desnudos, drogas, violencia, anuncios o datos personales). Elige otra.",
+    "photoUnclear": "La foto está demasiado oscura o borrosa para ver el spot. Haz otra.",
+    "photoNotPlace": "La foto tiene que mostrar el spot, no un meme, una captura o un selfie de cerca.",
+    "textRejected": "El nombre o la descripción incumplen las normas (spam, contenido inapropiado o sin sentido)."
   },
   "types": {
     "STREET": "Calle",
@@ -169,5 +205,31 @@
     "route": "🗺️ Ruta",
     "unnamed": "Spot sin nombre",
     "noDescription": "No hay descripción detallada para este spot."
+  },
+  "report": {
+    "title": "Denunciar",
+    "subtitle": "¿Qué pasa con {{name}}?",
+    "reasonLabel": "Motivo",
+    "commentLabel": "Detalles (opcional)",
+    "commentPlaceholder": "¿Qué deberíamos revisar?",
+    "send": "Enviar denuncia",
+    "sent": "¡Gracias! Revisaremos este spot.",
+    "already": "Ya has denunciado este spot.",
+    "own": "No puedes denunciar tu propio spot.",
+    "tooMany": "Demasiadas denuncias. Inténtalo en unos minutos.",
+    "failed": "No se pudo enviar la denuncia. Inténtalo de nuevo.",
+    "loginText": "Inicia sesión para denunciar un spot. Sin cuenta, puedes escribirnos desde la página de normas.",
+    "howItWorks": "Cómo funciona la moderación",
+    "reasons": {
+      "SPAM": "Spam o publicidad",
+      "INAPPROPRIATE": "Foto o texto inapropiado (desnudos, drogas, violencia)",
+      "FAKE": "No es un spot de skate / es falso",
+      "WRONG_LOCATION": "Lugar equivocado o el spot ya no existe",
+      "DANGEROUS": "Peligroso o ilegal",
+      "OTHER": "Otra cosa"
+    }
+  },
+  "legal": {
+    "link": "Normas y privacidad"
   }
 }
