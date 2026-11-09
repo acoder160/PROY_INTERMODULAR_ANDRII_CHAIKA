@@ -102,7 +102,9 @@
     "googleFailed": "تعذّر تسجيل الدخول باستخدام Google. حاول مرة أخرى.",
     "tryDemo": "جرّب النسخة التجريبية",
     "demoHint": "بدون تسجيل: حساب تجريبي مشترك.",
-    "demoFailed": "النسخة التجريبية غير متاحة حاليًا. حاول لاحقًا."
+    "demoFailed": "النسخة التجريبية غير متاحة حاليًا. حاول لاحقًا.",
+    "acceptTerms": "عمري 14 عامًا أو أكثر وأوافق على",
+    "acceptRequired": "يرجى تأكيد أن عمرك 14 عامًا أو أكثر وأنك توافق على القواعد."
   },
   "admin": {
     "backToMap": "العودة إلى الخريطة",
@@ -173,7 +175,17 @@
     "textRejected": "الاسم أو الوصف يخالف القواعد (رسائل مزعجة أو محتوى غير لائق أو كلام بلا معنى).",
     "demoReadonly": "غير متاح في الحساب التجريبي. أنشئ حسابك الخاص لتجربته.",
     "notOwner": "يمكنك تعديل منشوراتك فقط.",
-    "cannotFollowSelf": "لا يمكنك متابعة نفسك."
+    "cannotFollowSelf": "لا يمكنك متابعة نفسك.",
+    "checkinTooFar": "يجب أن تكون في المكان (ضمن 300 م) لتسجيل الحضور.",
+    "sessionBadTime": "اختر وقتًا بين الآن و30 يومًا قادمة.",
+    "hostCannotLeave": "You host this session. Cancel it instead of leaving.",
+    "alreadyCheckedIn": "You are already checked in.",
+    "alreadyJoined": "You already joined this session.",
+    "duplicateCandidate": "There is already a spot here.",
+    "sessionOver": "انتهت هذه الجلسة.",
+    "sessionLimit": "لديك بالفعل 10 جلسات قادمة.",
+    "blocked": "لا يمكنك متابعة هذا المستخدم.",
+    "cannotBlockSelf": "لا يمكنك حظر نفسك."
   },
   "types": {
     "STREET": "شارع",
@@ -275,13 +287,18 @@
     "activity": {
       "SPOT_CREATED": "أضاف مكانًا",
       "COMMENTED": "علّق على مكان",
-      "RATED": "قيّم مكانًا"
+      "RATED": "قيّم مكانًا",
+      "CHECKED_IN": "يتزلج في مكان",
+      "SESSION_CREATED": "خطّط لجلسة"
     },
     "notif": {
       "FOLLOW": "بدأ بمتابعتك",
       "COMMENT_ON_SPOT": "علّق على مكانك {{spot}}",
       "REPLY": "ردّ على تعليقك",
-      "COMMENT_LIKE": "أُعجب بتعليقك"
+      "COMMENT_LIKE": "أُعجب بتعليقك",
+      "SESSION_JOINED": "سيحضر جلستك في {{spot}}",
+      "SESSION_REMINDER": "جلستك في {{spot}} تبدأ قريبًا",
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
     },
     "reply": "رد",
     "replyingTo": "رد على {{username}}",
@@ -302,5 +319,76 @@
     "deleteSpot": "حذف المكان",
     "deleteSpotConfirm": "حذف هذا المكان؟ ستُحذف معه صورته وتقييماته وتعليقاته.",
     "loadFailed": "تعذّر التحميل. تحقّق من اتصالك وحاول مرة أخرى."
+  },
+  "live": {
+    "title": "مباشر",
+    "skatingNow": "يتزلجون الآن: {{count}}",
+    "nobody": "لا أحد يتزلج هنا الآن",
+    "imHere": "أنا هنا",
+    "leave": "مغادرة",
+    "needLocation": "اسمح بالوصول إلى الموقع وكن في المكان لتسجيل الحضور.",
+    "sessions": "الجلسات",
+    "noSessions": "لا توجد جلسات مخططة بعد.",
+    "planSession": "خطّط لجلسة",
+    "when": "متى",
+    "note": "ملاحظة (اختياري)",
+    "notePlaceholder": "Game of SKATE، تصوير، المبتدئون مرحَّب بهم…",
+    "create": "إنشاء",
+    "join": "انضمام",
+    "joined": "سأحضر",
+    "cancelSession": "إلغاء",
+    "cancelConfirm": "إلغاء هذه الجلسة؟",
+    "going": "سيحضرون: {{count}}",
+    "hostedBy": "المنظِّم: {{username}}"
+  },
+  "ai": {
+    "suggesting": "AI is filling in the details from your photo…"
+  },
+  "duplicate": {
+    "title": "Is this the same spot?",
+    "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
+    "openExisting": "Open it",
+    "createAnyway": "It's different, create it"
+  },
+  "search": {
+    "placeholder": "Try “smooth ledges for beginners near me”",
+    "submit": "Search spots",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "results": "{{count}} spots found",
+    "noResults": "No spots match. Try different words.",
+    "noAi": "Keyword search (AI unavailable)",
+    "failed": "Search isn't available right now.",
+    "chipRating": "{{value}}★ and up",
+    "chipDistance": "within {{km}} km"
+  },
+  "weather": {
+    "label": "Weather",
+    "DRY": "Dry",
+    "WET": "Wet ground",
+    "RAIN": "Raining"
+  },
+  "addSpot": {
+    "mobileOnly": {
+      "title": "Add spots from the app",
+      "body": "Adding a spot needs your phone's camera and GPS, so it's only available in the mobile app.",
+      "get": "Get the app",
+      "soon": "App download coming soon"
+    }
+  },
+  "safety": {
+    "block": "حظر",
+    "unblock": "إلغاء الحظر",
+    "blockConfirm": "هل تريد حظر {{username}}؟ لن ترى تعليقاته بعد الآن ولن يتمكن أي منكما من متابعة الآخر.",
+    "queueTitle": "Reports",
+    "queueEmpty": "No open reports.",
+    "target": {
+      "COMMENT": "Comment",
+      "USER": "Profile"
+    },
+    "by": "by {{username}}",
+    "removeComment": "Remove comment",
+    "clearProfile": "Clear bio and photo",
+    "dismiss": "Dismiss"
   }
 }

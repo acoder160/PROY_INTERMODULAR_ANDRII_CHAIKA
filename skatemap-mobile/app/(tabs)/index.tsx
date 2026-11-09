@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking, useWindowDimensions, TextInput, ActivityIndicator } from 'react-native';
 import api from '../../utils/api';
 import { cleanLabel } from '../../utils/text';
 import { useAuth } from '../../context/AuthContext';
@@ -15,6 +15,7 @@ import { Palette, DisplayFont, MIN_TARGET } from '../../constants/theme';
 import GradientFill from '../../components/ui/GradientFill';
 import { useLocation } from '../../hooks/useLocation';
 import { useSpots } from '../../hooks/useSpots';
+import { useLiveCounts } from '../../hooks/useLiveCounts';
 import SpotDetailsModal from '../../components/SpotDetailsModal';
 import FilterModal, { DEFAULT_FILTERS, type FilterState } from '../../components/FilterModal';
 import LanguageModal from '../../components/LanguageModal';
@@ -29,6 +30,19 @@ const MODERATION_ERRORS: Record<string, string> = {
   photo_not_place: 'errors.photoNotPlace',
   text_rejected: 'errors.textRejected',
 };
+
+/** The spot list DTO, as far as the search results need it. */
+interface SearchResult {
+  filters: {
+    types: string[];
+    difficulty: string[];
+    minRating: number;
+    distanceKm: number;
+    keywords: string[];
+  };
+  aiUsed: boolean;
+  spots: any[];
+}
 
 const NO_FAVORITES: number[] = [];
 
@@ -61,6 +75,7 @@ export default function HomeScreen() {
   const { spots, fetchSpots, isOffline } = useSpots(token);
   const [extraSpots, setExtraSpots] = useState<any[]>([]);
   const [focus, setFocus] = useState<{ lat: number; lng: number; id: number } | null>(null);
+  const liveCounts = useLiveCounts();
 
   // Saved spots: one list for the map popup and the spot sheet, so both always agree
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
@@ -126,6 +141,48 @@ export default function HomeScreen() {
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
 
   const [formError, setFormError] = useState<string | null>(null);
+
+  // The photo is uploaded as soon as it is taken, so the AI can suggest the form's values while the
+  // user types, and a "create anyway" retry doesn't upload it again
+  const [suggesting, setSuggesting] = useState(false);
+  const flowRef = useRef(0); // bumps on every new photo or reset: late answers are dropped
+  const uploadRef = useRef<Promise<string> | null>(null);
+  const editedRef = useRef<Set<string>>(new Set()); // type / level chosen by the user: the AI leaves them alone
+
+  // Search in plain words
+  const [searchText, setSearchText] = useState('');
+  const [searching, setSearching] = useState(false);
+  const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
+  const [searchFailed, setSearchFailed] = useState(false);
+
+  const runSearch = async () => {
+    const query = searchText.trim();
+    if (!query || searching) return;
+    setSearching(true);
+    setSearchFailed(false);
+    try {
+      const res = await api.post('/search', {
+        query,
+        lat: userLocation?.lat,
+        lng: userLocation?.lng,
+      });
+      const result = res.data as SearchResult;
+      setSearchResult(result);
+      const best = result.spots[0];
+      if (best) setFocus({ lat: best.latitude, lng: best.longitude, id: best.id });
+    } catch {
+      setSearchResult(null);
+      setSearchFailed(true);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchText('');
+    setSearchResult(null);
+    setSearchFailed(false);
+  };
 
   // Lógica para recargar spots (ahora funciona también sin token para invitados)
   const handleReloadSpots = async () => {
@@ -206,6 +263,9 @@ export default function HomeScreen() {
   };
 
   const resetAddFlow = () => {
+    flowRef.current += 1;
+    uploadRef.current = null;
+    setSuggesting(false);
     setModalVisible(false); setIsAddingMode(false); setNewSpotLocation(null); setCapturedPhoto(null); setStatusMessage(null);
     setFormError(null);
     setFormData({ name: '', description: '', spotType: 'STREET', difficultyLevel: 'INTERMEDIATE' });
@@ -221,11 +281,62 @@ export default function HomeScreen() {
   };
 
 
+  /** Uploads the photo now and asks the AI for tags; the form stays editable the whole time. */
+  const startUploadAndSuggest = (uri: string) => {
+    const flow = ++flowRef.current;
+    editedRef.current = new Set();
+    const upload = uploadImageToCloudinary(uri);
+    uploadRef.current = upload;
+    upload
+      .then(async (url) => {
+        if (flow !== flowRef.current) return;
+        setSuggesting(true);
+        try {
+          const res = await api.post('/ai/suggest-tags', { mediaUrl: url });
+          const tags = res.data as { available: boolean; spotType?: string; difficulty?: string; name?: string; description?: string };
+          if (flow !== flowRef.current || !tags?.available) return;
+          // Only fill what is still empty: whatever the user already typed or picked wins
+          setFormData((prev) => ({
+            ...prev,
+            name: prev.name.trim() ? prev.name : tags.name ?? prev.name,
+            description: prev.description.trim() ? prev.description : tags.description ?? prev.description,
+            spotType: !editedRef.current.has('spotType') && tags.spotType ? tags.spotType : prev.spotType,
+            difficultyLevel: !editedRef.current.has('difficultyLevel') && tags.difficulty ? tags.difficulty : prev.difficultyLevel,
+          }));
+        } catch {
+          // no suggestion: the user fills the form as before
+        } finally {
+          if (flow === flowRef.current) setSuggesting(false);
+        }
+      })
+      .catch(() => {}); // an upload failure shows up on save, which retries it
+  };
+
+  const onFormChange = (next: typeof formData) => {
+    if (next.spotType !== formData.spotType) editedRef.current.add('spotType');
+    if (next.difficultyLevel !== formData.difficultyLevel) editedRef.current.add('difficultyLevel');
+    setFormData(next);
+  };
+
+  const ensureUploaded = async (uri: string): Promise<string> => {
+    if (uploadRef.current) {
+      try {
+        return await uploadRef.current;
+      } catch {
+        // the early upload failed: try once more now
+      }
+    }
+    const retry = uploadImageToCloudinary(uri);
+    uploadRef.current = retry;
+    return retry;
+  };
+
   const takePicture = async () => {
     if (cameraRef.current) {
       setStatusMessage(t('status.processingPhoto'));
       const photo = await cameraRef.current.takePictureAsync({ quality: 0.6 });
       setCapturedPhoto(photo.uri);
+      startUploadAndSuggest(photo.uri);
       setShowCamera(false);
       setIsAddingMode(true);
       setStatusMessage(t('status.tapCircle'));
@@ -233,7 +344,7 @@ export default function HomeScreen() {
     }
   };
 
-  const handleSaveSpot = async () => {
+  const handleSaveSpot = async (force = false) => {
     if (!user || !token) {
       router.push('/login');
       return;
@@ -242,10 +353,10 @@ export default function HomeScreen() {
     if (!newSpotLocation || !formData.name.trim() || !capturedPhoto) { setFormError(t('errors.missingData')); return; }
 
     setIsUploading(true);
-    let finalImageUrl = null;
+    let finalImageUrl: string;
 
     try {
-      finalImageUrl = await uploadImageToCloudinary(capturedPhoto);
+      finalImageUrl = await ensureUploaded(capturedPhoto);
     } catch {
       setFormError(t('errors.uploadFailed'));
       setIsUploading(false); return;
@@ -253,13 +364,21 @@ export default function HomeScreen() {
 
     try {
       await api.post(`/spots`, {
-        ...formData, latitude: newSpotLocation.lat, longitude: newSpotLocation.lng, mediaUrl: finalImageUrl
+        ...formData, latitude: newSpotLocation.lat, longitude: newSpotLocation.lng, mediaUrl: finalImageUrl,
+        ...(force ? { force: true } : {}),
       }, { headers: { Authorization: `Bearer ${token}` } });
       
       resetAddFlow();
       showStatus(cleanLabel(t('errors.spotCreated')));
       fetchSpots();
     } catch (error: any) {
+      const data = error.response?.data;
+      if (data?.code === 'duplicate_candidate' && data.candidate) {
+        promptDuplicate(data.candidate, data.meters);
+        return;
+      }
+      // A refused photo is deleted by the server: the next save has to upload it again
+      if (typeof data?.code === 'string' && data.code.startsWith('photo_')) uploadRef.current = null;
       const serverError = error.response?.data?.error; // Captura errores de Bucket4j
       const serverMessage = error.response?.data?.message; // Captura errores de IA o Validación
       const moderationKey = MODERATION_ERRORS[error.response?.data?.code];
@@ -272,6 +391,27 @@ export default function HomeScreen() {
     } finally {
       setIsUploading(false); 
     }
+  };
+
+  /** "Is this the same spot?": open the existing one, or create it anyway (force). */
+  const promptDuplicate = (candidate: any, meters: number) => {
+    Alert.alert(
+      t('duplicate.title'),
+      t('duplicate.message', { name: candidate.name, meters: Math.round(Number(meters) || 0) }),
+      [
+        {
+          text: t('duplicate.openExisting'),
+          onPress: () => {
+            resetAddFlow();
+            setExtraSpots((prev) => (prev.some((s) => s.id === candidate.id) ? prev : [...prev, candidate]));
+            setSelectedSpot(candidate);
+            setFocus({ lat: candidate.latitude, lng: candidate.longitude, id: candidate.id });
+          },
+        },
+        { text: t('duplicate.createAnyway'), onPress: () => { handleSaveSpot(true); } },
+        { text: t('common.cancel'), style: 'cancel' },
+      ],
+    );
   };
 
   // --- LÓGICA DE FILTRADO (Haversine Formula) ---
@@ -288,7 +428,7 @@ export default function HomeScreen() {
 
   // Spots opened by link that the cached list does not have yet
   const allSpots = extraSpots.length ? [...spots, ...extraSpots.filter((x) => !spots.some((s: any) => s.id === x.id))] : spots;
-  const filteredSpots = allSpots.filter((spot: any) => {
+  const filteredSpots = searchResult ? searchResult.spots : allSpots.filter((spot: any) => {
     // Filtro por tipo
     if (filters.spotType !== 'ALL' && spot.spotType !== filters.spotType && spot.type !== filters.spotType) return false;
     
@@ -321,6 +461,7 @@ export default function HomeScreen() {
           }}
           favoriteIds={token ? favoriteIds : null}
           onToggleFavorite={toggleFavorite}
+          liveCounts={liveCounts}
         />
       </View>
 
@@ -391,8 +532,59 @@ export default function HomeScreen() {
         </View>
       </View>
 
+      {/* Search in plain words ("smooth ledges for beginners near me") */}
+      <View style={[styles.searchRow, { top: insets.top + 8 + 56 + 8 }]}>
+        <View style={styles.searchBox}>
+          <Ionicons name="search" size={20} color={Palette.ink} />
+          <TextInput
+            style={styles.searchInput}
+            value={searchText}
+            onChangeText={setSearchText}
+            placeholder={t('search.placeholder')}
+            placeholderTextColor="#5b5b5b"
+            returnKeyType="search"
+            onSubmitEditing={runSearch}
+            maxLength={200}
+            autoCorrect={false}
+            accessibilityLabel={t('search.submit')}
+          />
+          {searching ? (
+            <ActivityIndicator size="small" color={Palette.ink} />
+          ) : (searchText.length > 0 || searchResult || searchFailed) ? (
+            <TouchableOpacity onPress={clearSearch} accessibilityRole="button" accessibilityLabel={t('search.clear')} hitSlop={10}>
+              <Ionicons name="close-circle" size={22} color={Palette.ink} />
+            </TouchableOpacity>
+          ) : null}
+        </View>
+        {(searchResult || searchFailed) && (
+          <View style={styles.searchInfo} accessibilityLiveRegion="polite">
+            <Text style={styles.searchInfoText}>
+              {searchFailed
+                ? t('search.failed')
+                : searchResult && searchResult.spots.length === 0
+                  ? t('search.noResults')
+                  : t('search.results', { count: searchResult?.spots.length ?? 0 })}
+            </Text>
+            {searchResult && (
+              <View style={styles.chipRow}>
+                {[
+                  ...searchResult.filters.types.map((x) => t(`types.${x}`, { defaultValue: x })),
+                  ...searchResult.filters.difficulty.map((x) => t(`difficulty.${x}`, { defaultValue: x })),
+                  ...(searchResult.filters.minRating > 0 ? [t('search.chipRating', { value: searchResult.filters.minRating })] : []),
+                  ...(searchResult.filters.distanceKm > 0 ? [t('search.chipDistance', { km: searchResult.filters.distanceKm })] : []),
+                  ...searchResult.filters.keywords,
+                ].map((chip, i) => (
+                  <View key={`${chip}-${i}`} style={styles.chip}><Text style={styles.chipText}>{chip}</Text></View>
+                ))}
+                {!searchResult.aiUsed && <Text style={styles.searchHint}>{t('search.noAi')}</Text>}
+              </View>
+            )}
+          </View>
+        )}
+      </View>
+
       {/* Avisos: modo offline */}
-      <View pointerEvents="none" style={[styles.notices, { top: insets.top + 8 + 56 + 12 }]}>
+      <View pointerEvents="none" style={[styles.notices, { top: insets.top + 8 + 56 + 12 + (searchResult || searchFailed ? 130 : 56) }]}>
         {isOffline && (
           <View style={styles.offlineBadge}>
             <Ionicons name="cloud-offline" size={16} color={Palette.ink} />
@@ -450,12 +642,13 @@ export default function HomeScreen() {
       <SpotFormModal 
         visible={modalVisible}
         onClose={handleCloseForm}
-        onSave={handleSaveSpot}
+        onSave={() => { handleSaveSpot(); }}
         formData={formData}
-        setFormData={setFormData}
+        setFormData={onFormChange}
         capturedPhoto={capturedPhoto}
         isUploading={isUploading}
         errorMessage={formError}
+        suggesting={suggesting}
       />
 
       <SpotDetailsModal
@@ -469,6 +662,7 @@ export default function HomeScreen() {
         onSpotDeleted={() => { setExtraSpots([]); fetchSpots(); }}
         onReport={() => { setReportSpot(selectedSpot); setSelectedSpot(null); }}
         isFavorite={!!selectedSpot && visibleFavoriteIds.includes(selectedSpot.id)}
+        liveCount={selectedSpot ? liveCounts[selectedSpot.id] ?? 0 : 0}
         onToggleFavorite={toggleFavorite}
       />
 
@@ -553,6 +747,34 @@ const styles = StyleSheet.create({
   },
   userPill: { backgroundColor: Palette.white, borderColor: Palette.white, flexShrink: 1 },
   userPillText: { color: Palette.ink, maxWidth: 140 },
+
+  searchRow: { position: 'absolute', left: 16, right: 16, zIndex: 10, gap: 6 },
+  searchBox: {
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 14,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: Palette.ink,
+    backgroundColor: Palette.white,
+  },
+  searchInput: { flex: 1, fontSize: 16, color: Palette.ink, paddingVertical: 8 },
+  searchInfo: {
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: Palette.white,
+    backgroundColor: Palette.asphalt,
+  },
+  searchInfoText: { color: Palette.white, fontSize: 14, fontWeight: '700' },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignItems: 'center' },
+  chip: { paddingVertical: 2, paddingHorizontal: 10, borderRadius: 12, backgroundColor: Palette.pink },
+  chipText: { color: Palette.ink, fontSize: 13, fontWeight: '700' },
+  searchHint: { color: Palette.white, fontSize: 12, opacity: 0.85 },
 
   notices: { position: 'absolute', left: 16, right: 16, alignItems: 'center', zIndex: 10 },
   offlineBadge: {

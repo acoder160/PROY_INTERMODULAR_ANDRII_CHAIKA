@@ -12,10 +12,12 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import CommentSection from './social/CommentSection';
+import LiveSection from './social/LiveSection';
+import WeatherBadge from './social/WeatherBadge';
 import SpotFormModal from './SpotFormModal';
 import { apiErrorText, shareUrl } from '../utils/social';
 
-export default function SpotDetailsModal({ visible, onClose, spot, token, onSpotUpdated, onSpotDeleted, onReport, isFavorite, onToggleFavorite, userLocation }: any) {
+export default function SpotDetailsModal({ visible, onClose, spot, token, onSpotUpdated, onSpotDeleted, onReport, isFavorite, onToggleFavorite, liveCount = 0, userLocation }: any) {
   const { t } = useTranslation();
   const router = useRouter();
   const { user } = useAuth();
@@ -313,6 +315,8 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
                 {distanceText && <Text style={styles.distance}>{distanceText}</Text>}
               </View>
 
+              <WeatherBadge spotId={spot.id} />
+
               {!!spot.description && <Text style={styles.desc}>{spot.description}</Text>}
 
               <TouchableOpacity style={styles.directionsBtn} onPress={openDirections} accessibilityRole="button">
@@ -320,6 +324,8 @@ export default function SpotDetailsModal({ visible, onClose, spot, token, onSpot
                 <Ionicons name="navigate" size={22} color={Palette.ink} />
                 <Text style={styles.directionsText}>{t('popup.directions')}</Text>
               </TouchableOpacity>
+
+              <LiveSection spotId={spot.id} me={user} liveCount={liveCount} onBeforeNavigate={onClose} />
 
               <View style={styles.ratingBox}>
                 <Text style={styles.ratingNumber}>{localAvgRating.toFixed(1)}</Text>

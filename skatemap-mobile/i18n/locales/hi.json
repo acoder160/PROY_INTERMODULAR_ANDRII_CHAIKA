@@ -102,7 +102,9 @@
     "googleFailed": "Google से साइन इन नहीं हो सका। फिर से कोशिश करें।",
     "tryDemo": "डेमो आज़माएँ",
     "demoHint": "साइन अप की ज़रूरत नहीं: एक साझा टेस्ट खाता।",
-    "demoFailed": "डेमो अभी उपलब्ध नहीं है। बाद में फिर कोशिश करें।"
+    "demoFailed": "डेमो अभी उपलब्ध नहीं है। बाद में फिर कोशिश करें।",
+    "acceptTerms": "मैं 14 वर्ष या उससे अधिक का हूँ और मैं स्वीकार करता/करती हूँ:",
+    "acceptRequired": "कृपया पुष्टि करें कि आप 14 वर्ष या उससे अधिक के हैं और नियम स्वीकार करते हैं।"
   },
   "admin": {
     "backToMap": "नक्शे पर वापस",
@@ -173,7 +175,17 @@
     "textRejected": "नाम या विवरण नियमों का उल्लंघन करता है (स्पैम, अनुचित सामग्री या बेमतलब टेक्स्ट)।",
     "demoReadonly": "डेमो खाते पर उपलब्ध नहीं। आज़माने के लिए अपना खाता बनाएँ।",
     "notOwner": "आप केवल अपनी ही पोस्ट बदल सकते हैं।",
-    "cannotFollowSelf": "आप खुद को फ़ॉलो नहीं कर सकते।"
+    "cannotFollowSelf": "आप खुद को फ़ॉलो नहीं कर सकते।",
+    "checkinTooFar": "चेक-इन के लिए आपको स्पॉट पर (300 मी. के भीतर) होना होगा।",
+    "sessionBadTime": "अभी से 30 दिनों के भीतर का समय चुनें।",
+    "hostCannotLeave": "You host this session. Cancel it instead of leaving.",
+    "alreadyCheckedIn": "You are already checked in.",
+    "alreadyJoined": "You already joined this session.",
+    "duplicateCandidate": "There is already a spot here.",
+    "sessionOver": "यह सेशन खत्म हो चुका है।",
+    "sessionLimit": "आपके पहले से 10 आने वाले सेशन हैं।",
+    "blocked": "आप इस उपयोगकर्ता को फ़ॉलो नहीं कर सकते।",
+    "cannotBlockSelf": "आप खुद को ब्लॉक नहीं कर सकते।"
   },
   "types": {
     "STREET": "स्ट्रीट",
@@ -275,13 +287,18 @@
     "activity": {
       "SPOT_CREATED": "ने एक स्पॉट जोड़ा",
       "COMMENTED": "ने एक स्पॉट पर टिप्पणी की",
-      "RATED": "ने एक स्पॉट को रेट किया"
+      "RATED": "ने एक स्पॉट को रेट किया",
+      "CHECKED_IN": "एक स्पॉट पर स्केट कर रहे हैं",
+      "SESSION_CREATED": "ने एक सेशन तय किया"
     },
     "notif": {
       "FOLLOW": "ने आपको फ़ॉलो करना शुरू किया",
       "COMMENT_ON_SPOT": "ने आपके स्पॉट {{spot}} पर टिप्पणी की",
       "REPLY": "ने आपकी टिप्पणी का जवाब दिया",
-      "COMMENT_LIKE": "को आपकी टिप्पणी पसंद आई"
+      "COMMENT_LIKE": "को आपकी टिप्पणी पसंद आई",
+      "SESSION_JOINED": "आपके सेशन में आ रहे हैं: {{spot}}",
+      "SESSION_REMINDER": "{{spot}} पर आपका सेशन जल्द शुरू होगा",
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
     },
     "reply": "जवाब दें",
     "replyingTo": "{{username}} को जवाब",
@@ -302,5 +319,76 @@
     "deleteSpot": "स्पॉट हटाएँ",
     "deleteSpotConfirm": "यह स्पॉट हटाएँ? इसकी फ़ोटो, रेटिंग और टिप्पणियाँ भी हट जाएँगी।",
     "loadFailed": "लोड नहीं हो सका। अपना कनेक्शन जाँचें और फिर कोशिश करें।"
+  },
+  "live": {
+    "title": "लाइव",
+    "skatingNow": "अभी स्केट कर रहे: {{count}}",
+    "nobody": "अभी यहाँ कोई स्केट नहीं कर रहा",
+    "imHere": "मैं यहाँ हूँ",
+    "leave": "निकलें",
+    "needLocation": "चेक-इन के लिए लोकेशन की अनुमति दें और स्पॉट पर रहें।",
+    "sessions": "सेशन",
+    "noSessions": "अभी कोई सेशन तय नहीं है।",
+    "planSession": "सेशन तय करें",
+    "when": "कब",
+    "note": "नोट (वैकल्पिक)",
+    "notePlaceholder": "Game of SKATE, फ़िल्मिंग, नए लोग भी आएँ…",
+    "create": "बनाएँ",
+    "join": "शामिल हों",
+    "joined": "आ रहा/रही हूँ",
+    "cancelSession": "रद्द करें",
+    "cancelConfirm": "यह सेशन रद्द करें?",
+    "going": "आ रहे: {{count}}",
+    "hostedBy": "होस्ट: {{username}}"
+  },
+  "ai": {
+    "suggesting": "AI is filling in the details from your photo…"
+  },
+  "duplicate": {
+    "title": "Is this the same spot?",
+    "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
+    "openExisting": "Open it",
+    "createAnyway": "It's different, create it"
+  },
+  "search": {
+    "placeholder": "Try “smooth ledges for beginners near me”",
+    "submit": "Search spots",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "results": "{{count}} spots found",
+    "noResults": "No spots match. Try different words.",
+    "noAi": "Keyword search (AI unavailable)",
+    "failed": "Search isn't available right now.",
+    "chipRating": "{{value}}★ and up",
+    "chipDistance": "within {{km}} km"
+  },
+  "weather": {
+    "label": "Weather",
+    "DRY": "Dry",
+    "WET": "Wet ground",
+    "RAIN": "Raining"
+  },
+  "addSpot": {
+    "mobileOnly": {
+      "title": "Add spots from the app",
+      "body": "Adding a spot needs your phone's camera and GPS, so it's only available in the mobile app.",
+      "get": "Get the app",
+      "soon": "App download coming soon"
+    }
+  },
+  "safety": {
+    "block": "ब्लॉक करें",
+    "unblock": "अनब्लॉक करें",
+    "blockConfirm": "{{username}} को ब्लॉक करें? आपको उनकी टिप्पणियाँ दिखना बंद हो जाएँगी और आप दोनों एक-दूसरे को फ़ॉलो नहीं कर पाएँगे।",
+    "queueTitle": "Reports",
+    "queueEmpty": "No open reports.",
+    "target": {
+      "COMMENT": "Comment",
+      "USER": "Profile"
+    },
+    "by": "by {{username}}",
+    "removeComment": "Remove comment",
+    "clearProfile": "Clear bio and photo",
+    "dismiss": "Dismiss"
   }
 }

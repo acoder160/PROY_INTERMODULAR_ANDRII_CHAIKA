@@ -34,6 +34,10 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     @Query("SELECT f.followee.id FROM Follow f WHERE f.follower.id = :viewerId AND f.followee.id IN :candidateIds")
     List<Long> followedAmong(@Param("viewerId") Long viewerId, @Param("candidateIds") Collection<Long> candidateIds);
 
+    /** Followers of {@code userId}, for fan-out notifications (callers cap with a Pageable). */
+    @Query("SELECT f.follower FROM Follow f WHERE f.followee.id = :userId AND f.follower.deletedAt IS NULL ORDER BY f.id DESC")
+    List<skatemap.entity.User> followersOf(@Param("userId") Long userId, Pageable pageable);
+
     @Modifying
     @Query("DELETE FROM Follow f WHERE f.follower.id = :userId OR f.followee.id = :userId")
     int deleteAllOf(@Param("userId") Long userId);

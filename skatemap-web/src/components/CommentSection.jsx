@@ -5,7 +5,8 @@ import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import Avatar from './Avatar';
 import { StarRating } from './PaintBits';
-import { HeartIcon, ReplyIcon, EditIcon, TrashIcon, RefreshIcon } from './Icons';
+import { HeartIcon, ReplyIcon, EditIcon, TrashIcon, RefreshIcon, FlagIcon } from './Icons';
+import ReportSheet from './ReportSheet';
 import { cleanLabel } from '../utils/paint';
 import { apiErrorText, timeAgo } from '../utils/social';
 
@@ -169,6 +170,7 @@ function CommentItem({ comment, threadId, spotId, me, onPatch, onRemove, onRepli
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  const [reporting, setReporting] = useState(false);
   const mine = Boolean(me) && comment.username === me;
 
   if (comment.deleted) {
@@ -258,6 +260,11 @@ function CommentItem({ comment, threadId, spotId, me, onPatch, onRemove, onRepli
             <span>{t('social.reply')}</span>
           </button>
         )}
+        {me && !mine && !comment.authorDeleted && (
+          <button type="button" className="comment-action" onClick={() => setReporting(true)} aria-label={t('report.title')}>
+            <FlagIcon size={16} />
+          </button>
+        )}
         {mine && (
           <>
             <button type="button" className="comment-action" onClick={() => open('edit')} aria-label={t('social.edit')}>
@@ -288,6 +295,9 @@ function CommentItem({ comment, threadId, spotId, me, onPatch, onRemove, onRepli
         </div>
       )}
       {error && <p className="comment-error" role="alert">{error}</p>}
+      {reporting && (
+        <ReportSheet endpoint={`/comments/${comment.id}/reports`} subject={author} onClose={() => setReporting(false)} />
+      )}
     </div>
   );
 }

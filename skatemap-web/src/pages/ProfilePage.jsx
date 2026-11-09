@@ -7,7 +7,8 @@ import PageBar from '../components/PageBar';
 import Avatar from '../components/Avatar';
 import SpotCard from '../components/SpotCard';
 import Sheet from '../components/Sheet';
-import { LogoutIcon, EditIcon, BookmarkIcon } from '../components/Icons';
+import ReportSheet from '../components/ReportSheet';
+import { LogoutIcon, EditIcon, BookmarkIcon, FlagIcon } from '../components/Icons';
 import { apiErrorText, formatMonthYear, uploadImage } from '../utils/social';
 import '../Social.css';
 
@@ -44,6 +45,26 @@ export default function ProfilePage() {
       .catch(() => { if (!cancelled) setList([]); });
     return () => { cancelled = true; };
   }, [username, tab, reloadKey]);
+
+  const [reporting, setReporting] = useState(false);
+
+  const toggleBlock = async () => {
+    if (!user) { navigate('/login'); return; }
+    const path = `/users/${encodeURIComponent(username)}/block`;
+    if (!profile.blockedByMe && !window.confirm(t('safety.blockConfirm', { username }))) return;
+    setBusy(true);
+    try {
+      if (profile.blockedByMe) await api.delete(path); else await api.put(path);
+      setProfile((p) => ({
+        ...p,
+        blockedByMe: !p.blockedByMe,
+        followedByMe: false,
+        followers: p.followedByMe ? Math.max(0, p.followers - 1) : p.followers,
+      }));
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const toggleFollow = async () => {
     if (!user) { navigate('/login'); return; }
@@ -107,10 +128,25 @@ export default function ProfilePage() {
                 </Link>
               </>
             ) : (
-              <button type="button" className={profile.followedByMe ? 'btn-outline btn-small' : 'btn-primary btn-small'}
-                      onClick={toggleFollow} disabled={busy} aria-pressed={profile.followedByMe}>
-                {profile.followedByMe ? t('social.followingState') : t('social.follow')}
-              </button>
+              <>
+                {!profile.blockedByMe && (
+                  <button type="button" className={profile.followedByMe ? 'btn-outline btn-small' : 'btn-primary btn-small'}
+                          onClick={toggleFollow} disabled={busy} aria-pressed={profile.followedByMe}>
+                    {profile.followedByMe ? t('social.followingState') : t('social.follow')}
+                  </button>
+                )}
+                {user && (
+                  <>
+                    <button type="button" className="btn-outline btn-small" onClick={toggleBlock} disabled={busy}>
+                      <span>{profile.blockedByMe ? t('safety.unblock') : t('safety.block')}</span>
+                    </button>
+                    <button type="button" className="btn-outline btn-small" onClick={() => setReporting(true)}>
+                      <FlagIcon size={18} />
+                      <span>{t('report.title')}</span>
+                    </button>
+                  </>
+                )}
+              </>
             )}
           </div>
           <dl className="profile-stats">
@@ -144,6 +180,10 @@ export default function ProfilePage() {
           ))}
         </section>
       </main>
+
+      {reporting && (
+        <ReportSheet endpoint={`/users/${encodeURIComponent(username)}/reports`} subject={username} onClose={() => setReporting(false)} />
+      )}
 
       {editing && (
         <EditProfileSheet

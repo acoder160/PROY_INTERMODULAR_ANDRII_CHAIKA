@@ -30,6 +30,14 @@ public class RateLimitingService {
         // Each of these runs an AI moderation call
         PROFILE_UPDATE(10, Duration.ofHours(1)),
         SPOT_EDIT(10, Duration.ofHours(1)),
+        // Live layer
+        CHECKIN(10, Duration.ofMinutes(10)),
+        SESSION_CREATE(5, Duration.ofHours(1)),
+        SESSION_JOIN(30, Duration.ofMinutes(10)),
+        // AI helpers: each call costs a model request
+        SUGGEST_TAGS(20, Duration.ofHours(1)),
+        SEARCH(20, Duration.ofMinutes(1)),
+        WEATHER(60, Duration.ofMinutes(1)),
         // Shared demo account: counted per (demo, client IP), tighter than a normal account
         SPOT_CREATE_DEMO(1, Duration.ofMinutes(10)),
         COMMENT_DEMO(3, Duration.ofMinutes(30)),

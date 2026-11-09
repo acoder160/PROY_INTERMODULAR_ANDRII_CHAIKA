@@ -30,6 +30,10 @@ public class Activity {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id")
+    private SkateSession session;
+
     /** Stars, for RATED. */
     @Column(name = "rating")
     private Short rating;
@@ -55,6 +59,8 @@ public class Activity {
     public ActivityType getType() { return type; }
     public Spot getSpot() { return spot; }
     public Comment getComment() { return comment; }
+    public SkateSession getSession() { return session; }
+    public void setSession(SkateSession session) { this.session = session; }
     public Short getRating() { return rating; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }

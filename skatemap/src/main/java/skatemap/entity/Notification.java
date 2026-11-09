@@ -33,6 +33,10 @@ public class Notification {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id")
+    private SkateSession session;
+
     @Column(name = "read_at")
     private LocalDateTime readAt;
 
@@ -58,6 +62,8 @@ public class Notification {
     public NotificationType getType() { return type; }
     public Spot getSpot() { return spot; }
     public Comment getComment() { return comment; }
+    public SkateSession getSession() { return session; }
+    public void setSession(SkateSession session) { this.session = session; }
     public LocalDateTime getReadAt() { return readAt; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }

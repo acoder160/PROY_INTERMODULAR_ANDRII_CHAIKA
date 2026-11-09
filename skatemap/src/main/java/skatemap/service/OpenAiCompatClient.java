@@ -57,9 +57,38 @@ public class OpenAiCompatClient {
      * with JSON. {@code userContent} is a String or a list of content parts (text + image_url).
      */
     public JsonNode chatJson(Provider provider, String systemPrompt, Object userContent, int maxTokens, boolean vision) {
+        // JSON mode is reliable for text models; vision previews on Groq may not support it, so for
+        // images the JSON is extracted from the answer instead
+        return chat(provider, systemPrompt, userContent, maxTokens, vision, vision ? null : JSON_OBJECT).json();
+    }
+
+    /**
+     * Like {@link #chatJson} for text, but asks the provider to follow a JSON schema (strict mode), so
+     * the answer has exactly the fields we parse. A provider or model that rejects schemas (HTTP 400)
+     * is asked again in plain JSON mode: the caller validates the values either way.
+     */
+    public JsonNode chatJsonSchema(Provider provider, String systemPrompt, Object userContent, int maxTokens,
+                                   String schemaName, Map<String, Object> schema) {
+        Map<String, Object> format = Map.of("type", "json_schema",
+                "json_schema", Map.of("name", schemaName, "strict", true, "schema", schema));
+        Chat first = chat(provider, systemPrompt, userContent, maxTokens, false, format);
+        if (first.formatRejected()) {
+            log.info("AI provider [{}] rejected the JSON schema, asking in JSON mode", provider.label());
+            return chat(provider, systemPrompt, userContent, maxTokens, false, JSON_OBJECT).json();
+        }
+        return first.json();
+    }
+
+    private static final Map<String, Object> JSON_OBJECT = Map.of("type", "json_object");
+
+    /** {@code formatRejected}: the provider answered 400 to the response_format we sent. */
+    private record Chat(JsonNode json, boolean formatRejected) {}
+
+    private Chat chat(Provider provider, String systemPrompt, Object userContent, int maxTokens, boolean vision,
+                      Map<String, Object> responseFormat) {
         if (provider.apiKey() == null || provider.apiKey().isBlank()) {
             log.warn("AI provider [{}] skipped: API key missing", provider.label());
-            return null;
+            return new Chat(null, false);
         }
         try {
             Map<String, Object> body = new LinkedHashMap<>();
@@ -69,9 +98,7 @@ public class OpenAiCompatClient {
                     Map.of("role", "user", "content", userContent)));
             body.put("temperature", 0.0);
             body.put("max_completion_tokens", maxTokens);
-            // JSON mode is reliable for text models; vision previews on Groq may not support it, so for
-            // images the JSON is extracted from the answer instead
-            if (!vision) body.put("response_format", Map.of("type", "json_object"));
+            if (responseFormat != null) body.put("response_format", responseFormat);
             String effort = reasoningEffort(provider.model());
             if (effort != null) body.put("reasoning_effort", effort);
 
@@ -81,13 +108,13 @@ public class OpenAiCompatClient {
             String content = root.path("choices").path(0).path("message").path("content").asText("");
             JsonNode json = extractJson(content);
             if (json == null) log.warn("AI provider [{}] answered without a JSON object", provider.label());
-            return json;
+            return new Chat(json, false);
         } catch (HttpStatusCodeException e) {
             log.warn("AI provider [{}] failed: HTTP {}", provider.label(), e.getStatusCode().value());
-            return null;
+            return new Chat(null, e.getStatusCode().value() == 400 && responseFormat != null);
         } catch (Exception e) {
             log.warn("AI provider [{}] failed: {}", provider.label(), e.getClass().getSimpleName());
-            return null;
+            return new Chat(null, false);
         }
     }
 

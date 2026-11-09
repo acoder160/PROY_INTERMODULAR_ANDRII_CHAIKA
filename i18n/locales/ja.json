@@ -102,7 +102,9 @@
     "googleFailed": "Google でのログインに失敗しました。もう一度お試しください。",
     "tryDemo": "デモを試す",
     "demoHint": "登録不要：共有のテスト用アカウントです。",
-    "demoFailed": "現在デモは利用できません。しばらくしてからもう一度お試しください。"
+    "demoFailed": "現在デモは利用できません。しばらくしてからもう一度お試しください。",
+    "acceptTerms": "14歳以上であり、次に同意します：",
+    "acceptRequired": "14歳以上であり、ルールに同意することを確認してください。"
   },
   "admin": {
     "backToMap": "地図に戻る",
@@ -173,7 +175,17 @@
     "textRejected": "名前または説明がルールに違反しています（スパム、不適切な内容、意味のない文章）。",
     "demoReadonly": "デモアカウントでは利用できません。試すには自分のアカウントを作成してください。",
     "notOwner": "編集できるのは自分の投稿だけです。",
-    "cannotFollowSelf": "自分自身をフォローすることはできません。"
+    "cannotFollowSelf": "自分自身をフォローすることはできません。",
+    "checkinTooFar": "チェックインするにはスポット（300 m以内）にいる必要があります。",
+    "sessionBadTime": "今から30日以内の日時を選んでください。",
+    "hostCannotLeave": "You host this session. Cancel it instead of leaving.",
+    "alreadyCheckedIn": "You are already checked in.",
+    "alreadyJoined": "You already joined this session.",
+    "duplicateCandidate": "There is already a spot here.",
+    "sessionOver": "このセッションは終了しました。",
+    "sessionLimit": "予定中のセッションがすでに10件あります。",
+    "blocked": "このユーザーはフォローできません。",
+    "cannotBlockSelf": "自分自身はブロックできません。"
   },
   "types": {
     "STREET": "ストリート",
@@ -275,13 +287,18 @@
     "activity": {
       "SPOT_CREATED": "がスポットを追加しました",
       "COMMENTED": "がスポットにコメントしました",
-      "RATED": "がスポットを評価しました"
+      "RATED": "がスポットを評価しました",
+      "CHECKED_IN": "がスポットで滑っています",
+      "SESSION_CREATED": "がセッションを企画しました"
     },
     "notif": {
       "FOLLOW": "があなたをフォローしました",
       "COMMENT_ON_SPOT": "があなたのスポット「{{spot}}」にコメントしました",
       "REPLY": "があなたのコメントに返信しました",
-      "COMMENT_LIKE": "があなたのコメントにいいねしました"
+      "COMMENT_LIKE": "があなたのコメントにいいねしました",
+      "SESSION_JOINED": "があなたのセッション（{{spot}}）に参加します",
+      "SESSION_REMINDER": "{{spot}}でのセッションがまもなく始まります",
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
     },
     "reply": "返信",
     "replyingTo": "{{username}}さんへの返信",
@@ -302,5 +319,76 @@
     "deleteSpot": "スポットを削除",
     "deleteSpotConfirm": "このスポットを削除しますか？写真、評価、コメントも削除されます。",
     "loadFailed": "読み込めませんでした。接続を確認してもう一度お試しください。"
+  },
+  "live": {
+    "title": "ライブ",
+    "skatingNow": "滑っている人: {{count}}",
+    "nobody": "今ここで滑っている人はいません",
+    "imHere": "ここにいる",
+    "leave": "離れる",
+    "needLocation": "チェックインするには位置情報を許可し、スポットにいる必要があります。",
+    "sessions": "セッション",
+    "noSessions": "予定されているセッションはまだありません。",
+    "planSession": "セッションを企画",
+    "when": "日時",
+    "note": "メモ（任意）",
+    "notePlaceholder": "Game of SKATE、撮影、初心者歓迎…",
+    "create": "作成",
+    "join": "参加する",
+    "joined": "参加予定",
+    "cancelSession": "中止",
+    "cancelConfirm": "このセッションを中止しますか？",
+    "going": "参加: {{count}}",
+    "hostedBy": "主催: {{username}}"
+  },
+  "ai": {
+    "suggesting": "AI is filling in the details from your photo…"
+  },
+  "duplicate": {
+    "title": "Is this the same spot?",
+    "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
+    "openExisting": "Open it",
+    "createAnyway": "It's different, create it"
+  },
+  "search": {
+    "placeholder": "Try “smooth ledges for beginners near me”",
+    "submit": "Search spots",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "results": "{{count}} spots found",
+    "noResults": "No spots match. Try different words.",
+    "noAi": "Keyword search (AI unavailable)",
+    "failed": "Search isn't available right now.",
+    "chipRating": "{{value}}★ and up",
+    "chipDistance": "within {{km}} km"
+  },
+  "weather": {
+    "label": "Weather",
+    "DRY": "Dry",
+    "WET": "Wet ground",
+    "RAIN": "Raining"
+  },
+  "addSpot": {
+    "mobileOnly": {
+      "title": "Add spots from the app",
+      "body": "Adding a spot needs your phone's camera and GPS, so it's only available in the mobile app.",
+      "get": "Get the app",
+      "soon": "App download coming soon"
+    }
+  },
+  "safety": {
+    "block": "ブロック",
+    "unblock": "ブロック解除",
+    "blockConfirm": "{{username}}さんをブロックしますか？コメントが表示されなくなり、お互いにフォローできなくなります。",
+    "queueTitle": "Reports",
+    "queueEmpty": "No open reports.",
+    "target": {
+      "COMMENT": "Comment",
+      "USER": "Profile"
+    },
+    "by": "by {{username}}",
+    "removeComment": "Remove comment",
+    "clearProfile": "Clear bio and photo",
+    "dismiss": "Dismiss"
   }
 }

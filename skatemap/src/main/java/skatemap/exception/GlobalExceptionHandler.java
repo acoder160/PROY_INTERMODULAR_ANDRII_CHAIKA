@@ -36,6 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("message", ex.getMessage());
         body.put("code", ex.getCode());
+        if (ex.getDetails() != null) body.putAll(ex.getDetails());
         return ResponseEntity.status(ex.getStatus()).body(body);
     }
 

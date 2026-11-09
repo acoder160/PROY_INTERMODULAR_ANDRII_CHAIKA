@@ -102,7 +102,9 @@
     "googleFailed": "Đăng nhập bằng Google thất bại. Hãy thử lại.",
     "tryDemo": "Dùng thử bản demo",
     "demoHint": "Không cần đăng ký: một tài khoản thử nghiệm dùng chung.",
-    "demoFailed": "Bản demo hiện không khả dụng. Hãy thử lại sau."
+    "demoFailed": "Bản demo hiện không khả dụng. Hãy thử lại sau.",
+    "acceptTerms": "Tôi từ 14 tuổi trở lên và chấp nhận",
+    "acceptRequired": "Hãy xác nhận bạn từ 14 tuổi trở lên và chấp nhận các quy tắc."
   },
   "admin": {
     "backToMap": "Quay lại bản đồ",
@@ -173,7 +175,17 @@
     "textRejected": "Tên hoặc mô tả vi phạm quy định (spam, nội dung không phù hợp hoặc vô nghĩa).",
     "demoReadonly": "Không khả dụng với tài khoản demo. Hãy tạo tài khoản riêng để thử.",
     "notOwner": "Bạn chỉ có thể thay đổi bài đăng của chính mình.",
-    "cannotFollowSelf": "Bạn không thể tự theo dõi chính mình."
+    "cannotFollowSelf": "Bạn không thể tự theo dõi chính mình.",
+    "checkinTooFar": "Bạn cần có mặt tại spot (trong vòng 300 m) để check-in.",
+    "sessionBadTime": "Hãy chọn thời gian từ bây giờ đến 30 ngày tới.",
+    "hostCannotLeave": "You host this session. Cancel it instead of leaving.",
+    "alreadyCheckedIn": "You are already checked in.",
+    "alreadyJoined": "You already joined this session.",
+    "duplicateCandidate": "There is already a spot here.",
+    "sessionOver": "Buổi trượt này đã kết thúc.",
+    "sessionLimit": "Bạn đã có 10 buổi trượt sắp tới.",
+    "blocked": "Bạn không thể theo dõi người dùng này.",
+    "cannotBlockSelf": "Bạn không thể tự chặn mình."
   },
   "types": {
     "STREET": "Đường phố",
@@ -275,13 +287,18 @@
     "activity": {
       "SPOT_CREATED": "đã thêm một spot",
       "COMMENTED": "đã bình luận về một spot",
-      "RATED": "đã đánh giá một spot"
+      "RATED": "đã đánh giá một spot",
+      "CHECKED_IN": "đang trượt ở một spot",
+      "SESSION_CREATED": "đã lên lịch một buổi trượt"
     },
     "notif": {
       "FOLLOW": "đã bắt đầu theo dõi bạn",
       "COMMENT_ON_SPOT": "đã bình luận về spot {{spot}} của bạn",
       "REPLY": "đã trả lời bình luận của bạn",
-      "COMMENT_LIKE": "đã thích bình luận của bạn"
+      "COMMENT_LIKE": "đã thích bình luận của bạn",
+      "SESSION_JOINED": "sẽ đến buổi trượt của bạn ở {{spot}}",
+      "SESSION_REMINDER": "Buổi trượt của bạn ở {{spot}} sắp bắt đầu",
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
     },
     "reply": "Trả lời",
     "replyingTo": "Trả lời {{username}}",
@@ -302,5 +319,76 @@
     "deleteSpot": "Xóa spot",
     "deleteSpotConfirm": "Xóa spot này? Ảnh, đánh giá và bình luận của nó cũng sẽ bị xóa.",
     "loadFailed": "Không tải được. Hãy kiểm tra kết nối và thử lại."
+  },
+  "live": {
+    "title": "Trực tiếp",
+    "skatingNow": "Đang trượt: {{count}}",
+    "nobody": "Hiện không có ai trượt ở đây",
+    "imHere": "Tôi ở đây",
+    "leave": "Rời đi",
+    "needLocation": "Hãy cho phép truy cập vị trí và có mặt tại spot để check-in.",
+    "sessions": "Buổi trượt",
+    "noSessions": "Chưa có buổi trượt nào.",
+    "planSession": "Lên lịch buổi trượt",
+    "when": "Khi nào",
+    "note": "Ghi chú (không bắt buộc)",
+    "notePlaceholder": "Game of SKATE, quay phim, chào đón người mới…",
+    "create": "Tạo",
+    "join": "Tham gia",
+    "joined": "Sẽ đến",
+    "cancelSession": "Hủy",
+    "cancelConfirm": "Hủy buổi trượt này?",
+    "going": "Sẽ đến: {{count}}",
+    "hostedBy": "Chủ trì: {{username}}"
+  },
+  "ai": {
+    "suggesting": "AI is filling in the details from your photo…"
+  },
+  "duplicate": {
+    "title": "Is this the same spot?",
+    "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
+    "openExisting": "Open it",
+    "createAnyway": "It's different, create it"
+  },
+  "search": {
+    "placeholder": "Try “smooth ledges for beginners near me”",
+    "submit": "Search spots",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "results": "{{count}} spots found",
+    "noResults": "No spots match. Try different words.",
+    "noAi": "Keyword search (AI unavailable)",
+    "failed": "Search isn't available right now.",
+    "chipRating": "{{value}}★ and up",
+    "chipDistance": "within {{km}} km"
+  },
+  "weather": {
+    "label": "Weather",
+    "DRY": "Dry",
+    "WET": "Wet ground",
+    "RAIN": "Raining"
+  },
+  "addSpot": {
+    "mobileOnly": {
+      "title": "Add spots from the app",
+      "body": "Adding a spot needs your phone's camera and GPS, so it's only available in the mobile app.",
+      "get": "Get the app",
+      "soon": "App download coming soon"
+    }
+  },
+  "safety": {
+    "block": "Chặn",
+    "unblock": "Bỏ chặn",
+    "blockConfirm": "Chặn {{username}}? Bạn sẽ không thấy bình luận của họ nữa và hai người không thể theo dõi nhau.",
+    "queueTitle": "Reports",
+    "queueEmpty": "No open reports.",
+    "target": {
+      "COMMENT": "Comment",
+      "USER": "Profile"
+    },
+    "by": "by {{username}}",
+    "removeComment": "Remove comment",
+    "clearProfile": "Clear bio and photo",
+    "dismiss": "Dismiss"
   }
 }

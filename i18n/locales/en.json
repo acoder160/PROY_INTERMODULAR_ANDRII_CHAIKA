@@ -102,7 +102,9 @@
     "googleFailed": "Google sign-in failed. Try again.",
     "tryDemo": "Try the demo",
     "demoHint": "No sign-up needed: a shared test account.",
-    "demoFailed": "The demo isn't available right now. Try again later."
+    "demoFailed": "The demo isn't available right now. Try again later.",
+    "acceptTerms": "I am 14 or older and I accept the",
+    "acceptRequired": "Please confirm that you are 14 or older and accept the rules."
   },
   "admin": {
     "backToMap": "Back to map",
@@ -173,7 +175,17 @@
     "textRejected": "The name or description breaks the community rules (spam, inappropriate content or nonsense).",
     "demoReadonly": "Not available on the demo account. Create your own account to try this.",
     "notOwner": "You can only change your own posts.",
-    "cannotFollowSelf": "You can’t follow yourself."
+    "cannotFollowSelf": "You can’t follow yourself.",
+    "checkinTooFar": "You need to be at the spot (within 300 m) to check in.",
+    "sessionBadTime": "Pick a time between now and 30 days ahead.",
+    "hostCannotLeave": "You host this session. Cancel it instead of leaving.",
+    "alreadyCheckedIn": "You are already checked in.",
+    "alreadyJoined": "You already joined this session.",
+    "duplicateCandidate": "There is already a spot here.",
+    "sessionOver": "This session is over.",
+    "sessionLimit": "You already have 10 upcoming sessions.",
+    "blocked": "You can't follow this user.",
+    "cannotBlockSelf": "You can't block yourself."
   },
   "types": {
     "STREET": "Street",
@@ -275,13 +287,18 @@
     "activity": {
       "SPOT_CREATED": "added a spot",
       "COMMENTED": "commented on a spot",
-      "RATED": "rated a spot"
+      "RATED": "rated a spot",
+      "CHECKED_IN": "is skating at a spot",
+      "SESSION_CREATED": "planned a session"
     },
     "notif": {
       "FOLLOW": "started following you",
       "COMMENT_ON_SPOT": "commented on your spot {{spot}}",
       "REPLY": "replied to your comment",
-      "COMMENT_LIKE": "liked your comment"
+      "COMMENT_LIKE": "liked your comment",
+      "SESSION_JOINED": "is coming to your session at {{spot}}",
+      "SESSION_REMINDER": "Your session at {{spot}} starts soon",
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
     },
     "reply": "Reply",
     "replyingTo": "Reply to {{username}}",
@@ -302,5 +319,76 @@
     "deleteSpot": "Delete spot",
     "deleteSpotConfirm": "Delete this spot? Its photo, ratings and comments go with it.",
     "loadFailed": "Couldn’t load. Check your connection and try again."
+  },
+  "live": {
+    "title": "Live",
+    "skatingNow": "Skating now: {{count}}",
+    "nobody": "Nobody skating here right now",
+    "imHere": "I’m here",
+    "leave": "Leave",
+    "needLocation": "Allow location access and be at the spot to check in.",
+    "sessions": "Sessions",
+    "noSessions": "No sessions planned yet.",
+    "planSession": "Plan a session",
+    "when": "When",
+    "note": "Note (optional)",
+    "notePlaceholder": "Game of SKATE, filming, beginners welcome…",
+    "create": "Create",
+    "join": "Join",
+    "joined": "Going",
+    "cancelSession": "Cancel",
+    "cancelConfirm": "Cancel this session?",
+    "going": "Going: {{count}}",
+    "hostedBy": "Host: {{username}}"
+  },
+  "ai": {
+    "suggesting": "AI is filling in the details from your photo…"
+  },
+  "duplicate": {
+    "title": "Is this the same spot?",
+    "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
+    "openExisting": "Open it",
+    "createAnyway": "It's different, create it"
+  },
+  "search": {
+    "placeholder": "Try “smooth ledges for beginners near me”",
+    "submit": "Search spots",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "results": "{{count}} spots found",
+    "noResults": "No spots match. Try different words.",
+    "noAi": "Keyword search (AI unavailable)",
+    "failed": "Search isn't available right now.",
+    "chipRating": "{{value}}★ and up",
+    "chipDistance": "within {{km}} km"
+  },
+  "weather": {
+    "label": "Weather",
+    "DRY": "Dry",
+    "WET": "Wet ground",
+    "RAIN": "Raining"
+  },
+  "addSpot": {
+    "mobileOnly": {
+      "title": "Add spots from the app",
+      "body": "Adding a spot needs your phone's camera and GPS, so it's only available in the mobile app.",
+      "get": "Get the app",
+      "soon": "App download coming soon"
+    }
+  },
+  "safety": {
+    "block": "Block",
+    "unblock": "Unblock",
+    "blockConfirm": "Block {{username}}? You will no longer see their comments, and neither of you can follow the other.",
+    "queueTitle": "Reports",
+    "queueEmpty": "No open reports.",
+    "target": {
+      "COMMENT": "Comment",
+      "USER": "Profile"
+    },
+    "by": "by {{username}}",
+    "removeComment": "Remove comment",
+    "clearProfile": "Clear bio and photo",
+    "dismiss": "Dismiss"
   }
 }

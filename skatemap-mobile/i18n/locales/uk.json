@@ -102,7 +102,9 @@
     "googleFailed": "Не вдалося увійти через Google. Спробуйте ще раз.",
     "tryDemo": "Спробувати демо",
     "demoHint": "Без реєстрації: спільний тестовий акаунт.",
-    "demoFailed": "Демо зараз недоступне. Спробуйте пізніше."
+    "demoFailed": "Демо зараз недоступне. Спробуйте пізніше.",
+    "acceptTerms": "Мені 14 років або більше, і я приймаю",
+    "acceptRequired": "Підтвердьте, що вам 14 років або більше і ви приймаєте правила."
   },
   "admin": {
     "backToMap": "Назад до карти",
@@ -173,7 +175,17 @@
     "textRejected": "Назва або опис порушують правила (спам, неприйнятний вміст або нісенітниця).",
     "demoReadonly": "Недоступно в демо-акаунті. Створіть власний акаунт, щоб спробувати.",
     "notOwner": "Змінювати можна лише власні публікації.",
-    "cannotFollowSelf": "Не можна підписатися на себе."
+    "cannotFollowSelf": "Не можна підписатися на себе.",
+    "checkinTooFar": "Треба бути на споті (ближче 300 м), щоб відмітитися.",
+    "sessionBadTime": "Виберіть час від зараз до 30 днів наперед.",
+    "hostCannotLeave": "You host this session. Cancel it instead of leaving.",
+    "alreadyCheckedIn": "You are already checked in.",
+    "alreadyJoined": "You already joined this session.",
+    "duplicateCandidate": "There is already a spot here.",
+    "sessionOver": "Ця сесія вже закінчилася.",
+    "sessionLimit": "У вас уже 10 майбутніх сесій.",
+    "blocked": "Ви не можете підписатися на цього користувача.",
+    "cannotBlockSelf": "Не можна заблокувати самого себе."
   },
   "types": {
     "STREET": "Стріт",
@@ -275,13 +287,18 @@
     "activity": {
       "SPOT_CREATED": "додав(-ла) спот",
       "COMMENTED": "прокоментував(-ла) спот",
-      "RATED": "оцінив(-ла) спот"
+      "RATED": "оцінив(-ла) спот",
+      "CHECKED_IN": "катається на споті",
+      "SESSION_CREATED": "запланував(-ла) сесію"
     },
     "notif": {
       "FOLLOW": "підписався(-лася) на вас",
       "COMMENT_ON_SPOT": "прокоментував(-ла) ваш спот {{spot}}",
       "REPLY": "відповів(-ла) на ваш коментар",
-      "COMMENT_LIKE": "вподобав(-ла) ваш коментар"
+      "COMMENT_LIKE": "вподобав(-ла) ваш коментар",
+      "SESSION_JOINED": "іде на вашу сесію: {{spot}}",
+      "SESSION_REMINDER": "Сесія на «{{spot}}» скоро почнеться",
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
     },
     "reply": "Відповісти",
     "replyingTo": "Відповідь для {{username}}",
@@ -302,5 +319,76 @@
     "deleteSpot": "Видалити спот",
     "deleteSpotConfirm": "Видалити цей спот? Разом із ним зникнуть фото, оцінки й коментарі.",
     "loadFailed": "Не вдалося завантажити. Перевірте з’єднання і спробуйте ще раз."
+  },
+  "live": {
+    "title": "Наживо",
+    "skatingNow": "Зараз катаються: {{count}}",
+    "nobody": "Зараз тут ніхто не катається",
+    "imHere": "Я тут",
+    "leave": "Піти",
+    "needLocation": "Дозвольте доступ до геолокації та будьте на споті, щоб відмітитися.",
+    "sessions": "Сесії",
+    "noSessions": "Поки немає запланованих сесій.",
+    "planSession": "Запланувати сесію",
+    "when": "Коли",
+    "note": "Нотатка (необов’язково)",
+    "notePlaceholder": "Game of SKATE, зйомка, новачки welcome…",
+    "create": "Створити",
+    "join": "Піду",
+    "joined": "Іду",
+    "cancelSession": "Скасувати",
+    "cancelConfirm": "Скасувати цю сесію?",
+    "going": "Ідуть: {{count}}",
+    "hostedBy": "Організатор: {{username}}"
+  },
+  "ai": {
+    "suggesting": "AI is filling in the details from your photo…"
+  },
+  "duplicate": {
+    "title": "Is this the same spot?",
+    "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
+    "openExisting": "Open it",
+    "createAnyway": "It's different, create it"
+  },
+  "search": {
+    "placeholder": "Try “smooth ledges for beginners near me”",
+    "submit": "Search spots",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "results": "{{count}} spots found",
+    "noResults": "No spots match. Try different words.",
+    "noAi": "Keyword search (AI unavailable)",
+    "failed": "Search isn't available right now.",
+    "chipRating": "{{value}}★ and up",
+    "chipDistance": "within {{km}} km"
+  },
+  "weather": {
+    "label": "Weather",
+    "DRY": "Dry",
+    "WET": "Wet ground",
+    "RAIN": "Raining"
+  },
+  "addSpot": {
+    "mobileOnly": {
+      "title": "Add spots from the app",
+      "body": "Adding a spot needs your phone's camera and GPS, so it's only available in the mobile app.",
+      "get": "Get the app",
+      "soon": "App download coming soon"
+    }
+  },
+  "safety": {
+    "block": "Заблокувати",
+    "unblock": "Розблокувати",
+    "blockConfirm": "Заблокувати {{username}}? Ви більше не бачитимете його коментарі, і ніхто з вас не зможе підписатися на іншого.",
+    "queueTitle": "Reports",
+    "queueEmpty": "No open reports.",
+    "target": {
+      "COMMENT": "Comment",
+      "USER": "Profile"
+    },
+    "by": "by {{username}}",
+    "removeComment": "Remove comment",
+    "clearProfile": "Clear bio and photo",
+    "dismiss": "Dismiss"
   }
 }

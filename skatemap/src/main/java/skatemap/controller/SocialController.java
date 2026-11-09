@@ -50,7 +50,7 @@ public class SocialController {
         return ResponseEntity.ok(favoriteService.ids(auth.getName()));
     }
 
-    @GetMapping("/favorites/spots")
+    @GetMapping({"/favorites/spots", "/users/me/favorites"})
     public ResponseEntity<List<SpotDto>> favoriteSpots(Authentication auth) {
         return ResponseEntity.ok(favoriteService.spots(auth.getName()));
     }

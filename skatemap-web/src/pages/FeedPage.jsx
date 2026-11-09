@@ -8,6 +8,7 @@ import Avatar from '../components/Avatar';
 import SpotCard from '../components/SpotCard';
 import { StarRating } from '../components/PaintBits';
 import { timeAgo } from '../utils/social';
+import { formatSessionTime } from '../utils/live';
 import '../Social.css';
 
 /** What the people you follow have been doing: new spots, comments, first ratings. */
@@ -63,6 +64,7 @@ export default function FeedPage() {
                   <span className="feed-time"> · {timeAgo(item.createdAt, i18n.language)}</span>
                 </p>
                 {item.comment && <blockquote className="feed-quote">{item.comment}</blockquote>}
+                {item.session && <p className="feed-session">{formatSessionTime(item.session.startsAt, i18n.language)}</p>}
                 <SpotCard spot={item.spot} />
               </div>
             </li>

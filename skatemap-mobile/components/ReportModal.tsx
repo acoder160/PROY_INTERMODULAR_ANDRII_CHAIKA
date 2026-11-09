@@ -17,24 +17,29 @@ import { useAuth } from '../context/AuthContext';
 
 // Mismas razones que el backend (ReportReason) y que skatemap-web/src/components/ReportSheet.jsx
 export const REPORT_REASONS = ['SPAM', 'INAPPROPRIATE', 'FAKE', 'WRONG_LOCATION', 'DANGEROUS', 'OTHER'] as const;
+// Comments and profiles have no location, so those two reasons do not apply to them
+const CONTENT_REASONS = ['SPAM', 'INAPPROPRIATE', 'DANGEROUS', 'OTHER'] as const;
 const MAX_COMMENT = 300;
 
 const errorKey = (error: any) => {
   const code = error?.response?.data?.code;
   const status = error?.response?.status;
   if (code === 'already_reported' || status === 409) return 'report.already';
-  if (code === 'own_spot') return 'report.own';
+  if (code === 'own_spot' || code === 'own_content') return 'report.own';
   if (status === 429) return 'report.tooMany';
   return 'report.failed';
 };
 
 interface ReportModalProps {
-  spot: { id: number; name?: string } | null;
+  spot?: { id: number; name?: string } | null;
+  /** Reports a comment or a profile instead of a spot: the POST path and the name shown in the subtitle. */
+  endpoint?: string;
+  subject?: string;
   onClose: () => void;
 }
 
 /** "Report" sheet: a reason is required, details are optional. The review (AI + admin) runs on the server. */
-export default function ReportModal({ spot, onClose }: ReportModalProps) {
+export default function ReportModal({ spot, endpoint, subject, onClose }: ReportModalProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -50,14 +55,14 @@ export default function ReportModal({ spot, onClose }: ReportModalProps) {
     return () => clearTimeout(timer);
   }, [status, onClose]);
 
-  if (!spot) return null;
+  if (!spot && !endpoint) return null;
 
   const submit = async () => {
     if (!reason || status !== 'idle') return;
     setStatus('sending');
     setError(null);
     try {
-      await api.post(`/spots/${spot.id}/reports`, { reason, comment: comment.trim() || null });
+      await api.post(endpoint ?? `/spots/${spot?.id}/reports`, { reason, comment: comment.trim() || null });
       setStatus('sent');
     } catch (e) {
       setError(t(errorKey(e)));
@@ -83,7 +88,7 @@ export default function ReportModal({ spot, onClose }: ReportModalProps) {
           <PaintStrip style={styles.strip} />
 
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-            <Text style={styles.subtitle}>{t('report.subtitle', { name: spot.name || t('webview.unnamed') })}</Text>
+            <Text style={styles.subtitle}>{t('report.subtitle', { name: subject ?? (spot?.name || t('webview.unnamed')) })}</Text>
 
             {!user ? (
               <Text style={styles.text}>{t('report.loginText')}</Text>
@@ -96,7 +101,7 @@ export default function ReportModal({ spot, onClose }: ReportModalProps) {
               <>
                 <Text style={styles.sectionTitle} accessibilityRole="header">{t('report.reasonLabel')}</Text>
                 <View style={styles.reasons} accessibilityRole="radiogroup">
-                  {REPORT_REASONS.map((r) => (
+                  {(endpoint ? CONTENT_REASONS : REPORT_REASONS).map((r) => (
                     <ChoicePill
                       key={r}
                       display={false}

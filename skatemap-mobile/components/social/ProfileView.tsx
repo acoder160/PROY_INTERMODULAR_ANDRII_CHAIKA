@@ -9,6 +9,7 @@ import { DisplayFont, MIN_TARGET, Palette, Radius } from '../../constants/theme'
 import GradientFill from '../ui/GradientFill';
 import Avatar from './Avatar';
 import SpotCard from './SpotCard';
+import ReportModal from '../ReportModal';
 import { formatMonthYear } from '../../utils/social';
 
 type Tab = 'spots' | 'followers' | 'following';
@@ -25,6 +26,7 @@ interface Profile {
   followers: number;
   following: number;
   followedByMe: boolean;
+  blockedByMe?: boolean;
   me: boolean;
 }
 
@@ -60,6 +62,37 @@ export default function ProfileView({ username }: { username: string }) {
       .catch(() => { if (!cancelled) setList([]); });
     return () => { cancelled = true; };
   }, [username, tab, reloadKey]);
+
+  const [reporting, setReporting] = useState(false);
+
+  const applyBlock = async () => {
+    if (!profile) return;
+    setBusy(true);
+    try {
+      const path = `/users/${encodeURIComponent(username)}/block`;
+      if (profile.blockedByMe) await api.delete(path); else await api.put(path);
+      setProfile({
+        ...profile,
+        blockedByMe: !profile.blockedByMe,
+        followedByMe: false,
+        followers: profile.followedByMe ? Math.max(0, profile.followers - 1) : profile.followers,
+      });
+    } catch {
+      Alert.alert(t('popup.sendErrorConnection'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const toggleBlock = () => {
+    if (!user) { router.push('/login'); return; }
+    if (!profile) return;
+    if (profile.blockedByMe) { applyBlock(); return; }
+    Alert.alert(t('safety.block'), t('safety.blockConfirm', { username }), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('safety.block'), style: 'destructive', onPress: applyBlock },
+    ]);
+  };
 
   const toggleFollow = async () => {
     if (!user) { router.push('/login'); return; }
@@ -126,18 +159,35 @@ export default function ProfileView({ username }: { username: string }) {
               </TouchableOpacity>
             </>
           ) : (
-            <TouchableOpacity
-              style={[profile.followedByMe ? styles.outlineBtn : styles.primaryBtn, busy && { opacity: 0.6 }]}
-              onPress={toggleFollow}
-              disabled={busy}
-              accessibilityRole="button"
-              accessibilityState={{ selected: profile.followedByMe }}
-            >
-              {!profile.followedByMe && <GradientFill name="pink" radius={24} />}
-              <Text style={styles.outlineText}>{profile.followedByMe ? t('social.followingState') : t('social.follow')}</Text>
-            </TouchableOpacity>
+            <>
+              {!profile.blockedByMe && (
+                <TouchableOpacity
+                  style={[profile.followedByMe ? styles.outlineBtn : styles.primaryBtn, busy && { opacity: 0.6 }]}
+                  onPress={toggleFollow}
+                  disabled={busy}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: profile.followedByMe }}
+                >
+                  {!profile.followedByMe && <GradientFill name="pink" radius={24} />}
+                  <Text style={styles.outlineText}>{profile.followedByMe ? t('social.followingState') : t('social.follow')}</Text>
+                </TouchableOpacity>
+              )}
+              {!!user && (
+                <>
+                  <TouchableOpacity style={[styles.outlineBtn, busy && { opacity: 0.6 }]} onPress={toggleBlock} disabled={busy} accessibilityRole="button">
+                    <Text style={styles.outlineText}>{profile.blockedByMe ? t('safety.unblock') : t('safety.block')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.iconBtn} onPress={() => setReporting(true)} accessibilityRole="button" accessibilityLabel={t('report.title')}>
+                    <Ionicons name="flag-outline" size={20} color={Palette.ink} />
+                  </TouchableOpacity>
+                </>
+              )}
+            </>
           )}
         </View>
+        {reporting && (
+          <ReportModal endpoint={`/users/${encodeURIComponent(username)}/reports`} subject={username} onClose={() => setReporting(false)} />
+        )}
 
         <View style={styles.stats}>
           <Text style={styles.statLabel}>{t('social.ratingsCount')} <Text style={styles.statValue}>{profile.ratings}</Text></Text>

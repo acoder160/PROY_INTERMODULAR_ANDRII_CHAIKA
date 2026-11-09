@@ -14,6 +14,7 @@ export default function RegisterPage() {
     password: ''
   });
   const [error, setError] = useState('');
+  const [accepted, setAccepted] = useState(false);
 
   // isLoading bloquea el botón al instante
   const [isLoading, setIsLoading] = useState(false);
@@ -116,11 +117,24 @@ export default function RegisterPage() {
               value={formData.password}
               onChange={handleChange}
               required
-              minLength={6}
+              minLength={8}
             />
           </div>
 
-          <button type="submit" className="auth-button" disabled={isLoading}>
+          <label className="auth-consent">
+            <input
+              type="checkbox"
+              checked={accepted}
+              onChange={(e) => setAccepted(e.target.checked)}
+              required
+            />
+            <span>
+              {t('auth.acceptTerms')}{' '}
+              <Link to="/legal" target="_blank" className="auth-link">{t('legal.link')}</Link>
+            </span>
+          </label>
+
+          <button type="submit" className="auth-button" disabled={isLoading || !accepted}>
             {isLoading ? t('auth.registering') : t('auth.createAccount')}
           </button>
         </form>

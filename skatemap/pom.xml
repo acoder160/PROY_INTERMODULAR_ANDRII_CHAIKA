@@ -91,6 +91,12 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- Live check-in counts pushed to the map over WebSocket (STOMP) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
         <!-- Only /actuator/health is exposed: Docker healthcheck and uptime monitors -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

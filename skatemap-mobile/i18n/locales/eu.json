@@ -102,7 +102,9 @@
     "googleFailed": "Ezin izan da Googlerekin sartu. Saiatu berriro.",
     "tryDemo": "Probatu demoa",
     "demoHint": "Izena eman gabe: proba-kontu partekatu bat.",
-    "demoFailed": "Demoa ez dago erabilgarri orain. Saiatu geroago."
+    "demoFailed": "Demoa ez dago erabilgarri orain. Saiatu geroago.",
+    "acceptTerms": "14 urte edo gehiago ditut eta onartzen ditut",
+    "acceptRequired": "Baieztatu 14 urte edo gehiago dituzula eta arauak onartzen dituzula."
   },
   "admin": {
     "backToMap": "Itzuli mapara",
@@ -173,7 +175,17 @@
     "textRejected": "Izenak edo deskribapenak arauak urratzen ditu (spama, eduki desegokia edo zentzugabekeria).",
     "demoReadonly": "Ez dago erabilgarri demo kontuan. Sortu zure kontua probatzeko.",
     "notOwner": "Zure argitalpenak soilik alda ditzakezu.",
-    "cannotFollowSelf": "Ezin diozu zeure buruari jarraitu."
+    "cannotFollowSelf": "Ezin diozu zeure buruari jarraitu.",
+    "checkinTooFar": "Spotean egon behar duzu (300 m barruan) check-in egiteko.",
+    "sessionBadTime": "Aukeratu ordu bat oraintik 30 egunera bitartean.",
+    "hostCannotLeave": "You host this session. Cancel it instead of leaving.",
+    "alreadyCheckedIn": "You are already checked in.",
+    "alreadyJoined": "You already joined this session.",
+    "duplicateCandidate": "There is already a spot here.",
+    "sessionOver": "Saio hau amaitu da.",
+    "sessionLimit": "Dagoeneko 10 saio dituzu laster.",
+    "blocked": "Ezin duzu erabiltzaile hau jarraitu.",
+    "cannotBlockSelf": "Ezin duzu zeure burua blokeatu."
   },
   "types": {
     "STREET": "Kalea",
@@ -275,13 +287,18 @@
     "activity": {
       "SPOT_CREATED": "spot bat gehitu du",
       "COMMENTED": "spot bati iruzkina egin dio",
-      "RATED": "spot bat baloratu du"
+      "RATED": "spot bat baloratu du",
+      "CHECKED_IN": "spot batean irristatzen ari da",
+      "SESSION_CREATED": "saio bat antolatu du"
     },
     "notif": {
       "FOLLOW": "zu jarraitzen hasi da",
       "COMMENT_ON_SPOT": "zure {{spot}} spotari iruzkina egin dio",
       "REPLY": "zure iruzkinari erantzun dio",
-      "COMMENT_LIKE": "zure iruzkina gustatu zaio"
+      "COMMENT_LIKE": "zure iruzkina gustatu zaio",
+      "SESSION_JOINED": "zure {{spot}} saiora dator",
+      "SESSION_REMINDER": "Zure {{spot}} saioa laster hasiko da",
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
     },
     "reply": "Erantzun",
     "replyingTo": "Erantzuna {{username}}(r)i",
@@ -302,5 +319,76 @@
     "deleteSpot": "Ezabatu spota",
     "deleteSpotConfirm": "Spot hau ezabatu? Argazkia, balorazioak eta iruzkinak ere ezabatuko dira.",
     "loadFailed": "Ezin izan da kargatu. Egiaztatu konexioa eta saiatu berriro."
+  },
+  "live": {
+    "title": "Zuzenean",
+    "skatingNow": "Orain irristatzen: {{count}}",
+    "nobody": "Orain ez dago inor hemen irristatzen",
+    "imHere": "Hemen nago",
+    "leave": "Joan",
+    "needLocation": "Baimendu kokapena eta egon spotean check-in egiteko.",
+    "sessions": "Saioak",
+    "noSessions": "Oraindik ez dago saiorik antolatuta.",
+    "planSession": "Antolatu saio bat",
+    "when": "Noiz",
+    "note": "Oharra (aukerakoa)",
+    "notePlaceholder": "Game of SKATE, grabaketa, hasiberriak ongi etorri…",
+    "create": "Sortu",
+    "join": "Batu",
+    "joined": "Banoa",
+    "cancelSession": "Bertan behera utzi",
+    "cancelConfirm": "Saio hau bertan behera utzi?",
+    "going": "Doaz: {{count}}",
+    "hostedBy": "Antolatzailea: {{username}}"
+  },
+  "ai": {
+    "suggesting": "AI is filling in the details from your photo…"
+  },
+  "duplicate": {
+    "title": "Is this the same spot?",
+    "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
+    "openExisting": "Open it",
+    "createAnyway": "It's different, create it"
+  },
+  "search": {
+    "placeholder": "Try “smooth ledges for beginners near me”",
+    "submit": "Search spots",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "results": "{{count}} spots found",
+    "noResults": "No spots match. Try different words.",
+    "noAi": "Keyword search (AI unavailable)",
+    "failed": "Search isn't available right now.",
+    "chipRating": "{{value}}★ and up",
+    "chipDistance": "within {{km}} km"
+  },
+  "weather": {
+    "label": "Weather",
+    "DRY": "Dry",
+    "WET": "Wet ground",
+    "RAIN": "Raining"
+  },
+  "addSpot": {
+    "mobileOnly": {
+      "title": "Add spots from the app",
+      "body": "Adding a spot needs your phone's camera and GPS, so it's only available in the mobile app.",
+      "get": "Get the app",
+      "soon": "App download coming soon"
+    }
+  },
+  "safety": {
+    "block": "Blokeatu",
+    "unblock": "Desblokeatu",
+    "blockConfirm": "{{username}} blokeatu? Ez dituzu haren iruzkinak ikusiko eta ezin izango duzue elkar jarraitu.",
+    "queueTitle": "Reports",
+    "queueEmpty": "No open reports.",
+    "target": {
+      "COMMENT": "Comment",
+      "USER": "Profile"
+    },
+    "by": "by {{username}}",
+    "removeComment": "Remove comment",
+    "clearProfile": "Clear bio and photo",
+    "dismiss": "Dismiss"
   }
 }

@@ -42,7 +42,9 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow SkateMap to use your location to show nearby skate spots."
+          "locationWhenInUsePermission": "Allow SkateMap to use your location to show nearby skate spots.",
+          "isAndroidBackgroundLocationEnabled": false,
+          "isIosBackgroundLocationEnabled": false
         }
       ],
       "expo-font",

@@ -496,3 +496,292 @@
 .detail-report:hover {
   color: var(--danger);
 }
+
+/* ---------- Live: skaters at a spot right now ---------- */
+.spot-icon {
+  position: relative;
+}
+
+.live-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--ink);
+  border-radius: 11px;
+  background: var(--paint-pink);
+  color: var(--ink);
+  font: 900 13px/1 var(--display);
+  box-shadow: 0 0 0 0 rgba(255, 79, 163, 0.6);
+  animation: live-pulse 2s ease-out infinite;
+}
+
+/* A bubble with someone skating inside gets a pink ring instead of the white one */
+.marker-cluster.has-live div {
+  border-color: var(--paint-pink) !important;
+}
+
+@keyframes live-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 79, 163, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 79, 163, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 79, 163, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-badge { animation: none; }
+}
+
+/* ---------- Live section of the spot sheet ---------- */
+.live-section {
+  margin-top: 18px;
+  padding: 14px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-card);
+}
+
+.live-now {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-now-text {
+  flex: 1;
+  margin: 0;
+  font-weight: 700;
+}
+
+.live-dot {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--hairline);
+}
+
+.live-dot.is-on {
+  background: var(--paint-pink);
+  animation: live-pulse 2s ease-out infinite;
+}
+
+.live-people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.live-sessions-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+}
+
+.live-title {
+  margin: 0;
+  font: 700 20px/1 var(--display);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.live-session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.live-session {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #F2F2EF;
+}
+
+.live-session-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.live-session-time {
+  margin: 0;
+  font: 900 18px/1.1 var(--display);
+  text-transform: uppercase;
+}
+
+.live-session-note {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.live-session-meta {
+  margin: 4px 0 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.live-plan {
+  margin-top: 12px;
+}
+
+.live-plan-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.feed-session {
+  margin: 0;
+  font: 900 18px/1.1 var(--display);
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot.is-on { animation: none; }
+}
+
+/* ---------- Búsqueda en lenguaje natural, bajo la barra superior ---------- */
+.map-search {
+  position: absolute;
+  top: calc(76px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  width: min(560px, calc(100% - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.map-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--min-target);
+  padding: 0 14px;
+  border: 2px solid var(--ink);
+  border-radius: 24px;
+  background: var(--sheet);
+  color: var(--ink);
+  box-shadow: var(--shadow-float);
+}
+
+.map-search-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  padding: 8px 0;
+}
+
+.map-search-box:focus-within {
+  outline: 3px solid var(--paint-pink);
+  outline-offset: 2px;
+}
+
+.map-search-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+}
+
+.map-search-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 2px solid var(--sheet);
+  border-radius: 16px;
+  background: var(--asphalt);
+  color: var(--sheet);
+  font-size: 14px;
+}
+
+.map-search-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.map-search-chip {
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--paint-pink);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.map-search-hint {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* ---------- Añadir spot (solo informa: se crea desde la app) ---------- */
+.map-fab.map-fab-add {
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: fit-content;
+  max-width: calc(100% - 172px);
+  padding: 0 16px;
+  gap: 8px;
+  background: var(--paint-pink);
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.map-fab.map-fab-add:hover {
+  background: var(--paint-pink);
+  filter: brightness(1.06);
+}
+
+/* ---------- Tiempo en el spot ---------- */
+.weather-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0;
+  padding: 6px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.weather-badge.is-dry { background: var(--paint-yellow); }
+.weather-badge.is-wet { background: var(--sheet); }

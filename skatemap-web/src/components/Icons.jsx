@@ -137,3 +137,22 @@ export function StarIcon({ size = 22, filled = false }) {
     </svg>
   );
 }
+
+export const SearchIcon = make(<>
+  <circle cx="11" cy="11" r="6.5" />
+  <path d="M16 16l4.5 4.5" strokeWidth="2.4" />
+</>);
+
+export const PlusIcon = make(<path d="M12 5v14M5 12h14" strokeWidth="2.6" />);
+
+export const SunIcon = make(<>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4" />
+</>);
+
+export const DropIcon = make(<path d="M12 3.5c3 3.8 5.5 6.6 5.5 9.6a5.5 5.5 0 0 1-11 0c0-3 2.5-5.8 5.5-9.6z" />);
+
+export const RainIcon = make(<>
+  <path d="M7 14.5a4.5 4.5 0 0 1-.3-9 5.5 5.5 0 0 1 10.6 1.3A3.6 3.6 0 0 1 17 14.5z" />
+  <path d="M8 17.5l-1 2.5M12 17.5l-1 2.5M16 17.5l-1 2.5" />
+</>);

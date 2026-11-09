@@ -227,6 +227,9 @@ export default function AdminPage() {
     <div className="admin-page">
       <header className="admin-bar">
         <h1 className="admin-title">{t('admin.moderation')}</h1>
+        <button type="button" className="bar-pill" onClick={() => navigate('/admin/reports')}>
+          <span className="bar-pill-text">{t('safety.queueTitle')}</span>
+        </button>
         <button type="button" className="bar-pill bar-pill-account" onClick={() => navigate('/map')}>
           <span className="bar-pill-text">{t('admin.backToMap')}</span>
         </button>

@@ -9,18 +9,21 @@ import { AlertCircleIcon, CheckCircleIcon, FlagIcon } from './Icons';
 
 // Mismas razones que el backend (ReportReason) y que skatemap-mobile/components/ReportModal.tsx
 const REPORT_REASONS =['SPAM', 'INAPPROPRIATE', 'FAKE', 'WRONG_LOCATION', 'DANGEROUS', 'OTHER'];
+// Comments and profiles have no location, so those two reasons do not apply to them
+const CONTENT_REASONS = ['SPAM', 'INAPPROPRIATE', 'DANGEROUS', 'OTHER'];
 const MAX_COMMENT = 300;
 
 const errorKey = (error) => {
   const code = error.response?.data?.code;
   if (code === 'already_reported' || error.response?.status === 409) return 'report.already';
-  if (code === 'own_spot') return 'report.own';
+  if (code === 'own_spot' || code === 'own_content') return 'report.own';
   if (error.response?.status === 429) return 'report.tooMany';
   return 'report.failed';
 };
 
 // Hoja "Denunciar": razón obligatoria + detalle opcional. La revisión (IA + admin) va en segundo plano.
-export default function ReportSheet({ spot, onClose }) {
+// Sin `endpoint` denuncia el spot; con `endpoint` y `subject` denuncia un comentario o un perfil.
+export default function ReportSheet({ spot, endpoint, subject, onClose }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -42,7 +45,7 @@ export default function ReportSheet({ spot, onClose }) {
     setStatus('sending');
     setError(null);
     try {
-      await api.post(`/spots/${spot.id}/reports`, { reason, comment: comment.trim() || null });
+      await api.post(endpoint ?? `/spots/${spot.id}/reports`, { reason, comment: comment.trim() || null });
       setStatus('sent');
     } catch (err) {
       setError(t(errorKey(err)));
@@ -70,7 +73,7 @@ export default function ReportSheet({ spot, onClose }) {
 
   return (
     <Sheet open onClose={onClose} title={t('report.title')} footer={footer} className="report-sheet">
-      <p className="report-subtitle">{t('report.subtitle', { name: spot.name || t('webview.unnamed') })}</p>
+      <p className="report-subtitle">{t('report.subtitle', { name: subject ?? (spot?.name || t('webview.unnamed')) })}</p>
 
       {!user ? (
         <p className="report-text">{t('report.loginText')}</p>
@@ -83,7 +86,7 @@ export default function ReportSheet({ spot, onClose }) {
         <>
           <h3 className="sheet-section-title" id={reasonsId}>{t('report.reasonLabel')}</h3>
           <div className="report-reasons" role="radiogroup" aria-labelledby={reasonsId}>
-            {REPORT_REASONS.map((r) => (
+            {(endpoint ? CONTENT_REASONS : REPORT_REASONS).map((r) => (
               <ChoicePill
                 key={r}
                 display={false}

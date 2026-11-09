@@ -20,6 +20,8 @@ interface SpotFormModalProps {
   errorMessage?: string | null;
   /** Header text; "New spot" by default. Editing an existing spot passes its own. */
   title?: string;
+  /** The AI is reading the photo to fill in the form. */
+  suggesting?: boolean;
 }
 
 const TYPES = ['STREET', 'PARK', 'RAMPS', 'RAIL', 'LEDGE'];
@@ -34,7 +36,8 @@ export default function SpotFormModal({
   capturedPhoto,
   isUploading,
   errorMessage,
-  title
+  title,
+  suggesting = false,
 }: SpotFormModalProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -93,6 +96,13 @@ export default function SpotFormModal({
                   <Ionicons name="checkmark-circle" size={16} color={Palette.positive} />
                   <Text style={styles.photoTagText}>{cleanLabel(t('form.photoCaptured'))}</Text>
                 </View>
+              </View>
+            )}
+
+            {suggesting && (
+              <View style={styles.suggesting} accessibilityLiveRegion="polite">
+                <ActivityIndicator size="small" color={Palette.ink} />
+                <Text style={styles.suggestingText}>{t('ai.suggesting')}</Text>
               </View>
             )}
 
@@ -194,6 +204,8 @@ export default function SpotFormModal({
 }
 
 const styles = StyleSheet.create({
+  suggesting: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 },
+  suggestingText: { fontSize: 14, fontWeight: '700', color: Palette.ink, flexShrink: 1 },
   overlay: { flex: 1, backgroundColor: 'rgba(28,28,28,0.6)', justifyContent: 'flex-end' },
   sheet: {
     backgroundColor: Palette.sheet,

@@ -73,6 +73,11 @@ public class AiModerationService {
                 new Provider("groq gpt-oss-safeguard-20b", GROQ_URL, groqApiKey, "openai/gpt-oss-safeguard-20b"));
     }
 
+    /** The general-purpose text models (not the safeguard one): other text features reuse this chain. */
+    public List<Provider> textProviders() {
+        return providers.subList(0, providers.size() - 1);
+    }
+
     public boolean isContentAllowed(String textToAnalyze) {
         if (textToAnalyze == null || textToAnalyze.trim().isEmpty()) {
             return false;

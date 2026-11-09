@@ -19,7 +19,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
      * Activity on hidden spots or deleted comments is left out.
      */
     @Query("SELECT a FROM Activity a JOIN FETCH a.actor "
-            + "LEFT JOIN FETCH a.spot s LEFT JOIN FETCH a.comment c "
+            + "LEFT JOIN FETCH a.spot s LEFT JOIN FETCH a.comment c LEFT JOIN FETCH a.session "
             + "WHERE a.actor.id IN (SELECT f.followee.id FROM Follow f WHERE f.follower.id = :userId) "
             + "AND a.id < :before "
             + "AND (s IS NULL OR s.status = :visible) "
@@ -27,6 +27,10 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
             + "ORDER BY a.id DESC")
     List<Activity> feed(@Param("userId") Long userId, @Param("before") Long before,
                         @Param("visible") SpotStatus visible, Pageable pageable);
+
+    /** Throttle: has this actor produced an activity of this type since {@code since}? */
+    boolean existsByActorIdAndTypeAndCreatedAtAfter(Long actorId, skatemap.entity.enums.ActivityType type,
+                                                    java.time.LocalDateTime since);
 
     @Modifying
     @Query("DELETE FROM Activity a WHERE a.actor.id = :userId")

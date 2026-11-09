@@ -293,3 +293,19 @@
     font-size: 34px;
   }
 }
+
+.auth-consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 4px 0 14px;
+  cursor: pointer;
+}
+.auth-consent input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  flex: none;
+}

@@ -19,7 +19,7 @@ def get_random_endpoint():
     endpoints = [
         "/api/spots",
         f"/api/spots/nearby?lat={lat}&lng={lng}&radius=5000",
-        f"/api/spots/{spot_id}/my-rating",
+        f"/api/ratings/check/{spot_id}",
         f"/api/spots/{spot_id}/comments"
     ]
     

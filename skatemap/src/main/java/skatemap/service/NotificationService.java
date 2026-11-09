@@ -11,6 +11,7 @@ import skatemap.dto.SocialDtos.UserSummary;
 import skatemap.entity.Comment;
 import skatemap.entity.Notification;
 import skatemap.entity.Spot;
+import skatemap.entity.SkateSession;
 import skatemap.entity.User;
 import skatemap.entity.enums.NotificationType;
 import skatemap.repository.NotificationRepository;
@@ -34,9 +35,11 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final ApplicationEventPublisher events;
     private final UserLookup userLookup;
+    private final skatemap.repository.UserBlockRepository blockRepository;
 
     public NotificationService(NotificationRepository notificationRepository, ApplicationEventPublisher events,
-                               UserLookup userLookup) {
+                               UserLookup userLookup, skatemap.repository.UserBlockRepository blockRepository) {
+        this.blockRepository = blockRepository;
         this.notificationRepository = notificationRepository;
         this.events = events;
         this.userLookup = userLookup;
@@ -44,13 +47,32 @@ public class NotificationService {
 
     /** Nobody is notified about their own actions, deleted accounts get nothing. */
     public void notify(User recipient, User actor, NotificationType type, Spot spot, Comment comment) {
-        if (recipient == null || recipient.getId().equals(actor.getId()) || recipient.isDeleted()) return;
+        notify(recipient, actor, type, spot, comment, null);
+    }
+
+    public void notify(User recipient, User actor, NotificationType type, Spot spot, Comment comment, SkateSession session) {
+        if (recipient == null || recipient.getId().equals(actor.getId())) return;
+        save(recipient, actor, type, spot, comment, session);
+    }
+
+    /** "Your session starts soon": the host gets it too, so self-notifications are allowed here. */
+    public void remind(User recipient, User host, Spot spot, SkateSession session) {
+        save(recipient, host, NotificationType.SESSION_REMINDER, spot, null, session);
+    }
+
+    private void save(User recipient, User actor, NotificationType type, Spot spot, Comment comment, SkateSession session) {
+        if (recipient == null || recipient.isDeleted()) return;
+        // Someone you blocked cannot reach you, not even with a like
+        if (type != NotificationType.SESSION_REMINDER
+                && blockRepository.existsByBlockerIdAndBlockedId(recipient.getId(), actor.getId())) return;
         if (type == NotificationType.COMMENT_LIKE && comment != null
                 && notificationRepository.existsByRecipientIdAndActorIdAndTypeAndCommentId(
                         recipient.getId(), actor.getId(), type, comment.getId())) {
             return;
         }
-        Notification saved = notificationRepository.save(new Notification(recipient, actor, type, spot, comment));
+        Notification notification = new Notification(recipient, actor, type, spot, comment);
+        notification.setSession(session);
+        Notification saved = notificationRepository.save(notification);
         events.publishEvent(new Created(saved.getId()));
     }
 
@@ -78,7 +100,7 @@ public class NotificationService {
         return new NotificationItem(n.getId(), n.getType(), UserSummary.of(n.getActor()), SpotSummary.of(n.getSpot()),
                 c == null ? null : c.getId(),
                 c == null || c.isDeleted() ? null : snippet(c.getContent()),
-                n.getReadAt() != null, n.getCreatedAt());
+                FeedService.sessionRef(n.getSession()), n.getReadAt() != null, n.getCreatedAt());
     }
 
     static String snippet(String text) {

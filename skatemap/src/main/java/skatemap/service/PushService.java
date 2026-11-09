@@ -178,6 +178,21 @@ public class PushService {
                     case "ru" -> "Лайк вашему комментарию от " + actor;
                     default -> actor + " liked your comment";
                 };
+                case SESSION_JOINED -> switch (lang) {
+                    case "es" -> actor + " se apunta a tu sesión en " + spot;
+                    case "ru" -> actor + " идёт на вашу сессию: " + spot;
+                    default -> actor + " joined your session at " + spot;
+                };
+                case FOLLOWEE_CHECKED_IN -> switch (lang) {
+                    case "es" -> actor + " está patinando en " + spot;
+                    case "ru" -> actor + " катается на «" + spot + "»";
+                    default -> actor + " is skating at " + spot;
+                };
+                case SESSION_REMINDER -> switch (lang) {
+                    case "es" -> "Tu sesión en " + spot + " empieza pronto";
+                    case "ru" -> "Сессия на «" + spot + "» скоро начнётся";
+                    default -> "Your session at " + spot + " starts soon";
+                };
             };
             return new String[]{title, body};
         }

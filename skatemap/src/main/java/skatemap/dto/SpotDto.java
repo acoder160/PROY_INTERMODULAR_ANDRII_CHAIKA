@@ -42,6 +42,9 @@ public class SpotDto {
     @Size(max = 500)
     private String mediaUrl;
 
+    /** Request only: create even though a possible duplicate was found (the user confirmed). */
+    private Boolean force;
+
     public SpotDto() {}
 
     public Long getId() { return id; }
@@ -64,4 +67,7 @@ public class SpotDto {
     public void setSurfaceRating(Double surfaceRating) { this.surfaceRating = surfaceRating; }
     public String getMediaUrl() { return mediaUrl; }
     public void setMediaUrl(String mediaUrl) { this.mediaUrl = mediaUrl; }
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
+    public Boolean getForce() { return force; }
+    public void setForce(Boolean force) { this.force = force; }
 }

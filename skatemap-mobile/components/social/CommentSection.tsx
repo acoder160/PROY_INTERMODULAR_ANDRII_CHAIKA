@@ -10,6 +10,7 @@ import { DisplayFont, MIN_TARGET, Palette, Radius } from '../../constants/theme'
 import GradientFill from '../ui/GradientFill';
 import { StarRating } from '../ui/PaintBits';
 import Avatar from './Avatar';
+import ReportModal from '../ReportModal';
 
 const COMMENT_ERRORS = { text_rejected: 'social.commentRejected' };
 
@@ -212,6 +213,7 @@ function CommentItem({ comment, threadId, spotId, me, onPatch, onRemove, onRepli
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reporting, setReporting] = useState(false);
   const mine = Boolean(me) && comment.username === me;
 
   if (comment.deleted) {
@@ -308,6 +310,11 @@ function CommentItem({ comment, threadId, spotId, me, onPatch, onRemove, onRepli
             <Text style={styles.actionText}>{t('social.reply')}</Text>
           </TouchableOpacity>
         )}
+        {!!me && !mine && !comment.authorDeleted && (
+          <TouchableOpacity style={styles.action} onPress={() => setReporting(true)} accessibilityRole="button" accessibilityLabel={t('report.title')}>
+            <Ionicons name="flag-outline" size={18} color={Palette.inkMuted} />
+          </TouchableOpacity>
+        )}
         {mine && (
           <>
             <TouchableOpacity style={styles.action} onPress={() => open('edit')} accessibilityRole="button" accessibilityLabel={t('social.edit')}>
@@ -319,6 +326,10 @@ function CommentItem({ comment, threadId, spotId, me, onPatch, onRemove, onRepli
           </>
         )}
       </View>
+
+      {reporting && (
+        <ReportModal endpoint={`/comments/${comment.id}/reports`} subject={author} onClose={() => setReporting(false)} />
+      )}
 
       {mode && (
         <View style={styles.inputRow}>

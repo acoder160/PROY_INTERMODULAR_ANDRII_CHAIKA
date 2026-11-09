@@ -102,7 +102,9 @@
     "googleFailed": "Inloggen met Google is mislukt. Probeer het opnieuw.",
     "tryDemo": "Probeer de demo",
     "demoHint": "Zonder registratie: een gedeeld testaccount.",
-    "demoFailed": "De demo is nu niet beschikbaar. Probeer het later opnieuw."
+    "demoFailed": "De demo is nu niet beschikbaar. Probeer het later opnieuw.",
+    "acceptTerms": "Ik ben 14 jaar of ouder en accepteer de",
+    "acceptRequired": "Bevestig dat je 14 jaar of ouder bent en de regels accepteert."
   },
   "admin": {
     "backToMap": "Terug naar de kaart",
@@ -173,7 +175,17 @@
     "textRejected": "De naam of beschrijving overtreedt de regels (spam, ongepaste inhoud of onzin).",
     "demoReadonly": "Niet beschikbaar met het demo-account. Maak je eigen account om dit te proberen.",
     "notOwner": "Je kunt alleen je eigen berichten wijzigen.",
-    "cannotFollowSelf": "Je kunt jezelf niet volgen."
+    "cannotFollowSelf": "Je kunt jezelf niet volgen.",
+    "checkinTooFar": "Je moet bij de spot zijn (binnen 300 m) om in te checken.",
+    "sessionBadTime": "Kies een tijd tussen nu en over 30 dagen.",
+    "hostCannotLeave": "You host this session. Cancel it instead of leaving.",
+    "alreadyCheckedIn": "You are already checked in.",
+    "alreadyJoined": "You already joined this session.",
+    "duplicateCandidate": "There is already a spot here.",
+    "sessionOver": "Deze sessie is voorbij.",
+    "sessionLimit": "Je hebt al 10 komende sessies.",
+    "blocked": "Je kunt deze gebruiker niet volgen.",
+    "cannotBlockSelf": "Je kunt jezelf niet blokkeren."
   },
   "types": {
     "STREET": "Street",
@@ -275,13 +287,18 @@
     "activity": {
       "SPOT_CREATED": "heeft een spot toegevoegd",
       "COMMENTED": "heeft op een spot gereageerd",
-      "RATED": "heeft een spot beoordeeld"
+      "RATED": "heeft een spot beoordeeld",
+      "CHECKED_IN": "skatet bij een spot",
+      "SESSION_CREATED": "heeft een sessie gepland"
     },
     "notif": {
       "FOLLOW": "volgt je nu",
       "COMMENT_ON_SPOT": "heeft op je spot {{spot}} gereageerd",
       "REPLY": "heeft op je reactie geantwoord",
-      "COMMENT_LIKE": "vindt je reactie leuk"
+      "COMMENT_LIKE": "vindt je reactie leuk",
+      "SESSION_JOINED": "komt naar je sessie bij {{spot}}",
+      "SESSION_REMINDER": "Je sessie bij {{spot}} begint zo",
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
     },
     "reply": "Beantwoorden",
     "replyingTo": "Antwoord aan {{username}}",
@@ -302,5 +319,76 @@
     "deleteSpot": "Spot verwijderen",
     "deleteSpotConfirm": "Deze spot verwijderen? De foto, beoordelingen en reacties verdwijnen ook.",
     "loadFailed": "Laden mislukt. Controleer je verbinding en probeer het opnieuw."
+  },
+  "live": {
+    "title": "Live",
+    "skatingNow": "Nu aan het skaten: {{count}}",
+    "nobody": "Er skatet hier nu niemand",
+    "imHere": "Ik ben hier",
+    "leave": "Weggaan",
+    "needLocation": "Geef toegang tot je locatie en wees bij de spot om in te checken.",
+    "sessions": "Sessies",
+    "noSessions": "Nog geen sessies gepland.",
+    "planSession": "Sessie plannen",
+    "when": "Wanneer",
+    "note": "Notitie (optioneel)",
+    "notePlaceholder": "Game of SKATE, filmen, beginners welkom…",
+    "create": "Aanmaken",
+    "join": "Meedoen",
+    "joined": "Ik ga",
+    "cancelSession": "Annuleren",
+    "cancelConfirm": "Deze sessie annuleren?",
+    "going": "Gaan: {{count}}",
+    "hostedBy": "Host: {{username}}"
+  },
+  "ai": {
+    "suggesting": "AI is filling in the details from your photo…"
+  },
+  "duplicate": {
+    "title": "Is this the same spot?",
+    "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
+    "openExisting": "Open it",
+    "createAnyway": "It's different, create it"
+  },
+  "search": {
+    "placeholder": "Try “smooth ledges for beginners near me”",
+    "submit": "Search spots",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "results": "{{count}} spots found",
+    "noResults": "No spots match. Try different words.",
+    "noAi": "Keyword search (AI unavailable)",
+    "failed": "Search isn't available right now.",
+    "chipRating": "{{value}}★ and up",
+    "chipDistance": "within {{km}} km"
+  },
+  "weather": {
+    "label": "Weather",
+    "DRY": "Dry",
+    "WET": "Wet ground",
+    "RAIN": "Raining"
+  },
+  "addSpot": {
+    "mobileOnly": {
+      "title": "Add spots from the app",
+      "body": "Adding a spot needs your phone's camera and GPS, so it's only available in the mobile app.",
+      "get": "Get the app",
+      "soon": "App download coming soon"
+    }
+  },
+  "safety": {
+    "block": "Blokkeren",
+    "unblock": "Deblokkeren",
+    "blockConfirm": "{{username}} blokkeren? Je ziet hun reacties niet meer en jullie kunnen elkaar niet meer volgen.",
+    "queueTitle": "Reports",
+    "queueEmpty": "No open reports.",
+    "target": {
+      "COMMENT": "Comment",
+      "USER": "Profile"
+    },
+    "by": "by {{username}}",
+    "removeComment": "Remove comment",
+    "clearProfile": "Clear bio and photo",
+    "dismiss": "Dismiss"
   }
 }

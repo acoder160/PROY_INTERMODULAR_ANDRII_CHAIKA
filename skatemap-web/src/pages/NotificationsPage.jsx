@@ -68,7 +68,8 @@ export default function NotificationsPage() {
                   <Avatar username={n.actor.username} url={n.actor.avatarUrl} size={40} />
                   <span className="notif-body">
                     <span className="notif-line">
-                      <strong>{actor}</strong> {t(`social.notif.${n.type}`, { spot: n.spot?.name ?? '' })}
+                      {n.type !== 'SESSION_REMINDER' && <><strong>{actor}</strong>{' '}</>}
+                      {t(`social.notif.${n.type}`, { spot: n.spot?.name ?? '' })}
                     </span>
                     {n.comment && <span className="notif-quote">{n.comment}</span>}
                     <span className="feed-time">{timeAgo(n.createdAt, i18n.language)}</span>

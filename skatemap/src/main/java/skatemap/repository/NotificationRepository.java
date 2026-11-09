@@ -15,7 +15,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     /** Newest first, keyset on id; served by idx_notifications_recipient. */
     @Query("SELECT n FROM Notification n JOIN FETCH n.actor "
-            + "LEFT JOIN FETCH n.spot LEFT JOIN FETCH n.comment "
+            + "LEFT JOIN FETCH n.spot LEFT JOIN FETCH n.comment LEFT JOIN FETCH n.session "
             + "WHERE n.recipient.id = :userId AND n.id < :before ORDER BY n.id DESC")
     List<Notification> page(@Param("userId") Long userId, @Param("before") Long before, Pageable pageable);
 

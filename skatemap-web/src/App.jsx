@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import MapPage from './pages/MapPage';
 import AdminPage from './pages/AdminPage';
+import AdminReportsPage from './pages/AdminReportsPage';
 import LegalPage from './pages/LegalPage';
 import ProfilePage from './pages/ProfilePage';
 import FeedPage from './pages/FeedPage';
@@ -26,6 +27,7 @@ function App() {
           <Route path="/map" element={<MapPage />} />
 
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/reports" element={<AdminReportsPage />} />
           <Route path="/legal" element={<LegalPage />} />
           {/* Social: profiles are public; feed, notifications and saved spots ask for an account */}
           <Route path="/u/:username" element={<ProfilePage />} />

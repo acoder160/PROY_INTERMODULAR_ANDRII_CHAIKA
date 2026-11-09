@@ -212,18 +212,43 @@ public class ImageModerationService {
         return new ReportReview(verdict, target, category, confidence, explanation, false);
     }
 
+    /** Any JSON question about a photo, through the same vision chain (Groq models, then OpenAI). */
+    public JsonNode askAboutPhoto(String systemPrompt, String text, String mediaUrl, int maxTokens) {
+        return askVision(systemPrompt, text, CloudinaryAssets.previewUrl(mediaUrl), maxTokens);
+    }
+
+    static final String SAME_SPOT_PROMPT = """
+            You compare two photos of skateboarding spots. Decide whether both show the SAME physical place
+            (same obstacles, ground and surroundings), possibly from another angle, distance or time of day.
+            Be conservative: two similar-looking but different places (e.g. two ledges of one plaza, or two
+            parks) are NOT the same unless you can tell they are. Answer ONLY with JSON:
+            {"sameSpot": true or false, "confidence": number from 0 to 1}""";
+
+    /** Do these two photos show the same place? Null when no vision model answered. */
+    public JsonNode comparePhotos(String urlA, String urlB) {
+        return askVisionImages(SAME_SPOT_PROMPT, "Photo 1 and photo 2 follow. Are they the same spot?",
+                java.util.Arrays.asList(CloudinaryAssets.previewUrl(urlA), CloudinaryAssets.previewUrl(urlB)), 100);
+    }
+
     private JsonNode askVision(String systemPrompt, String text, String imageUrl, int maxTokens) {
+        return askVisionImages(systemPrompt, text, imageUrl == null ? List.of() : List.of(imageUrl), maxTokens);
+    }
+
+    private JsonNode askVisionImages(String systemPrompt, String text, List<String> imageUrls, int maxTokens) {
         long deadline = System.currentTimeMillis() + BUDGET_MS;
         for (Provider provider : visionProviders) {
             if (System.currentTimeMillis() > deadline) break;
             Object content = text;
-            if (imageUrl != null) {
-                Map<String, Object> image = new LinkedHashMap<>();
-                image.put("url", imageUrl);
-                if (provider.isOpenAi()) image.put("detail", "low");
-                content = List.of(
-                        Map.of("type", "text", "text", text),
-                        Map.of("type", "image_url", "image_url", image));
+            if (!imageUrls.isEmpty() && imageUrls.stream().noneMatch(java.util.Objects::isNull)) {
+                List<Object> parts = new java.util.ArrayList<>();
+                parts.add(Map.of("type", "text", "text", text));
+                for (String imageUrl : imageUrls) {
+                    Map<String, Object> image = new LinkedHashMap<>();
+                    image.put("url", imageUrl);
+                    if (provider.isOpenAi()) image.put("detail", "low");
+                    parts.add(Map.of("type", "image_url", "image_url", image));
+                }
+                content = parts;
             }
             JsonNode answer = client.chatJson(provider, systemPrompt, content, maxTokens, true);
             if (answer != null) {

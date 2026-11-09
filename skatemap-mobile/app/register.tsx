@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
 import GoogleAuthButton from '../components/GoogleAuthButton';
+import { hasLegalPage, openLegalPage } from '../utils/legal';
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
@@ -13,6 +14,7 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [accepted, setAccepted] = useState(false);
   
   // Estado para saber si el servidor está tardando
   const [isWakingUp, setIsWakingUp] = useState(false);
@@ -33,6 +35,11 @@ export default function RegisterScreen() {
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
       setErrorMessage(t('auth.emailInvalid'));
+      return;
+    }
+
+    if (!accepted) {
+      setErrorMessage(t('auth.acceptRequired'));
       return;
     }
 
@@ -149,6 +156,23 @@ export default function RegisterScreen() {
             textContentType="newPassword"
           />
 
+          <View style={styles.consentRow}>
+            <TouchableOpacity
+              onPress={() => setAccepted(a => !a)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: accepted }}
+              style={[styles.checkbox, accepted && styles.checkboxOn]}
+            >
+              {accepted && <Text style={styles.checkMark}>✓</Text>}
+            </TouchableOpacity>
+            <Text style={styles.consentText} onPress={() => setAccepted(a => !a)}>
+              {t('auth.acceptTerms')}{' '}
+              {hasLegalPage && (
+                <Text style={styles.link} onPress={openLegalPage}>{t('legal.link')}</Text>
+              )}
+            </Text>
+          </View>
+
           <TouchableOpacity onPress={handleRegister} disabled={isLoading} activeOpacity={0.88}>
             <View style={styles.button}>
               <GradientFill name="pink" radius={26} />
@@ -192,6 +216,11 @@ const styles = StyleSheet.create({
   input: { backgroundColor: Palette.white, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12, minHeight: MIN_TARGET, marginBottom: 18, fontSize: 16, color: Palette.ink, borderWidth: 2, borderColor: Palette.white },
   button: { minHeight: 56, borderRadius: 28, backgroundColor: Palette.pink, borderWidth: 2, borderColor: Palette.ink, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
   buttonText: { color: Palette.ink, fontFamily: DisplayFont.black, fontSize: 24, letterSpacing: 1, textTransform: 'uppercase' },
+  consentRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 6 },
+  checkbox: { width: 28, height: 28, borderRadius: 8, borderWidth: 2, borderColor: Palette.white, alignItems: 'center', justifyContent: 'center' },
+  checkboxOn: { backgroundColor: Palette.pink, borderColor: Palette.ink },
+  checkMark: { color: Palette.ink, fontWeight: '900', fontSize: 18 },
+  consentText: { flex: 1, color: Palette.onAsphaltMuted, fontSize: 14, lineHeight: 19 },
   footer: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', marginTop: 16 },
   footerText: { color: Palette.onAsphaltMuted, fontSize: 15 },
   linkPill: { minHeight: MIN_TARGET, paddingHorizontal: 6, justifyContent: 'center' },

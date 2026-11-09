@@ -11,10 +11,12 @@ import Avatar from '../../components/social/Avatar';
 import SpotCard from '../../components/social/SpotCard';
 import { StarRating } from '../../components/ui/PaintBits';
 import { timeAgo, type SpotSummary, type UserSummary } from '../../utils/social';
+import { formatSessionTime } from '../../components/social/LiveSection';
 
 interface FeedItem {
   id: number;
-  type: 'SPOT_CREATED' | 'COMMENTED' | 'RATED';
+  type: 'SPOT_CREATED' | 'COMMENTED' | 'RATED' | 'CHECKED_IN' | 'SESSION_CREATED';
+  session: { id: number; startsAt: string } | null;
   actor: UserSummary;
   spot: SpotSummary | null;
   comment: string | null;
@@ -108,6 +110,7 @@ export default function FeedScreen() {
                 </View>
                 <Text style={styles.time}>{timeAgo(item.createdAt, i18n.language)}</Text>
                 {!!item.comment && <Text style={styles.quote}>{item.comment}</Text>}
+                {!!item.session && <Text style={styles.session}>{formatSessionTime(item.session.startsAt, i18n.language)}</Text>}
                 <SpotCard spot={item.spot} />
               </View>
             </View>
@@ -130,4 +133,5 @@ const styles = StyleSheet.create({
   time: { color: Palette.inkMuted, fontSize: 13, marginTop: -4 },
   quote: { fontSize: 15, color: Palette.ink, paddingVertical: 8, paddingHorizontal: 12, backgroundColor: '#F2F2EF', borderRadius: 10 },
   more: { minHeight: MIN_TARGET, fontFamily: DisplayFont.bold },
+  session: { fontFamily: DisplayFont.black, fontSize: 18, textTransform: 'uppercase', color: Palette.ink },
 });

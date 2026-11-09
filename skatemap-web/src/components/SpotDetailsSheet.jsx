@@ -8,12 +8,14 @@ import { TypeChip, DifficultyMarks, StarRating, PaintStrip } from './PaintBits';
 import { CameraIcon, NavigateIcon, CheckCircleIcon, AlertCircleIcon, ChevronIcon, FlagIcon, BookmarkIcon, ShareIcon, EditIcon, TrashIcon } from './Icons';
 import CommentSection from './CommentSection';
 import EditSpotSheet from './EditSpotSheet';
+import LiveSection from './LiveSection';
+import WeatherBadge from './WeatherBadge';
 import { apiErrorText, shareSpot } from '../utils/social';
 import { cleanLabel, directionsUrl, haversineKm } from '../utils/paint';
 
 // Hoja de detalle: equivale a skatemap-mobile/components/SpotDetailsModal.tsx.
 // El padre la monta con key={spot.id}, así el estado se reinicia al cambiar de spot.
-export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onSpotDeleted, onReport, isFavorite, onToggleFavorite, userLocation }) {
+export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onSpotDeleted, onReport, isFavorite, onToggleFavorite, liveCount = 0, userLocation }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -185,12 +187,16 @@ export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onSpotD
         {distanceText && <span className="detail-distance">{distanceText}</span>}
       </div>
 
+      <WeatherBadge spotId={spot.id} />
+
       {spot.description && <p className="detail-desc">{spot.description}</p>}
 
       <a className="btn-primary detail-directions" href={directionsUrl(spot)} target="_blank" rel="noopener noreferrer">
         <NavigateIcon size={22} />
         <span>{t('popup.directions')}</span>
       </a>
+
+      <LiveSection spot={spot} liveCount={liveCount} onClose={onClose} />
 
       <div className="rating-box">
         <span className="rating-number">{avgRating.toFixed(1)}</span>

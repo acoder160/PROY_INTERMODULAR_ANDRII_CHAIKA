@@ -53,11 +53,14 @@ public class CommentService {
     private final FeedService feedService;
     private final NotificationService notificationService;
     private final TransactionTemplate tx;
+    private final skatemap.repository.UserBlockRepository blockRepository;
 
     public CommentService(CommentRepository commentRepository, CommentLikeRepository likeRepository,
                           RatingRepository ratingRepository, SpotRepository spotRepository, UserLookup userLookup,
                           AiModerationService aiModerationService, FeedService feedService,
-                          NotificationService notificationService, PlatformTransactionManager transactionManager) {
+                          NotificationService notificationService, PlatformTransactionManager transactionManager,
+                          skatemap.repository.UserBlockRepository blockRepository) {
+        this.blockRepository = blockRepository;
         this.commentRepository = commentRepository;
         this.likeRepository = likeRepository;
         this.ratingRepository = ratingRepository;
@@ -113,12 +116,22 @@ public class CommentService {
     @Transactional(readOnly = true)
     public CursorPage<CommentDto> page(Long spotId, Long before, Integer limit) {
         int size = limit == null ? DEFAULT_PAGE : Math.max(1, Math.min(limit, MAX_PAGE));
-        List<Comment> top = commentRepository.findBySpotIdAndParentIsNullAndIdLessThanOrderByIdDesc(
+        List<Comment> fetched = commentRepository.findBySpotIdAndParentIsNullAndIdLessThanOrderByIdDesc(
                 spotId, NotificationService.cursor(before), PageRequest.of(0, size));
-        if (top.isEmpty()) return new CursorPage<>(List.of(), null);
+        if (fetched.isEmpty()) return new CursorPage<>(List.of(), null);
+        // Comments of people the viewer blocked stay hidden (their replies go with them). The cursor still
+        // advances over the fetched page, so a page can come back shorter than the limit.
+        Set<Long> blocked = userLookup.current()
+                .map(me -> (Set<Long>) new HashSet<>(blockRepository.blockedIds(me.getId())))
+                .orElse(Set.of());
+        List<Comment> top = fetched.stream().filter(c -> !blocked.contains(c.getUser().getId())).toList();
+        if (top.isEmpty()) {
+            return new CursorPage<>(List.of(), fetched.size() == size ? fetched.get(fetched.size() - 1).getId() : null);
+        }
 
         List<Long> topIds = top.stream().map(Comment::getId).toList();
-        List<Comment> replies = commentRepository.findByParentIdInOrderByIdAsc(topIds);
+        List<Comment> replies = commentRepository.findByParentIdInOrderByIdAsc(topIds).stream()
+                .filter(r -> !blocked.contains(r.getUser().getId())).toList();
 
         List<Long> allIds = new ArrayList<>(topIds);
         replies.forEach(r -> allIds.add(r.getId()));
@@ -140,7 +153,7 @@ public class CommentService {
         List<CommentDto> items = threads.values().stream()
                 .filter(t -> !t.isDeleted() || !t.getReplies().isEmpty())
                 .toList();
-        Long next = top.size() == size ? top.get(top.size() - 1).getId() : null;
+        Long next = fetched.size() == size ? fetched.get(fetched.size() - 1).getId() : null;
         return new CursorPage<>(items, next);
     }
 

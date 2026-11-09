@@ -30,6 +30,8 @@ export const setAccessToken = (token: string | null) => {
   accessToken = token;
 };
 
+export const getAccessToken = () => accessToken;
+
 export const saveRefreshToken = async (token: string) => {
   if (Platform.OS === 'web') {
     return;

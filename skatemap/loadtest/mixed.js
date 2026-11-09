@@ -1,4 +1,4 @@
-// Mixed load test: browsing + logins + comments. It WRITES comments and logs in many times,
+// Mixed load test: browsing + logins + comments + authenticated feed reads. It WRITES comments and logs in many times,
 // so run it only against a staging database, with rate limits off for the test:
 //
 //   backend:  RATE_LIMIT_ENABLED=false
@@ -32,6 +32,12 @@ export const options = {
       duration: '8m',
       preAllocatedVUs: 50,
     },
+    feed: {
+      executor: 'constant-vus',
+      exec: 'feedReader',
+      vus: 50,
+      duration: '8m',
+    },
     writers: {
       executor: 'constant-vus',
       exec: 'writer',
@@ -42,6 +48,7 @@ export const options = {
   thresholds: {
     http_req_failed: ['rate<0.01'],
     'http_req_duration{name:login}': ['p(95)<1000'],
+    'http_req_duration{name:feed}': ['p(95)<500'],
     'http_req_duration{name:comment}': ['p(95)<6000'], // includes AI moderation
   },
 };
@@ -78,4 +85,24 @@ export function writer(data) {
     { headers: { ...JSON_HEADERS, Authorization: `Bearer ${token}` }, tags: { name: 'comment' } });
   check(res, { 'comment ok': (r) => r.status === 200 });
   sleep(10 + Math.random() * 10);
+}
+
+// One login per VU, then page through the feed (first page + a keyset page).
+let feedToken = null;
+export function feedReader() {
+  if (!feedToken) {
+    feedToken = loginOnce();
+    if (!feedToken) { sleep(5); return; }
+  }
+  const headers = { ...JSON_HEADERS, Authorization: `Bearer ${feedToken}` };
+  const first = http.get(`${BASE_URL}/api/feed`, { headers, tags: { name: 'feed' } });
+  check(first, { 'feed ok': (r) => r.status === 200 });
+  if (first.status === 200) {
+    const cursor = first.json('nextCursor');
+    if (cursor) {
+      const next = http.get(`${BASE_URL}/api/feed?before=${cursor}`, { headers, tags: { name: 'feed' } });
+      check(next, { 'feed page 2 ok': (r) => r.status === 200 });
+    }
+  }
+  sleep(3 + Math.random() * 4);
 }

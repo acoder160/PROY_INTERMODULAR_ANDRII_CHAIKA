@@ -57,6 +57,11 @@ public class ProfileService {
     private final ImageModerationService imageModerationService;
     private final CloudinaryAssets cloudinaryAssets;
     private final PasswordEncoder passwordEncoder;
+    private final skatemap.repository.CheckinRepository checkinRepository;
+    private final skatemap.repository.SessionParticipantRepository participantRepository;
+    private final org.springframework.context.ApplicationEventPublisher eventPublisher;
+    private final skatemap.repository.UserBlockRepository blockRepository;
+    private final skatemap.repository.ContentReportRepository contentReportRepository;
 
     public ProfileService(UserLookup userLookup, UserRepository userRepository, SpotRepository spotRepository,
                           RatingRepository ratingRepository, CommentRepository commentRepository,
@@ -65,7 +70,17 @@ public class ProfileService {
                           NotificationRepository notificationRepository, PushTokenRepository pushTokenRepository,
                           NotificationService notificationService, RefreshTokenService refreshTokenService,
                           AiModerationService aiModerationService, ImageModerationService imageModerationService,
-                          CloudinaryAssets cloudinaryAssets, PasswordEncoder passwordEncoder) {
+                          CloudinaryAssets cloudinaryAssets, PasswordEncoder passwordEncoder,
+                          skatemap.repository.CheckinRepository checkinRepository,
+                          skatemap.repository.SessionParticipantRepository participantRepository,
+                          org.springframework.context.ApplicationEventPublisher eventPublisher,
+                          skatemap.repository.UserBlockRepository blockRepository,
+                          skatemap.repository.ContentReportRepository contentReportRepository) {
+        this.blockRepository = blockRepository;
+        this.contentReportRepository = contentReportRepository;
+        this.checkinRepository = checkinRepository;
+        this.participantRepository = participantRepository;
+        this.eventPublisher = eventPublisher;
         this.userLookup = userLookup;
         this.userRepository = userRepository;
         this.spotRepository = spotRepository;
@@ -150,11 +165,19 @@ public class ProfileService {
         String avatar = user.getAvatarUrl();
 
         followRepository.deleteAllOf(user.getId());
+        blockRepository.deleteAllOf(user.getId());
+        contentReportRepository.deleteAllOf(user.getId());
         favoriteRepository.deleteAllOf(user.getId());
         commentLikeRepository.deleteAllOf(user.getId());
         notificationRepository.deleteAllOf(user.getId());
         activityRepository.deleteAllOf(user.getId());
         pushTokenRepository.deleteAllOf(user.getId());
+        java.util.Set<Long> liveSpots = new java.util.LinkedHashSet<>(checkinRepository.activeSpotIds(user.getId()));
+        checkinRepository.deleteAllOf(user.getId());
+        if (!liveSpots.isEmpty()) {
+            eventPublisher.publishEvent(new LiveService.CountsChanged(liveSpots)); // maps drop the badge
+        }
+        participantRepository.deleteAllOf(user.getId());
 
         byte[] secret = new byte[32];
         new SecureRandom().nextBytes(secret);
@@ -186,7 +209,7 @@ public class ProfileService {
                 commentRepository.countByUserIdAndDeletedFalse(user.getId()),
                 followRepository.countByFolloweeId(user.getId()),
                 followRepository.countByFollowerId(user.getId()),
-                followed, me);
+                followed, me, viewer != null && !me && blockRepository.existsByBlockerIdAndBlockedId(viewer.getId(), user.getId()));
     }
 
     @Transactional(readOnly = true)
@@ -235,6 +258,9 @@ public class ProfileService {
         User followee = userLookup.require(followeeName);
         if (follower.getId().equals(followee.getId())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "cannot_follow_self", "You can't follow yourself");
+        }
+        if (blockRepository.existsBetween(follower.getId(), followee.getId())) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "blocked", "You can't follow this user");
         }
         if (!followRepository.existsByFollowerIdAndFolloweeId(follower.getId(), followee.getId())) {
             followRepository.save(new Follow(follower, followee));

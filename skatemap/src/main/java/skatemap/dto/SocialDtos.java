@@ -36,7 +36,7 @@ public final class SocialDtos {
 
     public record Profile(String username, String avatarUrl, String bio, LocalDateTime createdAt,
                           long spots, long ratings, long comments, long followers, long following,
-                          boolean followedByMe, boolean me) {}
+                          boolean followedByMe, boolean me, boolean blockedByMe) {}
 
     /** PATCH /api/users/me. Null leaves a field as it is; "" clears it. */
     public record ProfileUpdate(@Size(max = 280) String bio, @Size(max = 500) String avatarUrl) {}
@@ -57,11 +57,19 @@ public final class SocialDtos {
         }
     }
 
+    /** The session a feed item or notification is about; {@code startsAt} is an instant (UTC). */
+    public record SessionRef(Long id, java.time.Instant startsAt) {}
+
     public record FeedItem(Long id, ActivityType type, UserSummary actor, SpotSummary spot,
-                           String comment, Short rating, LocalDateTime createdAt) {}
+                           String comment, Short rating, SessionRef session, LocalDateTime createdAt) {}
 
     public record NotificationItem(Long id, NotificationType type, UserSummary actor, SpotSummary spot,
-                                   Long commentId, String comment, boolean read, LocalDateTime createdAt) {}
+                                   Long commentId, String comment, SessionRef session, boolean read, LocalDateTime createdAt) {}
+
+    public record CheckinRequest(@NotNull @jakarta.validation.constraints.DecimalMin("-90.0") @jakarta.validation.constraints.DecimalMax("90.0") Double latitude,
+                                 @NotNull @jakarta.validation.constraints.DecimalMin("-180.0") @jakarta.validation.constraints.DecimalMax("180.0") Double longitude) {}
+
+    public record SessionCreate(@NotNull java.time.Instant startsAt, @Size(max = 200) String note) {}
 
     /** One page of a keyset-paginated list. {@code nextCursor} goes in {@code ?before=}; null = last page. */
     public record CursorPage<T>(List<T> items, Long nextCursor) {}

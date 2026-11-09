@@ -4,5 +4,7 @@ package skatemap.entity.enums;
 public enum ActivityType {
     SPOT_CREATED,
     COMMENTED,
-    RATED
+    RATED,
+    CHECKED_IN,
+    SESSION_CREATED
 }

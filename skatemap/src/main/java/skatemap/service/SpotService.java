@@ -79,7 +79,15 @@ public class SpotService {
         this.tx = new TransactionTemplate(transactionManager);
     }
 
+    /** Photo comparisons per new spot: each costs a vision call, so only the closest candidates get one. */
+    static final int MAX_PHOTO_COMPARISONS = 2;
+
     public SpotDto createSpot(SpotDto spotDto, String username) {
+        // Cheapest check first, before any AI call: is this spot already on the map?
+        if (!Boolean.TRUE.equals(spotDto.getForce())) {
+            requireNotDuplicate(spotDto);
+        }
+
         // Moderate before anything is stored
         String textToAnalyze = spotDto.getName() + " - " + spotDto.getDescription();
         if (!aiModerationService.isContentAllowed(textToAnalyze)) {
@@ -116,6 +124,34 @@ public class SpotService {
         });
         spotListCache.invalidate();
         return created;
+    }
+
+    /**
+     * Two people adding the same ledge is the most common way a crowd map gets messy. A spot right
+     * next to an existing one, or nearby with a similar name, is answered with 409 and the existing
+     * spot, so the app can offer to open it instead; resending with force=true creates it anyway.
+     */
+    private void requireNotDuplicate(SpotDto spotDto) {
+        String newPhoto = blankToNull(spotDto.getMediaUrl());
+        // The photo goes to a vision model below: only our own Cloudinary uploads, as at save time
+        requireOwnCloudinaryUrl(newPhoto);
+        int comparisons = 0;
+        for (SpotRepository.DuplicateCandidate c : spotRepository.duplicateCandidates(
+                spotDto.getLatitude(), spotDto.getLongitude(), spotDto.getName(), DuplicateRules.NEARBY_METERS)) {
+            DuplicateRules.Verdict verdict = DuplicateRules.byPlaceAndName(c.getMeters(), c.getSimilarity(), newPhoto != null);
+            if (verdict == DuplicateRules.Verdict.DISTINCT) continue;
+            // Own read transaction: the author is lazy and the controller has no session of its own
+            SpotDto existing = tx.execute(status -> spotRepository.findById(c.getId()).map(SpotService::mapToDto).orElse(null));
+            if (existing == null) continue;
+            if (verdict == DuplicateRules.Verdict.ASK_PHOTOS) {
+                if (existing.getMediaUrl() == null || comparisons >= MAX_PHOTO_COMPARISONS) continue;
+                comparisons++;
+                if (!DuplicateRules.photosMatch(imageModerationService.comparePhotos(newPhoto, existing.getMediaUrl()))) continue;
+            }
+            throw new ApiException(HttpStatus.CONFLICT, "duplicate_candidate",
+                    "There is already a spot here: " + existing.getName(),
+                    java.util.Map.of("candidate", existing, "meters", Math.round(c.getMeters())));
+        }
     }
 
     /**

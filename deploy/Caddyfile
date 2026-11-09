@@ -5,6 +5,7 @@
 }
 
 {$API_DOMAIN} {
+	# Also carries the live-map WebSocket (/ws): Caddy proxies the Upgrade handshake by itself
 	reverse_proxy app:8080
 
 	header {

@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import 'react-native-reanimated';
+import '../utils/textDecoderPolyfill';
 import {
   useFonts,
   BigShouldersDisplay_700Bold,

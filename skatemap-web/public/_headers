@@ -1,2 +1,7 @@
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' https://accounts.google.com/gsi/client; frame-src https://accounts.google.com/gsi/; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://tile.openstreetmap.org https://res.cloudinary.com https://via.placeholder.com; connect-src 'self' https://accounts.google.com/gsi/ https://skatemap.onrender.com https://*.cartocdn.com https://tile.openstreetmap.org; font-src 'self' data:; form-action 'self'; upgrade-insecure-requests
+  # The full CSP is injected into index.html by vite.config.js (it needs the API origin from VITE_API_URL).
+  # Only what a <meta> CSP cannot express goes here.
+  Content-Security-Policy: frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(self), camera=(), microphone=()

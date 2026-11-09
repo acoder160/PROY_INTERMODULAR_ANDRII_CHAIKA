@@ -13,15 +13,26 @@ public class ApiException extends RuntimeException {
 
     private final HttpStatus status;
     private final String code;
+    /** Extra fields for the response body (e.g. the existing spot a new one duplicates). */
+    private final java.util.Map<String, Object> details;
 
     public ApiException(HttpStatus status, String message) {
         this(status, null, message);
     }
 
     public ApiException(HttpStatus status, String code, String message) {
+        this(status, code, message, null);
+    }
+
+    public ApiException(HttpStatus status, String code, String message, java.util.Map<String, Object> details) {
         super(message);
         this.status = status;
         this.code = code;
+        this.details = details;
+    }
+
+    public java.util.Map<String, Object> getDetails() {
+        return details;
     }
 
     public HttpStatus getStatus() {

@@ -9,6 +9,8 @@ import skatemap.dto.SocialDtos.SpotSummary;
 import skatemap.dto.SocialDtos.UserSummary;
 import skatemap.entity.Activity;
 import skatemap.entity.Comment;
+import skatemap.entity.SkateSession;
+import skatemap.dto.SocialDtos.SessionRef;
 import skatemap.entity.Spot;
 import skatemap.entity.User;
 import skatemap.entity.enums.ActivityType;
@@ -38,7 +40,17 @@ public class FeedService {
 
     /** Called inside the transaction of the action itself. */
     public void record(User actor, ActivityType type, Spot spot, Comment comment, Integer rating) {
-        activityRepository.save(new Activity(actor, type, spot, comment, rating == null ? null : rating.shortValue()));
+        record(actor, type, spot, comment, rating, null);
+    }
+
+    public void record(User actor, ActivityType type, Spot spot, Comment comment, Integer rating, SkateSession session) {
+        Activity activity = new Activity(actor, type, spot, comment, rating == null ? null : rating.shortValue());
+        activity.setSession(session);
+        activityRepository.save(activity);
+    }
+
+    static SessionRef sessionRef(SkateSession session) {
+        return session == null ? null : new SessionRef(session.getId(), SessionService.toInstant(session.getStartsAt()));
     }
 
     @Transactional(readOnly = true)
@@ -49,7 +61,7 @@ public class FeedService {
         List<FeedItem> items = rows.stream().map(a -> new FeedItem(a.getId(), a.getType(),
                 UserSummary.of(a.getActor()), SpotSummary.of(a.getSpot()),
                 a.getComment() == null ? null : NotificationService.snippet(a.getComment().getContent()),
-                a.getRating(), a.getCreatedAt())).toList();
+                a.getRating(), sessionRef(a.getSession()), a.getCreatedAt())).toList();
         Long next = rows.size() == PAGE_SIZE ? rows.get(rows.size() - 1).getId() : null;
         return new CursorPage<>(items, next);
     }

@@ -26,12 +26,16 @@ interface SkateMapProps {
   /** Saved spots: the bookmark in a spot popup shows and toggles this. */
   /** null when signed out: the popup button then only asks to sign in. */
   favoriteIds?: number[] | null;
+  /** Skaters checked in at each spot right now (spotId → count); drawn as a badge on the marker. */
+  liveCounts?: Record<number, number>;
   onToggleFavorite?: (spotId: number) => void;
   /** Short notice for map-side problems while placing a spot (too far, no GPS). */
   onNotice?: (message: string) => void;
   /** Fly to this spot (opened from the feed, a profile or a notification). A new object flies again. */
   focus?: { lat: number; lng: number; id: number } | null;
 }
+
+const NO_LIVE: Record<number, number> = {};
 
 export default function SkateMap({ 
   spots = [], 
@@ -40,6 +44,7 @@ export default function SkateMap({
   onMapClick,
   onSpotClick,
   favoriteIds = null,
+  liveCounts = NO_LIVE,
   onToggleFavorite,
   onNotice = (message: string) => alert(message),
   focus = null,
@@ -105,6 +110,14 @@ export default function SkateMap({
       `);
     }
   }, [spots]);
+
+  // Contadores en vivo: el mapa vuelve a pintar los marcadores visibles con su insignia
+  const liveJson = JSON.stringify(liveCounts);
+  useEffect(() => {
+    if (mapReadyRef.current && webviewRef.current) {
+      webviewRef.current.injectJavaScript(`window.__setLive(${liveJson}); true;`);
+    }
+  }, [liveJson]);
 
   // Spots guardados: el popup pinta el marcador de "guardado" con esta lista
   const favoritesJson = JSON.stringify(favoriteIds);
@@ -204,7 +217,23 @@ export default function SkateMap({
 
           /* Spots: iconos propios por tipo; la marca del spot nuevo usa .paint-marker */
           .paint-marker { display: flex; align-items: center; justify-content: center; }
-          .spot-icon { background: transparent; border: 0; }
+          .spot-icon { background: transparent; border: 0; position: relative; }
+          .live-badge {
+            position: absolute; top: -6px; right: -8px;
+            min-width: 22px; height: 22px; padding: 0 5px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #1C1C1C; border-radius: 11px;
+            background: #FF4FA3; color: #1C1C1C;
+            font: 900 13px/1 'Big Shoulders Display', system-ui, sans-serif;
+            animation: live-pulse 2s ease-out infinite;
+          }
+          .marker-cluster.has-live div { border-color: #FF4FA3 !important; }
+          @keyframes live-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 79, 163, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 79, 163, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 79, 163, 0); }
+          }
+          @media (prefers-reduced-motion: reduce) { .live-badge { animation: none; } }
           .spot-icon-img {
             display: block;
             width: 45px; height: 45px;
@@ -524,9 +553,10 @@ export default function SkateMap({
             iconCreateFunction: function(cluster) {
               var count = cluster.getChildCount();
               var size = count < 10 ? 'small' : count < 100 ? 'medium' : 'large';
+              var live = cluster.getAllChildMarkers().some(function(m) { return (window.LIVE[m.spotId] || 0) > 0; });
               return L.divIcon({
                 html: '<div class="spot-cluster-label">+' + count + '</div>',
-                className: 'marker-cluster marker-cluster-' + size,
+                className: 'marker-cluster marker-cluster-' + size + (live ? ' has-live' : ''),
                 iconSize: L.point(42, 42)
               });
             }
@@ -543,6 +573,17 @@ export default function SkateMap({
             className: 'marker-cluster marker-cluster-small',
             iconSize: L.point(42, 42)
           });
+          var singleSpotLiveIcon = L.divIcon({
+            html: '<div class="spot-cluster-label">+1</div>',
+            className: 'marker-cluster marker-cluster-small has-live',
+            iconSize: L.point(42, 42)
+          });
+          // Skaters per spot right now, kept in sync by the app
+          window.LIVE = {};
+          window.__setLive = function(counts) {
+            window.LIVE = counts || {};
+            if (typeof window.renderVisibleSpots === 'function') window.renderVisibleSpots();
+          };
 
           function escapeHtml(value) {
             return String(value == null ? '' : value).replace(/[&<>"']/g, function(character) {
@@ -561,18 +602,21 @@ export default function SkateMap({
           }
 
           // Iconos PNG propios; el div exterior lo posiciona Leaflet, la imagen interior puede escalarse al seleccionar
-          function getSpotIcon(spotType) {
-            if (!spotIcons[spotType]) {
+          function getSpotIcon(spotType, live) {
+            live = live || 0;
+            var key = spotType + '|' + live;
+            if (!spotIcons[key]) {
               var iconUrl = SPOT_ICONS[spotType] || SPOT_ICONS.STREET;
-              spotIcons[spotType] = L.divIcon({
+              var badge = live > 0 ? '<span class="live-badge">' + (live > 9 ? '9+' : live) + '</span>' : '';
+              spotIcons[key] = L.divIcon({
                 className: 'spot-icon',
-                html: '<img class="spot-icon-img" src="' + iconUrl + '" alt="" />',
+                html: '<img class="spot-icon-img" src="' + iconUrl + '" alt="" />' + badge,
                 iconSize: [45, 45],
                 iconAnchor: [22, 45],
                 popupAnchor: [0, -40]
               });
             }
-            return spotIcons[spotType];
+            return spotIcons[key];
           }
 
           var STAR_PATH = 'M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z';
@@ -622,7 +666,7 @@ export default function SkateMap({
             }
                 
             var spotType = (spot.spotType || spot.type || 'STREET').toUpperCase();
-            var icon = getSpotIcon(spotType);
+            var icon = getSpotIcon(spotType, window.LIVE[spot.id] || 0);
             var diff = (spot.difficultyLevel || 'INTERMEDIATE').toUpperCase();
             var level = DIFFICULTY_LEVEL[diff] || 2;
             var rating = spot.surfaceRating || 0;
@@ -664,7 +708,7 @@ export default function SkateMap({
             };
 
             var marker = L.marker([spot.latitude, spot.longitude + (lngOffset || 0)], {
-              icon: showAsPlusOneBubble ? singleSpotClusterIcon : icon
+              icon: showAsPlusOneBubble ? ((window.LIVE[spot.id] || 0) > 0 ? singleSpotLiveIcon : singleSpotClusterIcon) : icon
             }).bindPopup(buildPopup, { closeButton: false, maxWidth: 260, minWidth: 240, autoPanPaddingTopLeft: L.point(16, 96), autoPanPaddingBottomRight: L.point(16, 120) });
             marker.spotId = spot.id;
             return marker;
@@ -946,6 +990,7 @@ export default function SkateMap({
               ${userLocation ? `window.updateUserLocation(${userLocation.lat},${userLocation.lng});` : ''}
               window.isAddingMode = ${isAddingMode};
               window.__setFavorites(${favoritesJson});
+              window.__setLive(${liveJson});
               ${flyToFocus}
             }
             true;

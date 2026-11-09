@@ -102,7 +102,9 @@
     "googleFailed": "Google ile giriş başarısız. Tekrar dene.",
     "tryDemo": "Demoyu dene",
     "demoHint": "Kayıt gerekmez: ortak bir test hesabı.",
-    "demoFailed": "Demo şu anda kullanılamıyor. Daha sonra tekrar deneyin."
+    "demoFailed": "Demo şu anda kullanılamıyor. Daha sonra tekrar deneyin.",
+    "acceptTerms": "14 yaşında veya daha büyüğüm ve şunları kabul ediyorum:",
+    "acceptRequired": "Lütfen 14 yaşında veya daha büyük olduğunuzu ve kuralları kabul ettiğinizi onaylayın."
   },
   "admin": {
     "backToMap": "Haritaya dön",
@@ -173,7 +175,17 @@
     "textRejected": "Ad veya açıklama kurallara aykırı (spam, uygunsuz içerik veya anlamsız metin).",
     "demoReadonly": "Demo hesapta kullanılamaz. Denemek için kendi hesabınızı oluşturun.",
     "notOwner": "Yalnızca kendi paylaşımlarınızı değiştirebilirsiniz.",
-    "cannotFollowSelf": "Kendinizi takip edemezsiniz."
+    "cannotFollowSelf": "Kendinizi takip edemezsiniz.",
+    "checkinTooFar": "Check-in için spotta (300 m içinde) olmalısınız.",
+    "sessionBadTime": "Şu an ile 30 gün sonrası arasında bir zaman seçin.",
+    "hostCannotLeave": "You host this session. Cancel it instead of leaving.",
+    "alreadyCheckedIn": "You are already checked in.",
+    "alreadyJoined": "You already joined this session.",
+    "duplicateCandidate": "There is already a spot here.",
+    "sessionOver": "Bu seans sona erdi.",
+    "sessionLimit": "Zaten 10 yaklaşan seansınız var.",
+    "blocked": "Bu kullanıcıyı takip edemezsin.",
+    "cannotBlockSelf": "Kendini engelleyemezsin."
   },
   "types": {
     "STREET": "Sokak",
@@ -275,13 +287,18 @@
     "activity": {
       "SPOT_CREATED": "bir spot ekledi",
       "COMMENTED": "bir spota yorum yaptı",
-      "RATED": "bir spotu puanladı"
+      "RATED": "bir spotu puanladı",
+      "CHECKED_IN": "bir spotta kayıyor",
+      "SESSION_CREATED": "bir seans planladı"
     },
     "notif": {
       "FOLLOW": "sizi takip etmeye başladı",
       "COMMENT_ON_SPOT": "{{spot}} spotunuza yorum yaptı",
       "REPLY": "yorumunuza yanıt verdi",
-      "COMMENT_LIKE": "yorumunuzu beğendi"
+      "COMMENT_LIKE": "yorumunuzu beğendi",
+      "SESSION_JOINED": "{{spot}} seansınıza katılıyor",
+      "SESSION_REMINDER": "{{spot}} seansınız yakında başlıyor",
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
     },
     "reply": "Yanıtla",
     "replyingTo": "{{username}} kullanıcısına yanıt",
@@ -302,5 +319,76 @@
     "deleteSpot": "Spotu sil",
     "deleteSpotConfirm": "Bu spot silinsin mi? Fotoğrafı, puanları ve yorumları da silinir.",
     "loadFailed": "Yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin."
+  },
+  "live": {
+    "title": "Canlı",
+    "skatingNow": "Şu an kayan: {{count}}",
+    "nobody": "Şu an burada kimse kaymıyor",
+    "imHere": "Buradayım",
+    "leave": "Ayrıl",
+    "needLocation": "Check-in yapmak için konum iznini verin ve spotta olun.",
+    "sessions": "Seanslar",
+    "noSessions": "Henüz planlanmış seans yok.",
+    "planSession": "Seans planla",
+    "when": "Ne zaman",
+    "note": "Not (isteğe bağlı)",
+    "notePlaceholder": "Game of SKATE, çekim, yeni başlayanlar hoş geldin…",
+    "create": "Oluştur",
+    "join": "Katıl",
+    "joined": "Gidiyorum",
+    "cancelSession": "İptal et",
+    "cancelConfirm": "Bu seans iptal edilsin mi?",
+    "going": "Gelen: {{count}}",
+    "hostedBy": "Düzenleyen: {{username}}"
+  },
+  "ai": {
+    "suggesting": "AI is filling in the details from your photo…"
+  },
+  "duplicate": {
+    "title": "Is this the same spot?",
+    "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
+    "openExisting": "Open it",
+    "createAnyway": "It's different, create it"
+  },
+  "search": {
+    "placeholder": "Try “smooth ledges for beginners near me”",
+    "submit": "Search spots",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "results": "{{count}} spots found",
+    "noResults": "No spots match. Try different words.",
+    "noAi": "Keyword search (AI unavailable)",
+    "failed": "Search isn't available right now.",
+    "chipRating": "{{value}}★ and up",
+    "chipDistance": "within {{km}} km"
+  },
+  "weather": {
+    "label": "Weather",
+    "DRY": "Dry",
+    "WET": "Wet ground",
+    "RAIN": "Raining"
+  },
+  "addSpot": {
+    "mobileOnly": {
+      "title": "Add spots from the app",
+      "body": "Adding a spot needs your phone's camera and GPS, so it's only available in the mobile app.",
+      "get": "Get the app",
+      "soon": "App download coming soon"
+    }
+  },
+  "safety": {
+    "block": "Engelle",
+    "unblock": "Engeli kaldır",
+    "blockConfirm": "{{username}} engellensin mi? Yorumlarını artık görmeyeceksin ve ikiniz de birbirinizi takip edemeyeceksiniz.",
+    "queueTitle": "Reports",
+    "queueEmpty": "No open reports.",
+    "target": {
+      "COMMENT": "Comment",
+      "USER": "Profile"
+    },
+    "by": "by {{username}}",
+    "removeComment": "Remove comment",
+    "clearProfile": "Clear bio and photo",
+    "dismiss": "Dismiss"
   }
 }

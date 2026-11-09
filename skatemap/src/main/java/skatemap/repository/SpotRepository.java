@@ -58,6 +58,35 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
             @Param("distanceInMeters") double distanceInMeters
     );
 
+    /** True when the point is within {@code meters} of the spot (real metres, on the sphere). */
+    @Query(value = "SELECT EXISTS (SELECT 1 FROM spots s WHERE s.id = :spotId AND "
+            + "ST_DWithin(CAST(s.location AS geography), "
+            + "CAST(ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326) AS geography), :meters, false))",
+            nativeQuery = true)
+    boolean isWithin(@Param("spotId") Long spotId, @Param("latitude") double latitude,
+                     @Param("longitude") double longitude, @Param("meters") double meters);
+
+    /** A possible duplicate: an existing visible spot near the new one. */
+    interface DuplicateCandidate {
+        Long getId();
+        Double getMeters();
+        Double getSimilarity();
+    }
+
+    /**
+     * Visible spots within {@code meters} of a point, closest first, with the trigram similarity of
+     * their name to {@code name} (0..1, pg_trgm). The distance filter runs on idx_spots_location_geog.
+     */
+    @Query(value = "SELECT s.id AS id, "
+            + "ST_Distance(CAST(s.location AS geography), CAST(ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326) AS geography), false) AS meters, "
+            + "similarity(lower(s.name), lower(:name)) AS similarity "
+            + "FROM spots s WHERE s.status = 'VISIBLE' AND "
+            + "ST_DWithin(CAST(s.location AS geography), CAST(ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326) AS geography), :meters, false) "
+            + "ORDER BY meters LIMIT 5",
+            nativeQuery = true)
+    List<DuplicateCandidate> duplicateCandidates(@Param("latitude") double latitude, @Param("longitude") double longitude,
+                                                @Param("name") String name, @Param("meters") double meters);
+
     // --- Admin queues ---
 
     /** Spots no admin has looked at yet, newest first. */

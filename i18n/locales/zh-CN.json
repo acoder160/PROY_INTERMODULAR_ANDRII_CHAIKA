@@ -102,7 +102,9 @@
     "googleFailed": "Google 登录失败，请重试。",
     "tryDemo": "试用演示版",
     "demoHint": "无需注册：共享的测试账号。",
-    "demoFailed": "演示版暂时不可用，请稍后再试。"
+    "demoFailed": "演示版暂时不可用，请稍后再试。",
+    "acceptTerms": "我已年满 14 岁，并接受",
+    "acceptRequired": "请确认你已年满 14 岁并接受规则。"
   },
   "admin": {
     "backToMap": "返回地图",
@@ -173,7 +175,17 @@
     "textRejected": "名称或描述违反社区规则（垃圾信息、不当内容或无意义文字）。",
     "demoReadonly": "演示账号无法使用此功能。请创建自己的账号来试用。",
     "notOwner": "您只能修改自己发布的内容。",
-    "cannotFollowSelf": "您不能关注自己。"
+    "cannotFollowSelf": "您不能关注自己。",
+    "checkinTooFar": "您需要在地点附近（300 米内）才能签到。",
+    "sessionBadTime": "请选择从现在起 30 天内的时间。",
+    "hostCannotLeave": "You host this session. Cancel it instead of leaving.",
+    "alreadyCheckedIn": "You are already checked in.",
+    "alreadyJoined": "You already joined this session.",
+    "duplicateCandidate": "There is already a spot here.",
+    "sessionOver": "该活动已结束。",
+    "sessionLimit": "您已有 10 个即将开始的活动。",
+    "blocked": "你无法关注该用户。",
+    "cannotBlockSelf": "你不能屏蔽自己。"
   },
   "types": {
     "STREET": "街头",
@@ -275,13 +287,18 @@
     "activity": {
       "SPOT_CREATED": "添加了一个地点",
       "COMMENTED": "评论了一个地点",
-      "RATED": "给一个地点评了分"
+      "RATED": "给一个地点评了分",
+      "CHECKED_IN": "正在一个地点滑板",
+      "SESSION_CREATED": "发起了一个活动"
     },
     "notif": {
       "FOLLOW": "开始关注您",
       "COMMENT_ON_SPOT": "评论了您的地点“{{spot}}”",
       "REPLY": "回复了您的评论",
-      "COMMENT_LIKE": "赞了您的评论"
+      "COMMENT_LIKE": "赞了您的评论",
+      "SESSION_JOINED": "将参加您在“{{spot}}”的活动",
+      "SESSION_REMINDER": "您在“{{spot}}”的活动即将开始",
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
     },
     "reply": "回复",
     "replyingTo": "回复 {{username}}",
@@ -302,5 +319,76 @@
     "deleteSpot": "删除地点",
     "deleteSpotConfirm": "删除这个地点？它的照片、评分和评论也会一并删除。",
     "loadFailed": "加载失败。请检查网络连接后重试。"
+  },
+  "live": {
+    "title": "实时",
+    "skatingNow": "正在滑：{{count}}",
+    "nobody": "现在没有人在这里滑",
+    "imHere": "我在这儿",
+    "leave": "离开",
+    "needLocation": "请允许访问位置并到达地点后再签到。",
+    "sessions": "活动",
+    "noSessions": "还没有计划中的活动。",
+    "planSession": "发起活动",
+    "when": "时间",
+    "note": "备注（可选）",
+    "notePlaceholder": "Game of SKATE、拍片、欢迎新手…",
+    "create": "创建",
+    "join": "参加",
+    "joined": "会去",
+    "cancelSession": "取消",
+    "cancelConfirm": "取消这个活动？",
+    "going": "参加：{{count}}",
+    "hostedBy": "发起人：{{username}}"
+  },
+  "ai": {
+    "suggesting": "AI is filling in the details from your photo…"
+  },
+  "duplicate": {
+    "title": "Is this the same spot?",
+    "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
+    "openExisting": "Open it",
+    "createAnyway": "It's different, create it"
+  },
+  "search": {
+    "placeholder": "Try “smooth ledges for beginners near me”",
+    "submit": "Search spots",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "results": "{{count}} spots found",
+    "noResults": "No spots match. Try different words.",
+    "noAi": "Keyword search (AI unavailable)",
+    "failed": "Search isn't available right now.",
+    "chipRating": "{{value}}★ and up",
+    "chipDistance": "within {{km}} km"
+  },
+  "weather": {
+    "label": "Weather",
+    "DRY": "Dry",
+    "WET": "Wet ground",
+    "RAIN": "Raining"
+  },
+  "addSpot": {
+    "mobileOnly": {
+      "title": "Add spots from the app",
+      "body": "Adding a spot needs your phone's camera and GPS, so it's only available in the mobile app.",
+      "get": "Get the app",
+      "soon": "App download coming soon"
+    }
+  },
+  "safety": {
+    "block": "屏蔽",
+    "unblock": "取消屏蔽",
+    "blockConfirm": "要屏蔽 {{username}} 吗？你将不再看到对方的评论，双方也无法互相关注。",
+    "queueTitle": "Reports",
+    "queueEmpty": "No open reports.",
+    "target": {
+      "COMMENT": "Comment",
+      "USER": "Profile"
+    },
+    "by": "by {{username}}",
+    "removeComment": "Remove comment",
+    "clearProfile": "Clear bio and photo",
+    "dismiss": "Dismiss"
   }
 }

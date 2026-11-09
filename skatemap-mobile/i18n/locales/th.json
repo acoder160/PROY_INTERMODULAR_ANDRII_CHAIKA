@@ -102,7 +102,9 @@
     "googleFailed": "เข้าสู่ระบบด้วย Google ไม่สำเร็จ ลองอีกครั้ง",
     "tryDemo": "ลองใช้เดโม",
     "demoHint": "ไม่ต้องสมัคร: บัญชีทดสอบที่ใช้ร่วมกัน",
-    "demoFailed": "เดโมยังไม่พร้อมใช้งานในขณะนี้ โปรดลองอีกครั้งภายหลัง"
+    "demoFailed": "เดโมยังไม่พร้อมใช้งานในขณะนี้ โปรดลองอีกครั้งภายหลัง",
+    "acceptTerms": "ฉันอายุ 14 ปีขึ้นไปและยอมรับ",
+    "acceptRequired": "โปรดยืนยันว่าคุณอายุ 14 ปีขึ้นไปและยอมรับกฎ"
   },
   "admin": {
     "backToMap": "กลับไปที่แผนที่",
@@ -173,7 +175,17 @@
     "textRejected": "ชื่อหรือคำอธิบายละเมิดกฎ (สแปม เนื้อหาไม่เหมาะสม หรือข้อความไร้ความหมาย)",
     "demoReadonly": "ใช้กับบัญชีเดโมไม่ได้ สร้างบัญชีของคุณเองเพื่อลองใช้",
     "notOwner": "คุณแก้ไขได้เฉพาะโพสต์ของตัวเอง",
-    "cannotFollowSelf": "คุณติดตามตัวเองไม่ได้"
+    "cannotFollowSelf": "คุณติดตามตัวเองไม่ได้",
+    "checkinTooFar": "คุณต้องอยู่ที่สปอต (ภายใน 300 ม.) เพื่อเช็กอิน",
+    "sessionBadTime": "เลือกเวลาตั้งแต่ตอนนี้ถึง 30 วันข้างหน้า",
+    "hostCannotLeave": "You host this session. Cancel it instead of leaving.",
+    "alreadyCheckedIn": "You are already checked in.",
+    "alreadyJoined": "You already joined this session.",
+    "duplicateCandidate": "There is already a spot here.",
+    "sessionOver": "เซสชันนี้จบแล้ว",
+    "sessionLimit": "คุณมีเซสชันที่กำลังจะมาถึงครบ 10 รายการแล้ว",
+    "blocked": "คุณไม่สามารถติดตามผู้ใช้นี้ได้",
+    "cannotBlockSelf": "คุณไม่สามารถบล็อกตัวเองได้"
   },
   "types": {
     "STREET": "สตรีท",
@@ -275,13 +287,18 @@
     "activity": {
       "SPOT_CREATED": "เพิ่มสปอต",
       "COMMENTED": "แสดงความคิดเห็นในสปอต",
-      "RATED": "ให้คะแนนสปอต"
+      "RATED": "ให้คะแนนสปอต",
+      "CHECKED_IN": "กำลังเล่นที่สปอต",
+      "SESSION_CREATED": "วางแผนเซสชัน"
     },
     "notif": {
       "FOLLOW": "เริ่มติดตามคุณ",
       "COMMENT_ON_SPOT": "แสดงความคิดเห็นในสปอต {{spot}} ของคุณ",
       "REPLY": "ตอบกลับความคิดเห็นของคุณ",
-      "COMMENT_LIKE": "ถูกใจความคิดเห็นของคุณ"
+      "COMMENT_LIKE": "ถูกใจความคิดเห็นของคุณ",
+      "SESSION_JOINED": "จะไปเซสชันของคุณที่ {{spot}}",
+      "SESSION_REMINDER": "เซสชันของคุณที่ {{spot}} ใกล้เริ่มแล้ว",
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
     },
     "reply": "ตอบกลับ",
     "replyingTo": "ตอบกลับ {{username}}",
@@ -302,5 +319,76 @@
     "deleteSpot": "ลบสปอต",
     "deleteSpotConfirm": "ลบสปอตนี้ใช่ไหม? รูป คะแนน และความคิดเห็นจะถูกลบไปด้วย",
     "loadFailed": "โหลดไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง"
+  },
+  "live": {
+    "title": "สด",
+    "skatingNow": "กำลังเล่นอยู่: {{count}}",
+    "nobody": "ตอนนี้ไม่มีใครเล่นอยู่ที่นี่",
+    "imHere": "ฉันอยู่ที่นี่",
+    "leave": "ออก",
+    "needLocation": "อนุญาตการเข้าถึงตำแหน่งและอยู่ที่สปอตเพื่อเช็กอิน",
+    "sessions": "เซสชัน",
+    "noSessions": "ยังไม่มีเซสชันที่วางแผนไว้",
+    "planSession": "วางแผนเซสชัน",
+    "when": "เมื่อไร",
+    "note": "โน้ต (ไม่บังคับ)",
+    "notePlaceholder": "Game of SKATE, ถ่ายคลิป, มือใหม่ยินดีต้อนรับ…",
+    "create": "สร้าง",
+    "join": "เข้าร่วม",
+    "joined": "ไปแน่",
+    "cancelSession": "ยกเลิก",
+    "cancelConfirm": "ยกเลิกเซสชันนี้ใช่ไหม?",
+    "going": "ไปด้วย: {{count}}",
+    "hostedBy": "ผู้จัด: {{username}}"
+  },
+  "ai": {
+    "suggesting": "AI is filling in the details from your photo…"
+  },
+  "duplicate": {
+    "title": "Is this the same spot?",
+    "message": "“{{name}}” is already on the map, about {{meters}} m from here.",
+    "openExisting": "Open it",
+    "createAnyway": "It's different, create it"
+  },
+  "search": {
+    "placeholder": "Try “smooth ledges for beginners near me”",
+    "submit": "Search spots",
+    "clear": "Clear search",
+    "searching": "Searching…",
+    "results": "{{count}} spots found",
+    "noResults": "No spots match. Try different words.",
+    "noAi": "Keyword search (AI unavailable)",
+    "failed": "Search isn't available right now.",
+    "chipRating": "{{value}}★ and up",
+    "chipDistance": "within {{km}} km"
+  },
+  "weather": {
+    "label": "Weather",
+    "DRY": "Dry",
+    "WET": "Wet ground",
+    "RAIN": "Raining"
+  },
+  "addSpot": {
+    "mobileOnly": {
+      "title": "Add spots from the app",
+      "body": "Adding a spot needs your phone's camera and GPS, so it's only available in the mobile app.",
+      "get": "Get the app",
+      "soon": "App download coming soon"
+    }
+  },
+  "safety": {
+    "block": "บล็อก",
+    "unblock": "เลิกบล็อก",
+    "blockConfirm": "บล็อก {{username}} ไหม? คุณจะไม่เห็นความคิดเห็นของเขาอีก และทั้งคู่จะติดตามกันไม่ได้",
+    "queueTitle": "Reports",
+    "queueEmpty": "No open reports.",
+    "target": {
+      "COMMENT": "Comment",
+      "USER": "Profile"
+    },
+    "by": "by {{username}}",
+    "removeComment": "Remove comment",
+    "clearProfile": "Clear bio and photo",
+    "dismiss": "Dismiss"
   }
 }

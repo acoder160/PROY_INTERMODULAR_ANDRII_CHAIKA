@@ -12,11 +12,13 @@ import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import FilterSheet from '../components/FilterSheet';
 import SpotDetailsSheet from '../components/SpotDetailsSheet';
+import AddSpotNotice from '../components/AddSpotNotice';
 import { TypeChip, DifficultyMarks, StarRating } from '../components/PaintBits';
 import ReportSheet from '../components/ReportSheet';
-import { OptionsIcon, PersonIcon, RefreshIcon, LocateIcon, ShieldIcon, CameraIcon, CloseIcon, FeedIcon, BellIcon, BookmarkIcon } from '../components/Icons';
+import { SearchIcon, PlusIcon, OptionsIcon, PersonIcon, RefreshIcon, LocateIcon, ShieldIcon, CameraIcon, CloseIcon, FeedIcon, BellIcon, BookmarkIcon } from '../components/Icons';
 import Avatar from '../components/Avatar';
 import '../Social.css';
+import { useLiveCounts } from '../utils/live';
 import { DEFAULT_FILTERS, cleanLabel, directionsUrl, haversineKm } from '../utils/paint';
 import '../MapChrome.css';
 
@@ -33,8 +35,7 @@ const cartoAttribution = cartoApiKey
     ? '&copy; OpenStreetMap contributors &copy; CARTO'
     : '&copy; OpenStreetMap contributors';
 const spotIconCache = {};
-const getSpotIcon = (type) => {
-    if (spotIconCache[type]) return spotIconCache[type];
+const getSpotIcon = (type, live = 0) => {
     let iconPath = '/icons/icon_street.png'; // Por defecto
     switch (type) {
         case 'STREET': iconPath = '/icons/icon_street.png'; break;
@@ -47,20 +48,24 @@ const getSpotIcon = (type) => {
     
     // Los PNG no son cuadrados: la imagen se encaja sin deformar (object-fit en .spot-icon-img),
     // igual que en la app móvil. El div exterior lo coloca Leaflet; la imagen puede escalarse al seleccionar.
-    spotIconCache[type] = L.divIcon({
-        className: 'spot-icon',
-        html: `<img class="spot-icon-img" src="${iconPath}" alt="" />`,
+    const key = `${type}|${live}`;
+    if (spotIconCache[key]) return spotIconCache[key];
+    // Skaters there right now: a pink count badge on the icon
+    const badge = live > 0 ? `<span class="live-badge">${live > 9 ? '9+' : live}</span>` : '';
+    spotIconCache[key] = L.divIcon({
+        className: live > 0 ? 'spot-icon is-live' : 'spot-icon',
+        html: `<img class="spot-icon-img" src="${iconPath}" alt="" />${badge}`,
         iconSize: [45, 45],
         iconAnchor: [22, 45],
         popupAnchor: [0, -40]
     });
-    return spotIconCache[type];
+    return spotIconCache[key];
 };
 
-let singleSpotClusterIcon = null;
-const getSingleSpotClusterIcon = () => singleSpotClusterIcon || (singleSpotClusterIcon = L.divIcon({
+const singleSpotClusterIcons = {};
+const getSingleSpotClusterIcon = (live = false) => singleSpotClusterIcons[live] || (singleSpotClusterIcons[live] = L.divIcon({
     html: '<div class="spot-cluster-label">+1</div>',
-    className: 'marker-cluster marker-cluster-small',
+    className: `marker-cluster marker-cluster-small${live ? ' has-live' : ''}`,
     iconSize: L.point(42, 42),
 }));
 
@@ -82,11 +87,12 @@ const getPopupContainer = (marker) => {
     return container;
 };
 
-const createSpotMarker = (spot, offset, icon) => {
+const createSpotMarker = (spot, offset, icon, live = 0) => {
     const marker = L.marker([spot.latitude, spot.longitude + offset], {
         icon,
         spotId: spot.id,
         spotType: spot.spotType,
+        live, // the count the icon was drawn with: lets the live update notice a drop back to 0
     });
     marker.bindPopup(() => getPopupContainer(marker), {
         closeButton: false, // botones propios (denunciar + cerrar) dentro de SpotPopup
@@ -120,7 +126,7 @@ const forEachSpotCopyInBounds = (spots, bounds, callback) => {
 // (grupo de clusters) y Leaflet.markercluster solo pinta lo que cabe en pantalla.
 //  - Pocos spots a la vista (< 150): iconos sueltos, nunca burbujas.
 //  - Muchos spots y zoom bajo: burbujas "+N" / "+1". Con zoom >= 15: siempre iconos.
-function DynamicSpotLayer({ spots, onOpenDetails, favoriteIds, onToggleFavorite, myPosition }) {
+function DynamicSpotLayer({ spots, onOpenDetails, favoriteIds, onToggleFavorite, myPosition, liveCounts }) {
     const map = useMap();
     const positionRef = useRef(myPosition);
     const selectedRef = useRef(null);   // marcador con el popup abierto
@@ -135,6 +141,13 @@ function DynamicSpotLayer({ spots, onOpenDetails, favoriteIds, onToggleFavorite,
     const modeRef = useRef('cluster'); // 'cluster' | 'loose'
     const loadingRef = useRef(false);   // el grupo aún está cargando marcadores por bloques
     const spotsRef = useRef(spots);
+    const liveRef = useRef(liveCounts);
+    // The icon a marker should show now: "+1" bubble when zoomed out, the type icon otherwise,
+    // both marked when someone is skating there
+    const iconFor = useCallback((spotId, spotType, bubble) => {
+        const live = liveRef.current.get(spotId) ?? 0;
+        return bubble ? getSingleSpotClusterIcon(live > 0) : getSpotIcon(spotType, live);
+    }, []);
     const [openPopup, setOpenPopup] = useState(null); // { spotId, container, popup }
 
     const spotsById = useMemo(() => new Map(spots.map((spot) => [spot.id, spot])), [spots]);
@@ -209,7 +222,7 @@ function DynamicSpotLayer({ spots, onOpenDetails, favoriteIds, onToggleFavorite,
         clusterMarkersRef.current.forEach((marker) => {
             if (marker.options.bubble !== bubble) {
                 marker.options.bubble = bubble;
-                marker.setIcon(bubble ? getSingleSpotClusterIcon() : getSpotIcon(marker.options.spotType));
+                marker.setIcon(iconFor(marker.options.spotId, marker.options.spotType, bubble));
             }
         });
 
@@ -228,13 +241,13 @@ function DynamicSpotLayer({ spots, onOpenDetails, favoriteIds, onToggleFavorite,
             });
             wanted.forEach(({ spot, offset }, key) => {
                 if (!looseMarkersRef.current.has(key)) {
-                    const marker = createSpotMarker(spot, offset, getSpotIcon(spot.spotType));
+                    const marker = createSpotMarker(spot, offset, iconFor(spot.id, spot.spotType, false), liveRef.current.get(spot.id) ?? 0);
                     looseMarkersRef.current.set(key, marker);
                     loose.addLayer(marker);
                 }
             });
         }
-    }, [map]);
+    }, [map, iconFor]);
 
     // 1. Capas (se crean una vez)
     useEffect(() => {
@@ -257,9 +270,11 @@ function DynamicSpotLayer({ spots, onOpenDetails, favoriteIds, onToggleFavorite,
             iconCreateFunction: (group) => {
                 const count = group.getChildCount();
                 const size = count < 10 ? 'small' : count < 100 ? 'medium' : 'large';
+                // Someone skating inside the bubble: it gets the pink live ring too
+                const live = group.getAllChildMarkers().some((m) => (liveRef.current.get(m.options.spotId) ?? 0) > 0);
                 return L.divIcon({
                     html: `<div class="spot-cluster-label">+${count}</div>`,
-                    className: `marker-cluster marker-cluster-${size}`,
+                    className: `marker-cluster marker-cluster-${size}${live ? ' has-live' : ''}`,
                     iconSize: L.point(42, 42),
                 });
             },
@@ -348,11 +363,7 @@ function DynamicSpotLayer({ spots, onOpenDetails, favoriteIds, onToggleFavorite,
             if (spot.latitude === null || spot.latitude === undefined ||
                 spot.longitude === null || spot.longitude === undefined) return;
             WORLD_COPIES.forEach((offset) => {
-                const marker = createSpotMarker(
-                    spot,
-                    offset,
-                    bubble ? getSingleSpotClusterIcon() : getSpotIcon(spot.spotType)
-                );
+                const marker = createSpotMarker(spot, offset, iconFor(spot.id, spot.spotType, bubble), liveRef.current.get(spot.id) ?? 0);
                 marker.options.bubble = bubble;
                 markers.push(marker);
             });
@@ -365,7 +376,23 @@ function DynamicSpotLayer({ spots, onOpenDetails, favoriteIds, onToggleFavorite,
         loadingRef.current = markers.length > 0;
         cluster.addLayers(markers); // al terminar, chunkProgress llama a evaluateMode
         if (markers.length === 0) evaluateMode();
-    }, [map, spots, evaluateMode]);
+    }, [map, spots, evaluateMode, iconFor]);
+
+    // 2b. Live counts changed: swap the icons of the affected markers only, then redraw bubbles
+    useEffect(() => {
+        liveRef.current = liveCounts;
+        const changed = [];
+        const update = (marker) => {
+            const live = liveCounts.get(marker.options.spotId) ?? 0;
+            if ((marker.options.live ?? 0) === live) return;
+            marker.options.live = live;
+            marker.setIcon(iconFor(marker.options.spotId, marker.options.spotType, Boolean(marker.options.bubble)));
+            changed.push(marker);
+        };
+        clusterMarkersRef.current.forEach(update);
+        looseMarkersRef.current.forEach(update);
+        if (changed.length && clusterRef.current) clusterRef.current.refreshClusters(changed);
+    }, [liveCounts, iconFor]);
 
     // 3. El contenido del popup (React) cambia de tamaño: avisamos a Leaflet para recolocarlo
     useEffect(() => {
@@ -713,11 +740,19 @@ export default function MapPage() {
     const [reportSpotId, setReportSpotId] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
     const [focus, setFocus] = useState(null);
+    const [showAddNotice, setShowAddNotice] = useState(false);
+
+    // Search in plain words ("smooth ledges for beginners near me")
+    const [searchText, setSearchText] = useState('');
+    const [searching, setSearching] = useState(false);
+    const [searchResult, setSearchResult] = useState(null); // { filters, aiUsed, spots }
+    const [searchFailed, setSearchFailed] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
 
     const { user, isAdmin } = useAuth();
     const navigate = useNavigate();
     const unread = useUnreadCount(Boolean(user));
+    const liveCounts = useLiveCounts();
 
     // Saved spots: one list for the whole map, so the popup and the spot sheet always agree
     const [favoriteIds, setFavoriteIds] = useState(() => new Set());
@@ -804,7 +839,40 @@ export default function MapPage() {
 
     const activeFilterCount = (filters.spotType !== 'ALL' ? 1 : 0) + (filters.minRating > 0 ? 1 : 0) + (filters.maxDistance > 0 ? 1 : 0);
 
-    const filteredSpots = useMemo(() => spots.filter((spot) => {
+    const runSearch = async (event) => {
+        event.preventDefault();
+        const query = searchText.trim();
+        if (!query || searching) return;
+        setSearching(true);
+        setSearchFailed(false);
+        try {
+            const res = await api.post('/search', { query, lat: myPosition?.lat, lng: myPosition?.lng });
+            setSearchResult(res.data);
+            const best = res.data.spots[0];
+            if (best) setFocus({ lat: best.latitude, lng: best.longitude, id: best.id });
+        } catch {
+            setSearchResult(null);
+            setSearchFailed(true);
+        } finally {
+            setSearching(false);
+        }
+    };
+
+    const clearSearch = () => {
+        setSearchText('');
+        setSearchResult(null);
+        setSearchFailed(false);
+    };
+
+    const searchChips = searchResult ? [
+        ...searchResult.filters.types.map((x) => t(`types.${x}`, { defaultValue: x })),
+        ...searchResult.filters.difficulty.map((x) => t(`difficulty.${x}`, { defaultValue: x })),
+        ...(searchResult.filters.minRating > 0 ? [t('search.chipRating', { value: searchResult.filters.minRating })] : []),
+        ...(searchResult.filters.distanceKm > 0 ? [t('search.chipDistance', { km: searchResult.filters.distanceKm })] : []),
+        ...searchResult.filters.keywords,
+    ] : [];
+
+    const filteredSpots = useMemo(() => searchResult ? searchResult.spots : spots.filter((spot) => {
         if (filters.spotType !== 'ALL' && spot.spotType !== filters.spotType) return false;
         if (filters.minRating > 0 && (spot.surfaceRating || 0) < filters.minRating) return false;
         if (filters.maxDistance > 0 && myPosition) {
@@ -812,7 +880,7 @@ export default function MapPage() {
             if (distance > filters.maxDistance) return false;
         }
         return true;
-    }), [spots, filters, myPosition]);
+    }), [spots, filters, myPosition, searchResult]);
 
     const selectedSpot = selectedSpotId === null ? null : spots.find((s) => s.id === selectedSpotId) ?? null;
     const reportSpot = reportSpotId === null ? null : spots.find((s) => s.id === reportSpotId) ?? null;
@@ -874,6 +942,50 @@ export default function MapPage() {
                 </div>
             </header>
 
+            {/* Search in plain words, under the top bar */}
+            <div className="map-search">
+                <form className="map-search-box" role="search" onSubmit={runSearch}>
+                    <SearchIcon size={20} />
+                    <input
+                        type="search"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        placeholder={t('search.placeholder')}
+                        aria-label={t('search.submit')}
+                        maxLength={200}
+                        enterKeyHint="search"
+                    />
+                    {(searchText || searchResult || searchFailed) && (
+                        <button type="button" className="map-search-clear" onClick={clearSearch} aria-label={t('search.clear')}>
+                            <CloseIcon size={18} />
+                        </button>
+                    )}
+                </form>
+                {(searching || searchResult || searchFailed) && (
+                    <div className="map-search-info" aria-live="polite">
+                        <strong>
+                            {searching ? t('search.searching')
+                                : searchFailed ? t('search.failed')
+                                : searchResult.spots.length === 0 ? t('search.noResults')
+                                : t('search.results', { count: searchResult.spots.length })}
+                        </strong>
+                        {searchResult && (
+                            <div className="map-search-chips">
+                                {searchChips.map((chip, i) => <span className="map-search-chip" key={`${chip}-${i}`}>{chip}</span>)}
+                                {!searchResult.aiUsed && <span className="map-search-hint">{t('search.noAi')}</span>}
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* Añadir spot: en la web solo se explica que se hace desde la app */}
+            <button type="button" className="map-fab map-fab-add" onClick={() => setShowAddNotice(true)}>
+                <PlusIcon size={26} />
+                <span>{t('map.addSpot')}</span>
+            </button>
+            <AddSpotNotice open={showAddNotice} onClose={() => setShowAddNotice(false)} />
+
             {/* Recargar (abajo a la izquierda) */}
             <button
                 type="button"
@@ -898,7 +1010,7 @@ export default function MapPage() {
                 <ZoomLimit />
                 <PrerenderedTiles />
                 <LocationButton setMyPosition={setMyPosition} />
-                <DynamicSpotLayer spots={filteredSpots} onOpenDetails={setSelectedSpotId} favoriteIds={visibleFavoriteIds} onToggleFavorite={toggleFavorite} myPosition={myPosition} />
+                <DynamicSpotLayer spots={filteredSpots} onOpenDetails={setSelectedSpotId} favoriteIds={visibleFavoriteIds} onToggleFavorite={toggleFavorite} myPosition={myPosition} liveCounts={liveCounts} />
                 <UserLocation position={myPosition} />
                 <FocusSpot focus={focus} />
             </MapContainer>
@@ -923,6 +1035,7 @@ export default function MapPage() {
                     onReport={setReportSpotId}
                     isFavorite={visibleFavoriteIds.has(selectedSpot.id)}
                     onToggleFavorite={toggleFavorite}
+                    liveCount={liveCounts.get(selectedSpot.id) ?? 0}
                 />
             )}
 

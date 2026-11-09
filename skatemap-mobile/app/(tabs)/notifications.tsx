@@ -14,7 +14,7 @@ import { timeAgo, type SpotSummary, type UserSummary } from '../../utils/social'
 
 interface NotificationItem {
   id: number;
-  type: 'FOLLOW' | 'COMMENT_ON_SPOT' | 'REPLY' | 'COMMENT_LIKE';
+  type: 'FOLLOW' | 'COMMENT_ON_SPOT' | 'REPLY' | 'COMMENT_LIKE' | 'SESSION_JOINED' | 'SESSION_REMINDER' | 'FOLLOWEE_CHECKED_IN';
   actor: UserSummary;
   spot: SpotSummary | null;
   comment: string | null;
@@ -103,7 +103,9 @@ export default function NotificationsScreen() {
                 <Avatar username={item.actor.username} url={item.actor.avatarUrl} size={40} />
                 <View style={styles.body}>
                   <Text style={styles.line}>
-                    <Text style={styles.actor}>{actor}</Text> {t(`social.notif.${item.type}`, { spot: item.spot?.name ?? '' })}
+                    {/* A reminder is about your session, not about what the host did */}
+                    {item.type !== 'SESSION_REMINDER' && <Text style={styles.actor}>{actor} </Text>}
+                    {t(`social.notif.${item.type}`, { spot: item.spot?.name ?? '' })}
                   </Text>
                   {!!item.comment && <Text style={styles.quote} numberOfLines={3}>{item.comment}</Text>}
                   <Text style={styles.time}>{timeAgo(item.createdAt, i18n.language)}</Text>
