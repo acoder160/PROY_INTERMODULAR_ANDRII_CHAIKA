@@ -31,9 +31,9 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     // Buscar spots por usuario creador
     List<Spot> findByCreatedBy_Id(Long userId);
 
-    /** A user's spots for their profile, newest first. */
+    /** A user's spots for their profile, newest first, one page at a time. */
     @EntityGraph(attributePaths = "createdBy")
-    List<Spot> findByCreatedBy_IdAndStatusOrderByIdDesc(Long userId, SpotStatus status);
+    List<Spot> findByCreatedBy_IdAndStatusOrderByIdDesc(Long userId, SpotStatus status, Pageable page);
 
     long countByCreatedBy_IdAndStatus(Long userId, SpotStatus status);
 

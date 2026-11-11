@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, type NativeScrollEvent, type NativeSyntheticEvent, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +15,7 @@ import { formatMonthYear } from '../../utils/social';
 
 type Tab = 'spots' | 'followers' | 'following';
 const TABS: Tab[] = ['spots', 'followers', 'following'];
+const PAGE_SIZE = 30; // the server's page size for these lists
 
 interface Profile {
   username: string;
@@ -56,13 +57,59 @@ export default function ProfileView({ username }: { username: string }) {
     return () => { cancelled = true; };
   }, [username, user, reloadKey]);
 
+  // The lists come in pages of PAGE_SIZE: the next one loads when you scroll near the end, so a
+  // profile with thousands of spots or followers stays light
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const loadingMoreRef = useRef(false);
+
   useEffect(() => {
     let cancelled = false;
-    api.get(`/users/${encodeURIComponent(username)}/${tab}`)
-      .then((res) => { if (!cancelled) setList(res.data ?? []); })
-      .catch(() => { if (!cancelled) setList([]); });
+    api.get(`/users/${encodeURIComponent(username)}/${tab}`, { params: { page: 0 } })
+      .then((res) => {
+        if (cancelled) return;
+        const items = res.data ?? [];
+        setList(items);
+        setPage(0);
+        setHasMore(items.length === PAGE_SIZE);
+      })
+      .catch(() => { if (!cancelled) { setList([]); setHasMore(false); } });
     return () => { cancelled = true; };
   }, [username, tab, reloadKey]);
+
+  const loadMore = async () => {
+    if (!hasMore || loadingMoreRef.current || list === null) return;
+    loadingMoreRef.current = true;
+    setLoadingMore(true);
+    const requestedTab = tab;
+    try {
+      const res = await api.get(`/users/${encodeURIComponent(username)}/${tab}`, { params: { page: page + 1 } });
+      if (requestedTab !== tabRef.current) return; // the tab changed meanwhile
+      const items: any[] = res.data ?? [];
+      // Skip anything already shown (a new follow can shift the pages by one)
+      setList((prev) => {
+        const key = (x: any) => (requestedTab === 'spots' ? x.id : x.username);
+        const seen = new Set((prev ?? []).map(key));
+        return [...(prev ?? []), ...items.filter((x) => !seen.has(key(x)))];
+      });
+      setPage((p) => p + 1);
+      setHasMore(items.length === PAGE_SIZE);
+    } catch {
+      // keep what is shown; scrolling again retries
+    } finally {
+      loadingMoreRef.current = false;
+      setLoadingMore(false);
+    }
+  };
+
+  const tabRef = useRef(tab);
+  useEffect(() => { tabRef.current = tab; }, [tab]);
+
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent;
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 600) loadMore();
+  };
 
   const [reporting, setReporting] = useState(false);
 
@@ -132,6 +179,8 @@ export default function ProfileView({ username }: { username: string }) {
   return (
     <ScrollView
       contentContainerStyle={styles.scroll}
+      onScroll={onScroll}
+      scrollEventThrottle={200}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); setReloadKey((k) => k + 1); }} />}
     >
       <View style={styles.card}>
@@ -222,6 +271,7 @@ export default function ProfileView({ username }: { username: string }) {
             {person.followedByMe && <Text style={styles.personTag}>{t('social.followingState')}</Text>}
           </TouchableOpacity>
         ))}
+        {loadingMore && <ActivityIndicator color={Palette.ink} />}
       </View>
     </ScrollView>
   );

@@ -213,9 +213,10 @@ public class ProfileService {
     }
 
     @Transactional(readOnly = true)
-    public List<SpotDto> spotsOf(String username) {
+    public List<SpotDto> spotsOf(String username, int page) {
         User user = userLookup.require(username);
-        return spotRepository.findByCreatedBy_IdAndStatusOrderByIdDesc(user.getId(), SpotStatus.VISIBLE)
+        return spotRepository.findByCreatedBy_IdAndStatusOrderByIdDesc(user.getId(), SpotStatus.VISIBLE,
+                        PageRequest.of(Math.max(page, 0), LIST_PAGE_SIZE))
                 .stream().map(SpotService::mapToDto).toList();
     }
 

@@ -64,6 +64,21 @@ class SocialIntegrationTest extends AbstractIntegrationTest {
         carol = user("carol" + run);
     }
 
+    // --- Profile lists ---
+
+    @Test
+    void aProfileListsSpotsOnePageAtATimeNewestFirst() throws Exception {
+        for (int i = 1; i <= 32; i++) spot(bob, "Bob spot " + i);
+        mvc.perform(get("/api/users/" + bob + "/spots"))
+                .andExpect(jsonPath("$.length()").value(30))
+                .andExpect(jsonPath("$[0].name").value("Bob spot 32"));
+        mvc.perform(get("/api/users/" + bob + "/spots").param("page", "1"))
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[1].name").value("Bob spot 1"));
+        mvc.perform(get("/api/users/" + bob + "/spots").param("page", "2"))
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
     // --- Follows ---
 
     @Test

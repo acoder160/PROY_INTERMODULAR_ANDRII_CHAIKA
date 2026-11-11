@@ -57,8 +57,9 @@ public class UserController {
     }
 
     @GetMapping("/{username}/spots")
-    public ResponseEntity<List<SpotDto>> spots(@PathVariable String username) {
-        return ResponseEntity.ok(profileService.spotsOf(username));
+    public ResponseEntity<List<SpotDto>> spots(@PathVariable String username,
+                                               @RequestParam(defaultValue = "0") int page) {
+        return ResponseEntity.ok(profileService.spotsOf(username, page));
     }
 
     @GetMapping("/{username}/followers")

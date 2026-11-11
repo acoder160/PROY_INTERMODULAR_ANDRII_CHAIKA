@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../api/axiosConfig';
@@ -14,6 +14,7 @@ import { apiErrorText, formatMonthYear, uploadImage } from '../utils/social';
 import '../Social.css';
 
 const TABS = ['spots', 'followers', 'following'];
+const PAGE_SIZE = 30; // the server's page size for these lists
 
 export default function ProfilePage() {
   const { username } = useParams();
@@ -37,15 +38,60 @@ export default function ProfilePage() {
     return () => { cancelled = true; };
   }, [username, user, reloadKey]);
 
+  // The lists come in pages of PAGE_SIZE: the next one loads when the end of the list scrolls into
+  // view (or with "Load more"), so a profile with thousands of spots or followers stays light
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   useEffect(() => {
     let cancelled = false;
     setList(null);
-    const path = tab === 'spots' ? 'spots' : tab;
-    api.get(`/users/${encodeURIComponent(username)}/${path}`)
-      .then((res) => { if (!cancelled) setList(res.data ?? []); })
+    setHasMore(false);
+    api.get(`/users/${encodeURIComponent(username)}/${tab}`, { params: { page: 0 } })
+      .then((res) => {
+        if (cancelled) return;
+        const items = res.data ?? [];
+        setList(items);
+        setPage(0);
+        setHasMore(items.length === PAGE_SIZE);
+      })
       .catch(() => { if (!cancelled) setList([]); });
     return () => { cancelled = true; };
   }, [username, tab, reloadKey]);
+
+  const loadMore = useCallback(async () => {
+    if (!hasMore || loadingMore || list === null) return;
+    setLoadingMore(true);
+    try {
+      const res = await api.get(`/users/${encodeURIComponent(username)}/${tab}`, { params: { page: page + 1 } });
+      const items = res.data ?? [];
+      // Skip anything already shown (a new follow can shift the pages by one)
+      const key = (x) => (tab === 'spots' ? x.id : x.username);
+      setList((prev) => {
+        const seen = new Set((prev ?? []).map(key));
+        return [...(prev ?? []), ...items.filter((x) => !seen.has(key(x)))];
+      });
+      setPage((p) => p + 1);
+      setHasMore(items.length === PAGE_SIZE);
+    } catch {
+      // keep what is shown; the button retries
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [hasMore, loadingMore, list, username, tab, page]);
+
+  // Load the next page a little before the end of the list is reached
+  const sentinelRef = useRef(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasMore || typeof IntersectionObserver === 'undefined') return undefined;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) loadMore();
+    }, { rootMargin: '600px 0px' });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasMore, loadMore]);
 
 
   const [reporting, setReporting] = useState(false);
@@ -182,6 +228,11 @@ export default function ProfilePage() {
               {person.followedByMe && <span className="person-tag">{t('social.followingState')}</span>}
             </Link>
           ))}
+          {hasMore && (
+            <button ref={sentinelRef} type="button" className="btn-outline btn-small comment-more" onClick={loadMore} disabled={loadingMore}>
+              {loadingMore ? <span className="spinner spinner-ink" aria-label={t('popup.loading')} /> : t('social.loadMore')}
+            </button>
+          )}
         </section>
       </main>
 
