@@ -102,12 +102,13 @@ class SpotServiceMediaUrlTest {
     }
 
     @Test
-    void photoInSomeoneElsesFolderIsNotDeleted() {
+    void photoInSomeoneElsesFolderIsRejected() {
         String other = "https://res.cloudinary.com/skatecloud/image/upload/v1/skatemap_spots/u2/b.jpg";
-        when(imageModeration.checkUpload(any(), any(), any())).thenReturn(new Verdict(Outcome.NOT_PLACE, null, ""));
         ApiException ex = assertThrows(ApiException.class, () -> spotService.createSpot(spot(other), "skater"));
-        assertEquals("photo_not_place", ex.getCode());
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
+        verify(spotRepository, never()).save(any());
         verify(cloudinaryAssets, never()).destroy(any());
+        verifyNoInteractions(imageModeration);
     }
 
     private static SpotDto spot(String mediaUrl) {

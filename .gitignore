@@ -57,3 +57,8 @@ class
 # --- SISTEMA OPERATIVO ---
 .DS_Store
 Thumbs.db
+
+# --- AGENTS & AI TOOLING ---
+.agents/
+.claude/
+.impeccable/

@@ -83,9 +83,12 @@ public class SpotService {
     static final int MAX_PHOTO_COMPARISONS = 2;
 
     public SpotDto createSpot(SpotDto spotDto, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> ApiException.notFound("User"));
+
         // Cheapest check first, before any AI call: is this spot already on the map?
         if (!Boolean.TRUE.equals(spotDto.getForce())) {
-            requireNotDuplicate(spotDto);
+            requireNotDuplicate(spotDto, user.getId());
         }
 
         // Moderate before anything is stored
@@ -96,10 +99,7 @@ public class SpotService {
         }
 
         String mediaUrl = blankToNull(spotDto.getMediaUrl());
-        requireOwnCloudinaryUrl(mediaUrl);
-
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> ApiException.notFound("User"));
+        requireOwnCloudinaryUrl(mediaUrl, user.getId());
 
         if (mediaUrl != null) {
             moderatePhoto(mediaUrl, spotDto, user);
@@ -131,10 +131,10 @@ public class SpotService {
      * next to an existing one, or nearby with a similar name, is answered with 409 and the existing
      * spot, so the app can offer to open it instead; resending with force=true creates it anyway.
      */
-    private void requireNotDuplicate(SpotDto spotDto) {
+    private void requireNotDuplicate(SpotDto spotDto, Long userId) {
         String newPhoto = blankToNull(spotDto.getMediaUrl());
         // The photo goes to a vision model below: only our own Cloudinary uploads, as at save time
-        requireOwnCloudinaryUrl(newPhoto);
+        requireOwnCloudinaryUrl(newPhoto, userId);
         int comparisons = 0;
         for (SpotRepository.DuplicateCandidate c : spotRepository.duplicateCandidates(
                 spotDto.getLatitude(), spotDto.getLongitude(), spotDto.getName(), DuplicateRules.NEARBY_METERS)) {
@@ -257,14 +257,14 @@ public class SpotService {
     }
 
 
-    /** Only images uploaded to our own Cloudinary account may be attached to a spot. */
-    private void requireOwnCloudinaryUrl(String mediaUrl) {
+    /** Only images uploaded to our own Cloudinary account in this user's folder may be attached to a spot. */
+    private void requireOwnCloudinaryUrl(String mediaUrl, Long userId) {
         if (mediaUrl == null) return;
         String prefix = cloudinaryCloudName == null || cloudinaryCloudName.isBlank()
                 ? "https://res.cloudinary.com/"
                 : "https://res.cloudinary.com/" + cloudinaryCloudName + "/";
-        if (!mediaUrl.startsWith(prefix)) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "mediaUrl: only images uploaded through the app are allowed");
+        if (!mediaUrl.startsWith(prefix) || !CloudinaryAssets.isInUserFolder(mediaUrl, userId)) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "mediaUrl: only photos uploaded through your account are allowed");
         }
     }
 
