@@ -1,31 +1,80 @@
 name: Render Keep-Alive
 
-# Render (plan gratuito) duerme el servicio tras 15 min sin peticiones, y el cron de GitHub
-# se retrasa a menudo mas de eso. Por eso cada ejecucion es un bucle largo (~5 h 40 min) que
-# hace peticiones cada 4-11 min, y el cron solo lo relanza cada 3 horas.
+# Render (plan gratuito) duerme el servicio tras 15 min sin peticiones.
+#
+# Problema anterior: dependiamos solo del cron de GitHub, que en repos con poca actividad se retrasa
+# horas o directamente NO se ejecuta (el 11-11-2026 de 5 disparos esperados solo llego 1), y que GitHub
+# desactiva tras 60 dias sin commits (asi paso del 14-07 al 11-11). Cuando el bucle terminaba y no
+# llegaba el siguiente cron, el servidor se dormia y el primer visitante esperaba minutos al arranque.
+#
+# Ahora la ejecucion se encadena sola: al terminar su bucle (~5 h 40 min) lanza la siguiente con
+# workflow_dispatch (GITHUB_TOKEN si puede disparar workflow_dispatch). El cron horario es solo la red de
+# seguridad: si ya hay un bucle activo termina en segundos sin hacer nada; si la cadena se rompio, la retoma.
 on:
   schedule:
-    - cron: '7 */3 * * *'
+    - cron: '17 * * * *'
   workflow_dispatch:
+    inputs:
+      chain:
+        description: 'Lanzada por la ejecucion anterior de la cadena (no comprobar si hay otra activa)'
+        type: boolean
+        default: false
 
-# La ejecucion nueva cancela la anterior: siempre hay un solo bucle activo
-concurrency:
-  group: render-keep-alive
-  cancel-in-progress: true
+# El titulo marca los eslabones de la cadena: la comprobacion de abajo siempre les cede el paso
+run-name: ${{ inputs.chain && 'Keep-alive (cadena)' || 'Keep-alive' }}
+
+permissions:
+  actions: write   # lanzar la siguiente ejecucion de la cadena y ver si hay otra activa
+  contents: read
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     timeout-minutes: 355
     steps:
+      # La cron (y un lanzamiento manual) solo arranca un bucle si no hay otro en marcha: cede ante cualquier
+      # eslabon de la cadena y ante cualquier ejecucion mas antigua. Si no puede comprobarlo, tampoco arranca
+      # (mejor esperar a la siguiente cron que acabar con dos cadenas en paralelo).
+      # La de la cadena se salta la comprobacion: arranca mientras la anterior aun esta cerrando.
+      - name: Comprobar si ya hay un bucle activo
+        id: guard
+        if: ${{ !inputs.chain }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! active=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow keep_alive.yml --limit 30 \
+              --json number,status,displayTitle \
+              --jq "[.[] | select(.number != $GITHUB_RUN_NUMBER)
+                         | select(.status != \"completed\")
+                         | select(.number < $GITHUB_RUN_NUMBER or (.displayTitle | contains(\"cadena\")))] | length"); then
+            echo "No se pudo consultar las ejecuciones; no se arranca otro bucle."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          elif [ "$active" -gt 0 ]; then
+            echo "Ya hay un bucle activo; esta ejecucion no hace nada."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No hay ningun bucle activo: se arranca uno."
+          fi
+
       - uses: actions/checkout@v4
+        if: ${{ steps.guard.outputs.skip != 'true' }}
 
       - uses: actions/setup-python@v5
+        if: ${{ steps.guard.outputs.skip != 'true' }}
         with:
           python-version: '3.12'
 
       - name: Bucle de keep-alive
+        if: ${{ steps.guard.outputs.skip != 'true' }}
         env:
           # Se puede cambiar en Settings -> Secrets and variables -> Actions -> Variables
           RENDER_URL: ${{ vars.RENDER_URL || 'https://skatemap.onrender.com' }}
         run: python keep_alive.py
+
+      # Tambien si el bucle fallo (pero no si alguien cancelo la ejecucion): asi la cadena no se corta.
+      # Para pararlo todo: Actions -> Render Keep-Alive -> "..." -> Disable workflow.
+      - name: Lanzar la siguiente ejecucion
+        if: ${{ (success() || failure()) && steps.guard.outputs.skip != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run keep_alive.yml --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME" -f chain=true

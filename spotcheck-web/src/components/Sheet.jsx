@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { CloseIcon } from './Icons';
+import { ChevronIcon, CloseIcon } from './Icons';
 import { PaintStrip } from './PaintBits';
 import { cleanLabel } from '../utils/paint';
 
@@ -19,6 +19,7 @@ export default function Sheet({ open, onClose, title, children, footer, classNam
   const overlayRef = useRef(null);
   const panelRef = useRef(null);
   const dragStartY = useRef(null);
+  const peekDrag = useRef(null); // { y, onControl } while a finger is down on the peeking sheet
   const titleId = useId();
   const peekable = typeof onPeekChange === 'function';
 
@@ -106,6 +107,26 @@ export default function Sheet({ open, onClose, title, children, footer, classNam
   );
   const peeking = peekable && peek;
 
+  // The short version only had the small handle to open it, and nothing inside it scrolls, so on phones it felt
+  // stuck half open. Now the whole sheet works like the handle: swipe up or tap anywhere that is not a control
+  // opens it, swipe down closes it. Buttons and links inside keep doing their own thing.
+  const onPeekDown = (event) => {
+    if (!peeking || event.target.closest('.sheet-handle')) return;
+    peekDrag.current = {
+      y: event.clientY,
+      onControl: Boolean(event.target.closest('button, a, input, textarea, select, label, [role="button"]')),
+    };
+  };
+  const onPeekUp = (event) => {
+    const start = peekDrag.current;
+    peekDrag.current = null;
+    if (!start || !peeking) return;
+    const delta = event.clientY - start.y;
+    if (delta < -30) onPeekChange(false);
+    else if (delta > 30) onClose();
+    else if (Math.abs(delta) < 10 && !start.onControl) onPeekChange(false);
+  };
+
   return createPortal(
     <div
       ref={overlayRef}
@@ -120,6 +141,9 @@ export default function Sheet({ open, onClose, title, children, footer, classNam
         aria-labelledby={title ? titleId : undefined}
         aria-label={title ? undefined : ariaLabel}
         tabIndex={-1}
+        onPointerDown={peekable ? onPeekDown : undefined}
+        onPointerUp={peekable ? onPeekUp : undefined}
+        onPointerCancel={peekable ? () => { peekDrag.current = null; } : undefined}
       >
         {handle}
         {hero ? (
@@ -146,6 +170,15 @@ export default function Sheet({ open, onClose, title, children, footer, classNam
           </>
         )}
         {footer && <div className="sheet-footer">{footer}</div>}
+        {peeking && (
+          // Visible way to open the rest: the text is cut at the fade, the button says there is more
+          <div className="sheet-peek-more">
+            <button type="button" className="btn-dark" onClick={() => onPeekChange(false)}>
+              <ChevronIcon up size={20} />
+              {t('popup.expand')}
+            </button>
+          </div>
+        )}
       </div>
     </div>,
     document.body

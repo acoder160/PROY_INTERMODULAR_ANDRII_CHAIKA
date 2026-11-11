@@ -23,7 +23,7 @@ export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onSpotD
   const navigate = useNavigate();
   const isLoggedIn = Boolean(user);
 
-  const [commentCount, setCommentCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(null); // null until the comments have loaded
   const [editing, setEditing] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
   const [myRating, setMyRating] = useState(0);
@@ -277,7 +277,7 @@ export default function SpotDetailsSheet({ spot, onClose, onSpotUpdated, onSpotD
         onClick={() => setShowComments((v) => !v)}
         aria-expanded={showComments}
       >
-        <span>{t('popup.comments', { count: commentCount })}</span>
+        <span>{commentCount === null ? t('social.commentsCount') : t('popup.comments', { count: commentCount })}</span>
         <ChevronIcon up={showComments} />
       </button>
 

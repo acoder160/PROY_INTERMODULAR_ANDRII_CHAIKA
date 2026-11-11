@@ -315,6 +315,10 @@ function DynamicSpotLayer({ spots, onOpenDetails, favoriteIds, onToggleFavorite,
         const onPopupOpen = (e) => {
             const marker = e.propagatedFrom;
             const container = popupContainers.get(marker);
+            // The top bar can take one or two rows: pan the card below its real edge, not a fixed guess.
+            // The content renders right after this and the ResizeObserver's update() pans with this padding.
+            const barBottom = document.querySelector('.map-topbar')?.getBoundingClientRect().bottom ?? 80;
+            e.popup.options.autoPanPaddingTopLeft = L.point(16, Math.round(barBottom) + 16);
             selectedRef.current = marker;
             marker.getElement()?.classList.add('is-selected');
             drawRoute();
@@ -1023,7 +1027,7 @@ export default function MapPage() {
         <div className="map-page">
             <h1 className="visually-hidden">SpotCheck</h1>
             {/* Barra superior asfalto: ajustes del mapa a la izquierda (filtros + idioma), cuenta y actividad a la derecha */}
-            <header className={`map-topbar${isAdmin ? ' has-admin' : ''}`}>
+            <header className="map-topbar">
                 <div className="bar-left">
                     <button
                         type="button"
@@ -1032,7 +1036,7 @@ export default function MapPage() {
                         aria-label={activeFilterCount > 0 ? `${t('map.filtersActive')}: ${activeFilterCount}` : t('map.filters')}
                     >
                         <OptionsIcon size={20} />
-                        <span className="bar-pill-text bar-filters-label">{t('map.filters')}</span>
+                        <span className="bar-pill-text">{t('map.filters')}</span>
                         {activeFilterCount > 0 && <span className="count-badge" aria-hidden="true">{activeFilterCount}</span>}
                     </button>
                     <LanguageSwitcher />
@@ -1055,14 +1059,14 @@ export default function MapPage() {
                             aria-label={unread > 0 ? `${t('social.activityTitle')}: ${unread}` : t('social.activityTitle')}
                         >
                             <BellIcon size={20} />
-                            <span className="bar-pill-text bar-hide-narrow">{t('social.activityTitle')}</span>
+                            <span className="bar-pill-text bar-hide-tiny">{t('social.activityTitle')}</span>
                             {unread > 0 && <span className="count-badge is-alert" aria-hidden="true">{unread > 99 ? '99+' : unread}</span>}
                         </button>
                     )}
                     {user ? (
                         <button type="button" onClick={() => navigate(`/u/${encodeURIComponent(username)}`)} className="bar-pill bar-pill-account" aria-label={`${username}. ${t('social.profile')}`}>
                             <Avatar username={username} size={24} />
-                            <span className="bar-pill-text bar-hide-narrow">{username}</span>
+                            <span className="bar-pill-text bar-hide-phone">{username}</span>
                         </button>
                     ) : (
                         <button type="button" onClick={() => navigate('/login')} className="bar-pill bar-pill-account">
@@ -1071,12 +1075,13 @@ export default function MapPage() {
                         </button>
                     )}
                 </div>
-            </header>
 
-            {/* Estado de carga / error / filtros sin resultados: píldora amarilla bajo la barra (DESIGN.md > Notices) */}
-            <div className="map-status-slot" role="status" aria-live="polite">
-                {statusNotice && <div className="map-status">{statusNotice}</div>}
-            </div>
+                {/* Estado de carga / error / filtros sin resultados: píldora amarilla bajo la barra (DESIGN.md > Notices).
+                    Va dentro de la barra para quedar siempre debajo de ella, también cuando ocupa dos filas. */}
+                <div className="map-status-slot" role="status" aria-live="polite">
+                    {statusNotice && <div className="map-status">{statusNotice}</div>}
+                </div>
+            </header>
 
             {!hintSeen && loadStatus === 'ready' && spots.length > 0 && !selectedSpot && !showFilters && !panel && (
                 <MapHint onDismiss={dismissHint} />

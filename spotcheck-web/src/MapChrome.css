@@ -6,6 +6,8 @@
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
+  /* clip, not just hidden: a hidden box can still be scrolled by focus or scrollIntoView, which slid the whole map sideways */
+  overflow: clip;
   background: var(--concrete);
 }
 
@@ -28,22 +30,30 @@
   inset: 0 0 auto 0;
   z-index: 1000;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px 10px;
   padding: calc(8px + env(safe-area-inset-top)) 16px 10px;
   background: var(--asphalt);
   background-image: var(--grad-topbar);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
+/* When both groups do not fit on one line (long words, narrow phone) the bar takes two rows:
+   map settings stay at the left edge, account and activity drop to the second row at the right edge. */
 .bar-left,
 .bar-right {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   min-width: 0;
-  flex-shrink: 1;
+}
+
+.bar-right {
+  margin-inline-start: auto;
+  justify-content: flex-end;
 }
 
 .bar-pill {
@@ -140,19 +150,22 @@
   z-index: 1000;
 }
 
-@media (max-width: 420px) {
-  .bar-hide-narrow {
-    display: none;
-  }
-  /* Con el botón de administración la barra no cabe con la etiqueta de Filtros */
-  .map-topbar.has-admin .bar-filters-label {
+/* Phones: the avatar alone says "my profile"; the name would push the second row past the screen edge */
+@media (max-width: 719px) {
+  .bar-hide-phone {
     display: none;
   }
 }
 
-/* En pantallas muy estrechas Filtros también queda en icono (con su contador); el aria-label sigue diciendo qué es */
+@media (max-width: 420px) {
+  .bar-hide-narrow {
+    display: none;
+  }
+}
+
+/* Very narrow screens: Activity becomes its bell too (the badge and aria-label still say what it is) */
 @media (max-width: 359px) {
-  .bar-filters-label {
+  .bar-hide-tiny {
     display: none;
   }
 }
@@ -228,7 +241,8 @@
 .map-status-slot {
   position: absolute;
   left: 50%;
-  top: calc(78px + env(safe-area-inset-top));
+  /* Lives inside the top bar, so it follows the bar when it grows to two rows */
+  top: calc(100% + 12px);
   transform: translateX(-50%);
   z-index: 999;
   width: max-content;
@@ -1400,6 +1414,33 @@
 
 .sheet.is-peek .detail-title {
   padding-inline-end: 110px;
+}
+
+/* The peeking sheet takes vertical drags itself (Sheet.jsx: swipe up opens, down closes); nothing in it scrolls */
+.sheet.is-peek {
+  touch-action: none;
+  cursor: pointer;
+}
+
+/* "Show more" bar at the bottom of the peek: a row of its own (the content above is cut at its edge, never covered) */
+.sheet-peek-more {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding: 10px 20px calc(12px + env(safe-area-inset-bottom));
+  border-top: 2px solid var(--hairline);
+  background: var(--sheet);
+}
+
+.sheet-peek-more .btn-dark {
+  min-height: var(--min-target);
+  gap: 6px;
+  padding: 0 20px;
+}
+
+/* The bar already keeps the bottom inset: the body above it does not need its own bottom padding */
+.sheet.has-hero.is-peek .sheet-body {
+  padding-bottom: 0;
 }
 
 /* Ventana centrada (feed, notificaciones): flota sobre el mapa con el velo de asfalto, a todos los tamaños.

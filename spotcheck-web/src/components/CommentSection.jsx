@@ -45,10 +45,16 @@ export default function CommentSection({ spotId, reloadKey, onCountChange }) {
     return () => { cancelled = true; };
   }, [spotId, reloadKey, retryKey]);
 
+  // null = not known yet (still loading, or the load failed): the header then shows no number at all.
+  // Reporting 0 meanwhile read as "no comments" and the real number appeared only after the next reload.
   useEffect(() => {
+    if (loading || failed) {
+      onCountChange?.(null);
+      return;
+    }
     const total = items.reduce((sum, c) => sum + (c.deleted ? 0 : 1) + c.replies.length, 0);
     onCountChange?.(nextCursor ? `${total}+` : total);
-  }, [items, nextCursor, onCountChange]);
+  }, [items, nextCursor, loading, failed, onCountChange]);
 
   const loadMore = async () => {
     setLoadingMore(true);
