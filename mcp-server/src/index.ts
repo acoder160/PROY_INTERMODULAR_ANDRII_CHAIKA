@@ -13,6 +13,8 @@ function requiredEnv(name: string): string {
   return value;
 }
 
+// Required environment variables
+
 const GOOGLE_PLACES_API_KEY = requiredEnv('GOOGLE_PLACES_API_KEY');
 const GOOGLE_PLACES_SEARCH_URL = 'https://places.googleapis.com/v1/places:searchText';
 const DATABASE_URL = requiredEnv('DATABASE_URL');
