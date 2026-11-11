@@ -93,16 +93,18 @@ export default function Sheet({ open, onClose, title, children, footer, classNam
       >
         {handle}
         {hero ? (
-          <div className="sheet-scroll">
+          <>
             {closeOnHero && (
               <div className="sheet-hero-actions">
                 {heroActions}
                 {closeButton}
               </div>
             )}
-            {hero}
-            <div className="sheet-body">{children}</div>
-          </div>
+            <div className="sheet-scroll">
+              {hero}
+              <div className="sheet-body">{children}</div>
+            </div>
+          </>
         ) : (
           <>
             <div className="sheet-header">
