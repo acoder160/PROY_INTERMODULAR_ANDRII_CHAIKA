@@ -66,7 +66,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Browsers send an Origin header and must match the web app (or the API itself, for Android)
-        registry.addEndpoint("/ws").setAllowedOrigins(allowedOrigins);
+        registry.addEndpoint("/ws").setAllowedOriginPatterns(allowedOrigins);
     }
 
     @Override

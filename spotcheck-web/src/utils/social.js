@@ -1,7 +1,10 @@
 import api from '../api/axiosConfig';
 
 // The API runs on its own origin ("https://api.example.com/api" → "https://api.example.com")
-export const API_ORIGIN = (import.meta.env.VITE_API_URL || 'http://localhost:8080/api').replace(/\/api\/?$/, '');
+const DEFAULT_API_URL = import.meta.env.PROD
+  ? 'https://skatemap.onrender.com/api'
+  : 'http://localhost:8080/api';
+export const API_ORIGIN = (import.meta.env.VITE_API_URL || DEFAULT_API_URL).replace(/\/api\/?$/, '');
 
 /** Share link: the backend serves a link preview (Open Graph) and sends people on to the map. */
 export const shareUrl = (spotId) => `${API_ORIGIN}/s/${spotId}`;

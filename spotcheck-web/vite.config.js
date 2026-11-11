@@ -3,15 +3,16 @@ import react from '@vitejs/plugin-react'
 
 const productionCsp = "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://accounts.google.com/gsi/client; frame-src https://accounts.google.com/gsi/; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data: blob: https://*.basemaps.cartocdn.com https://tile.openstreetmap.org https://res.cloudinary.com https://via.placeholder.com; connect-src 'self' https://accounts.google.com/gsi/ __API__ https://*.cartocdn.com https://tile.openstreetmap.org; font-src 'self' data:; form-action 'self'; upgrade-insecure-requests";
 // The API origin and its WebSocket (live map counts), from VITE_API_URL
-const apiSources = (apiUrl) => {
-  const origin = new URL(apiUrl || 'http://localhost:8080/api').origin;
+const apiSources = (apiUrl, mode) => {
+  const fallback = mode === 'production' ? 'https://skatemap.onrender.com/api' : 'http://localhost:8080/api';
+  const origin = new URL(apiUrl || fallback).origin;
   return `${origin} ${origin.replace(/^http/, 'ws')}`;
 };
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, import.meta.dirname, '');
-  const csp = productionCsp.replace('__API__', apiSources(env.VITE_API_URL));
+  const csp = productionCsp.replace('__API__', apiSources(env.VITE_API_URL, mode));
   return {
   plugins: [
     react(),

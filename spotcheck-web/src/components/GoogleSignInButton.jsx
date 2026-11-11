@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+  || '620654525736-uh4ohjud914834l4g3uiveu8v5ibd5pv.apps.googleusercontent.com';
 
 /**
  * Botón oficial "Continuar con Google". Google devuelve un ID token, el backend lo verifica

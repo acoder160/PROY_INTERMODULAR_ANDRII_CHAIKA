@@ -34,7 +34,7 @@ public class CorsConfig {
             throw new IllegalStateException(
                     "CORS_ORIGINS must list explicit origins when credentials are enabled");
         }
-        config.setAllowedOrigins(normalizedOrigins);
+        config.setAllowedOriginPatterns(normalizedOrigins);
 
         // Headers permitidos
         config.setAllowedHeaders(Arrays.asList(
