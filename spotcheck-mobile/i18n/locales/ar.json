@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "انتهت هذه الجلسة.",
-    "sessionLimit": "لديك بالفعل 10 جلسات قادمة.",
+    "sessionLimit": "لديك بالفعل 5 جلسات نشطة، وهذا هو الحد الأقصى.",
     "blocked": "لا يمكنك متابعة هذا المستخدم.",
     "cannotBlockSelf": "لا يمكنك حظر نفسك."
   },
@@ -219,6 +219,8 @@
     "newSpot": "مكان جديد 📍",
     "close": "✕ إلغاء",
     "photoCaptured": "تم التقاط الصورة ✔️",
+    "photoRefused": "الصورة غير مقبولة",
+    "retakePhoto": "التقط صورة أخرى",
     "name": "الاسم",
     "description": "الوصف...",
     "type": "النوع",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "أُعجب بتعليقك",
       "SESSION_JOINED": "سيحضر جلستك في {{spot}}",
       "SESSION_REMINDER": "جلستك في {{spot}} تبدأ قريبًا",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "غيّر الجلسة في {{spot}}",
+      "SESSION_CANCELLED": "ألغى الجلسة في {{spot}}"
     },
     "reply": "رد",
     "replyingTo": "رد على {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "لا توجد جلسات مخططة بعد.",
     "planSession": "خطّط لجلسة",
     "when": "متى",
+    "customTime": "وقت آخر",
+    "day": "اليوم",
+    "time": "الساعة",
+    "mySessions": "جلساتي",
+    "hosting": "أنظّمها",
     "note": "ملاحظة (اختياري)",
     "notePlaceholder": "Game of SKATE، تصوير، المبتدئون مرحَّب بهم…",
     "create": "إنشاء",
@@ -357,7 +366,13 @@
     "going": "سيحضرون: {{count}}",
     "hostedBy": "المنظِّم: {{username}}",
     "keepSession": "إبقاؤها",
-    "cancelSessionAction": "إلغاء الجلسة"
+    "cancelSessionAction": "إلغاء الجلسة",
+    "activeSessions": "الجلسات النشطة",
+    "editSession": "تعديل الجلسة",
+    "editNotice": "سيتم إشعار كل من سيحضر.",
+    "cancelNotice": "سيتم إشعار كل من سيحضر.",
+    "othersGoing": "سيحضر: {{count}}",
+    "nobodyYet": "لم ينضم أحد بعد"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

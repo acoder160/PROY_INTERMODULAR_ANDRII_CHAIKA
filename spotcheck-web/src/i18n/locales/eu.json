@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "Saio hau amaitu da.",
-    "sessionLimit": "Dagoeneko 10 saio dituzu laster.",
+    "sessionLimit": "Dagoeneko 5 saio aktibo dituzu, gehienez onartzen dena.",
     "blocked": "Ezin duzu erabiltzaile hau jarraitu.",
     "cannotBlockSelf": "Ezin duzu zeure burua blokeatu."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Spot berria 📍",
     "close": "✕ Utzi",
     "photoCaptured": "Argazkia egina ✔️",
+    "photoRefused": "Argazkia ez da baliozkoa",
+    "retakePhoto": "Atera beste argazki bat",
     "name": "Izena",
     "description": "Deskribapena...",
     "type": "Mota",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "zure iruzkina gustatu zaio",
       "SESSION_JOINED": "zure {{spot}} saiora dator",
       "SESSION_REMINDER": "Zure {{spot}} saioa laster hasiko da",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "{{spot}}-eko saioa aldatu du",
+      "SESSION_CANCELLED": "{{spot}}-eko saioa bertan behera utzi du"
     },
     "reply": "Erantzun",
     "replyingTo": "Erantzuna {{username}}(r)i",
@@ -347,6 +351,11 @@
     "noSessions": "Oraindik ez dago saiorik antolatuta.",
     "planSession": "Antolatu saio bat",
     "when": "Noiz",
+    "customTime": "Beste ordu bat",
+    "day": "Eguna",
+    "time": "Ordua",
+    "mySessions": "Nire saioak",
+    "hosting": "Antolatzen dut",
     "note": "Oharra (aukerakoa)",
     "notePlaceholder": "Game of SKATE, grabaketa, hasiberriak ongi etorri…",
     "create": "Sortu",
@@ -357,7 +366,13 @@
     "going": "Doaz: {{count}}",
     "hostedBy": "Antolatzailea: {{username}}",
     "keepSession": "Mantendu",
-    "cancelSessionAction": "Saioa bertan behera utzi"
+    "cancelSessionAction": "Saioa bertan behera utzi",
+    "activeSessions": "Saio aktiboak",
+    "editSession": "Editatu saioa",
+    "editNotice": "Izena eman duten guztiei jakinaraziko zaie.",
+    "cancelNotice": "Izena eman duten guztiei jakinaraziko zaie.",
+    "othersGoing": "Doaz: {{count}}",
+    "nobodyYet": "Oraindik inork ez du izena eman"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

@@ -101,12 +101,17 @@ export default function SpotCheck({
     LEDGE: Image.resolveAssetSource(require('../assets/images/icon_ledge.png'))?.uri ?? '',
   };
 
-  // Sincronizar spots
+  // Sincronizar spots. The parent builds a new array on every render (saving a spot, live counts…):
+  // only a real change in the data redraws the markers, so an open popup stays open.
+  const sentSpotsRef = useRef<string | null>(null);
   useEffect(() => {
     if (mapReadyRef.current && webviewRef.current) {
+      const data = serializeForInlineScript(spots);
+      if (data === sentSpotsRef.current) return;
+      sentSpotsRef.current = data;
       webviewRef.current.injectJavaScript(`
         if(typeof window.renderSpots === 'function') {
-          window.renderSpots(${serializeForInlineScript(spots)});
+          window.renderSpots(${data});
         }
         true;
       `);
@@ -277,9 +282,20 @@ export default function SpotCheck({
             object-fit: contain;
             object-position: 50% 100%;
             transform-origin: 50% 100%;
-            transition: transform 0.12s ease;
           }
+          /* Skateparks are big places: their icon keeps the full size, the rest are a bit smaller */
+          .spot-icon.is-small .spot-icon-img { width: 41px; height: 41px; }
+          .spot-icon.is-park .spot-icon-img { width: 46px; height: 46px; }
           .spot-icon.is-selected .spot-icon-img { transform: scale(1.2); }
+          /* The hop plays once, when the spot is tapped. Redraws after the map moves restore the
+             selected size without it (they rebuild the marker, which used to replay the animation). */
+          .spot-icon.is-popping .spot-icon-img { animation: spot-pop 0.22s cubic-bezier(0.3, 0.7, 0.4, 1.4); }
+          @keyframes spot-pop {
+            0% { transform: scale(1); }
+            55% { transform: scale(1.3); }
+            100% { transform: scale(1.2); }
+          }
+          @media (prefers-reduced-motion: reduce) { .spot-icon.is-popping .spot-icon-img { animation: none; } }
           .proposed-dot {
             width: 22px; height: 22px;
             border-radius: 50%;
@@ -659,13 +675,15 @@ export default function SpotCheck({
             var key = spotType + '|' + live;
             if (!spotIcons[key]) {
               var iconUrl = SPOT_ICONS[spotType] || SPOT_ICONS.STREET;
+              var isPark = spotType === 'PARK' || spotType === 'SKATEPARK';
+              var size = isPark ? 46 : 41;
               var badge = live > 0 ? '<span class="live-badge">' + (live > 9 ? '9+' : live) + '</span>' : '';
               spotIcons[key] = L.divIcon({
-                className: 'spot-icon',
+                className: isPark ? 'spot-icon is-park' : 'spot-icon is-small',
                 html: '<img class="spot-icon-img" src="' + iconUrl + '" alt="" />' + badge,
-                iconSize: [45, 45],
-                iconAnchor: [22, 45],
-                popupAnchor: [0, -40]
+                iconSize: [size, size],
+                iconAnchor: [Math.round(size / 2), size],
+                popupAnchor: [0, 5 - size]
               });
             }
             return spotIcons[key];
@@ -770,6 +788,7 @@ export default function SpotCheck({
           var selectedSpotId = null;
           var selectedLatLng = null;
           var isRerendering = false;
+          var isRestoringSelection = false;
 
           function renderVisibleSpots() {
             isRerendering = true;
@@ -841,7 +860,9 @@ export default function SpotCheck({
                 });
               }
               if (selectedMarker) {
+                isRestoringSelection = true;
                 selectedMarker.openPopup();
+                isRestoringSelection = false;
               } else {
                 // El spot se ha agrupado o ha salido de pantalla: se suelta la selección
                 selectedSpotId = null;
@@ -869,9 +890,15 @@ export default function SpotCheck({
             routeLine = L.polyline(points, L.extend({ color: '${Palette.pink}', weight: 6 }, style)).addTo(map);
           }
 
-          function setSelectedClass(marker, isSelected) {
+          function setSelectedClass(marker, isSelected, pop) {
             var el = marker && marker.getElement && marker.getElement();
-            if (el) el.classList.toggle('is-selected', isSelected);
+            if (!el) return;
+            el.classList.toggle('is-selected', isSelected);
+            el.classList.remove('is-popping');
+            if (isSelected && pop) {
+              void el.offsetWidth; // restart the animation if it was already set
+              el.classList.add('is-popping');
+            }
           }
 
           map.on('popupopen', function(e) {
@@ -879,7 +906,7 @@ export default function SpotCheck({
             if (!marker || marker.spotId === undefined) return;
             selectedSpotId = marker.spotId;
             selectedLatLng = marker.getLatLng();
-            setSelectedClass(marker, true);
+            setSelectedClass(marker, true, !isRestoringSelection);
             drawRoute();
           });
 
@@ -1056,7 +1083,7 @@ export default function SpotCheck({
               document.body.style.height = window.innerHeight + 'px';
               document.getElementById('map').style.height = window.innerHeight + 'px';
               map.invalidateSize(true);
-              window.renderSpots(${serializeForInlineScript(spots)});
+              window.renderSpots(${(sentSpotsRef.current = serializeForInlineScript(spots))});
               ${userLocation ? `window.updateUserLocation(${userLocation.lat},${userLocation.lng});` : ''}
               window.isAddingMode = ${isAddingMode};
               window.__setFavorites(${favoritesJson});

@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "এই সেশন শেষ হয়ে গেছে।",
-    "sessionLimit": "আপনার ইতিমধ্যে ১০টি আসন্ন সেশন আছে।",
+    "sessionLimit": "আপনার ইতিমধ্যে ৫টি সক্রিয় সেশন আছে, এটাই সর্বোচ্চ।",
     "blocked": "আপনি এই ব্যবহারকারীকে ফলো করতে পারবেন না।",
     "cannotBlockSelf": "আপনি নিজেকে ব্লক করতে পারবেন না।"
   },
@@ -219,6 +219,8 @@
     "newSpot": "নতুন স্পট 📍",
     "close": "✕ বাতিল",
     "photoCaptured": "ছবি তোলা হয়েছে ✔️",
+    "photoRefused": "ছবিটি গ্রহণযোগ্য নয়",
+    "retakePhoto": "আবার ছবি তুলুন",
     "name": "নাম",
     "description": "বিবরণ...",
     "type": "ধরন",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "আপনার মন্তব্য পছন্দ করেছেন",
       "SESSION_JOINED": "আপনার সেশনে আসছেন: {{spot}}",
       "SESSION_REMINDER": "{{spot}}-এ আপনার সেশন শিগগির শুরু হবে",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "{{spot}}-এর সেশন পরিবর্তন করেছে",
+      "SESSION_CANCELLED": "{{spot}}-এর সেশন বাতিল করেছে"
     },
     "reply": "উত্তর দিন",
     "replyingTo": "{{username}}-কে উত্তর",
@@ -347,6 +351,11 @@
     "noSessions": "এখনও কোনো সেশন ঠিক হয়নি।",
     "planSession": "সেশন ঠিক করুন",
     "when": "কখন",
+    "customTime": "অন্য সময়",
+    "day": "দিন",
+    "time": "সময়",
+    "mySessions": "আমার সেশন",
+    "hosting": "আমি আয়োজক",
     "note": "নোট (ঐচ্ছিক)",
     "notePlaceholder": "Game of SKATE, ফিল্মিং, নতুনরাও আসুন…",
     "create": "তৈরি করুন",
@@ -357,7 +366,13 @@
     "going": "যাচ্ছেন: {{count}}",
     "hostedBy": "আয়োজক: {{username}}",
     "keepSession": "রেখে দিন",
-    "cancelSessionAction": "সেশন বাতিল করুন"
+    "cancelSessionAction": "সেশন বাতিল করুন",
+    "activeSessions": "সক্রিয় সেশন",
+    "editSession": "সেশন সম্পাদনা",
+    "editNotice": "যারা আসছে সবাই বিজ্ঞপ্তি পাবে।",
+    "cancelNotice": "যারা আসছে সবাই বিজ্ঞপ্তি পাবে।",
+    "othersGoing": "আসছে: {{count}}",
+    "nobodyYet": "এখনও কেউ যোগ দেয়নি"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

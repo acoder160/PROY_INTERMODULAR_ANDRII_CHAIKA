@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "Esta sessão já acabou.",
-    "sessionLimit": "Você já tem 10 sessões marcadas.",
+    "sessionLimit": "Você já tem 5 sessões ativas, o máximo permitido.",
     "blocked": "Você não pode seguir este usuário.",
     "cannotBlockSelf": "Você não pode bloquear a si mesmo."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Novo spot 📍",
     "close": "✕ Cancelar",
     "photoCaptured": "Foto capturada ✔️",
+    "photoRefused": "Foto não aceita",
+    "retakePhoto": "Tirar outra foto",
     "name": "Nome",
     "description": "Descrição...",
     "type": "Tipo",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "curtiu seu comentário",
       "SESSION_JOINED": "vai à sua sessão em {{spot}}",
       "SESSION_REMINDER": "Sua sessão em {{spot}} começa em breve",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "alterou a sessão em {{spot}}",
+      "SESSION_CANCELLED": "cancelou a sessão em {{spot}}"
     },
     "reply": "Responder",
     "replyingTo": "Resposta para {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "Nenhuma sessão marcada ainda.",
     "planSession": "Marcar uma sessão",
     "when": "Quando",
+    "customTime": "Outro horário",
+    "day": "Dia",
+    "time": "Hora",
+    "mySessions": "Minhas sessões",
+    "hosting": "Organizo",
     "note": "Observação (opcional)",
     "notePlaceholder": "Game of SKATE, filmagem, iniciantes bem-vindos…",
     "create": "Criar",
@@ -357,7 +366,13 @@
     "going": "Vão: {{count}}",
     "hostedBy": "Organiza: {{username}}",
     "keepSession": "Manter",
-    "cancelSessionAction": "Cancelar sessão"
+    "cancelSessionAction": "Cancelar sessão",
+    "activeSessions": "Sessões ativas",
+    "editSession": "Editar sessão",
+    "editNotice": "Todos que vão serão avisados.",
+    "cancelNotice": "Todos que vão serão avisados.",
+    "othersGoing": "Vão: {{count}}",
+    "nobodyYet": "Ninguém entrou ainda"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

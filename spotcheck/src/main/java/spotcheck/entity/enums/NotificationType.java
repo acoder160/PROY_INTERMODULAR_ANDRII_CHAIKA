@@ -14,5 +14,9 @@ public enum NotificationType {
     /** a session the recipient joined starts in about 30 minutes (actor = host) */
     SESSION_REMINDER,
     /** someone the recipient follows (actor) just checked in at a spot */
-    FOLLOWEE_CHECKED_IN
+    FOLLOWEE_CHECKED_IN,
+    /** the host (actor) changed the time or note of a session the recipient joined */
+    SESSION_UPDATED,
+    /** the host (actor) cancelled a session the recipient joined (the session is gone: spot only) */
+    SESSION_CANCELLED
 }

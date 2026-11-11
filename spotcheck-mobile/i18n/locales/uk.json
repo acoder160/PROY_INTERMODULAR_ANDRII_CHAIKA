@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "Ця сесія вже закінчилася.",
-    "sessionLimit": "У вас уже 10 майбутніх сесій.",
+    "sessionLimit": "У вас уже 5 активних сесій — це максимум.",
     "blocked": "Ви не можете підписатися на цього користувача.",
     "cannotBlockSelf": "Не можна заблокувати самого себе."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Новий спот 📍",
     "close": "✕ Скасувати",
     "photoCaptured": "Фото зроблено ✔️",
+    "photoRefused": "Фото не підходить",
+    "retakePhoto": "Перезняти фото",
     "name": "Назва",
     "description": "Опис...",
     "type": "Тип",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "вподобав(-ла) ваш коментар",
       "SESSION_JOINED": "іде на вашу сесію: {{spot}}",
       "SESSION_REMINDER": "Сесія на «{{spot}}» скоро почнеться",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "змінив(ла) сесію на {{spot}}",
+      "SESSION_CANCELLED": "скасував(ла) сесію на {{spot}}"
     },
     "reply": "Відповісти",
     "replyingTo": "Відповідь для {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "Поки немає запланованих сесій.",
     "planSession": "Запланувати сесію",
     "when": "Коли",
+    "customTime": "Свій час",
+    "day": "День",
+    "time": "Час",
+    "mySessions": "Мої сесії",
+    "hosting": "Організовую",
     "note": "Нотатка (необов’язково)",
     "notePlaceholder": "Game of SKATE, зйомка, новачки welcome…",
     "create": "Створити",
@@ -357,7 +366,13 @@
     "going": "Ідуть: {{count}}",
     "hostedBy": "Організатор: {{username}}",
     "keepSession": "Залишити",
-    "cancelSessionAction": "Скасувати сесію"
+    "cancelSessionAction": "Скасувати сесію",
+    "activeSessions": "Активні сесії",
+    "editSession": "Змінити сесію",
+    "editNotice": "Усі, хто записався, отримають сповіщення.",
+    "cancelNotice": "Усі, хто записався, отримають сповіщення.",
+    "othersGoing": "Ідуть: {{count}}",
+    "nobodyYet": "Поки ніхто не записався"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "Bu seans sona erdi.",
-    "sessionLimit": "Zaten 10 yaklaşan seansınız var.",
+    "sessionLimit": "Zaten 5 aktif seansınız var, bu en fazla sayı.",
     "blocked": "Bu kullanıcıyı takip edemezsin.",
     "cannotBlockSelf": "Kendini engelleyemezsin."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Yeni spot 📍",
     "close": "✕ İptal",
     "photoCaptured": "Fotoğraf çekildi ✔️",
+    "photoRefused": "Fotoğraf uygun değil",
+    "retakePhoto": "Yeniden çek",
     "name": "Ad",
     "description": "Açıklama...",
     "type": "Tür",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "yorumunuzu beğendi",
       "SESSION_JOINED": "{{spot}} seansınıza katılıyor",
       "SESSION_REMINDER": "{{spot}} seansınız yakında başlıyor",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "{{spot}} seansını değiştirdi",
+      "SESSION_CANCELLED": "{{spot}} seansını iptal etti"
     },
     "reply": "Yanıtla",
     "replyingTo": "{{username}} kullanıcısına yanıt",
@@ -347,6 +351,11 @@
     "noSessions": "Henüz planlanmış seans yok.",
     "planSession": "Seans planla",
     "when": "Ne zaman",
+    "customTime": "Başka saat",
+    "day": "Gün",
+    "time": "Saat",
+    "mySessions": "Seanslarım",
+    "hosting": "Düzenliyorum",
     "note": "Not (isteğe bağlı)",
     "notePlaceholder": "Game of SKATE, çekim, yeni başlayanlar hoş geldin…",
     "create": "Oluştur",
@@ -357,7 +366,13 @@
     "going": "Gelen: {{count}}",
     "hostedBy": "Düzenleyen: {{username}}",
     "keepSession": "Kalsın",
-    "cancelSessionAction": "Seansı iptal et"
+    "cancelSessionAction": "Seansı iptal et",
+    "activeSessions": "Aktif seanslar",
+    "editSession": "Seansı düzenle",
+    "editNotice": "Katılan herkes bilgilendirilecek.",
+    "cancelNotice": "Katılan herkes bilgilendirilecek.",
+    "othersGoing": "Gelenler: {{count}}",
+    "nobodyYet": "Henüz kimse katılmadı"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

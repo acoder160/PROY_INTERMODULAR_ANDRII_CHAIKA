@@ -67,6 +67,12 @@ public class LiveController {
         return ResponseEntity.ok(sessionService.create(auth.getName(), spotId, request.startsAt(), request.note()));
     }
 
+    /** My upcoming sessions, hosted or joined (profile). */
+    @GetMapping("/users/me/sessions")
+    public ResponseEntity<List<SessionItem>> mySessions(Authentication auth) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(sessionService.mine(auth.getName()));
+    }
+
     @PostMapping("/sessions/{sessionId}/join")
     public ResponseEntity<SessionItem> join(@PathVariable Long sessionId, Authentication auth) {
         return ResponseEntity.ok(sessionService.join(auth.getName(), sessionId));
@@ -75,6 +81,12 @@ public class LiveController {
     @DeleteMapping("/sessions/{sessionId}/join")
     public ResponseEntity<SessionItem> leave(@PathVariable Long sessionId, Authentication auth) {
         return ResponseEntity.ok(sessionService.leave(auth.getName(), sessionId));
+    }
+
+    @PatchMapping("/sessions/{sessionId}")
+    public ResponseEntity<SessionItem> updateSession(@PathVariable Long sessionId, @Valid @RequestBody SessionCreate request,
+                                                     Authentication auth) {
+        return ResponseEntity.ok(sessionService.update(auth.getName(), sessionId, request.startsAt(), request.note()));
     }
 
     @DeleteMapping("/sessions/{sessionId}")

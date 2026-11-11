@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "This session is over.",
-    "sessionLimit": "You already have 10 upcoming sessions.",
+    "sessionLimit": "You already have 5 active sessions, the most you can host.",
     "blocked": "You can't follow this user.",
     "cannotBlockSelf": "You can't block yourself."
   },
@@ -219,6 +219,8 @@
     "newSpot": "New spot 📍",
     "close": "✕ Cancel",
     "photoCaptured": "Photo captured ✔️",
+    "photoRefused": "Photo not accepted",
+    "retakePhoto": "Retake photo",
     "name": "Name",
     "description": "Description...",
     "type": "Type",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "liked your comment",
       "SESSION_JOINED": "is coming to your session at {{spot}}",
       "SESSION_REMINDER": "Your session at {{spot}} starts soon",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "changed the session at {{spot}}",
+      "SESSION_CANCELLED": "cancelled the session at {{spot}}"
     },
     "reply": "Reply",
     "replyingTo": "Reply to {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "No sessions planned yet.",
     "planSession": "Plan a session",
     "when": "When",
+    "customTime": "Other time",
+    "day": "Day",
+    "time": "Time",
+    "mySessions": "My sessions",
+    "hosting": "Hosting",
     "note": "Note (optional)",
     "notePlaceholder": "Game of SKATE, filming, beginners welcome…",
     "create": "Create",
@@ -357,7 +366,13 @@
     "going": "Going: {{count}}",
     "hostedBy": "Host: {{username}}",
     "keepSession": "Keep it",
-    "cancelSessionAction": "Cancel session"
+    "cancelSessionAction": "Cancel session",
+    "activeSessions": "Active sessions",
+    "editSession": "Edit session",
+    "editNotice": "Everyone who's coming will be notified.",
+    "cancelNotice": "Everyone who's coming will be notified.",
+    "othersGoing": "Coming: {{count}}",
+    "nobodyYet": "Nobody has joined yet"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

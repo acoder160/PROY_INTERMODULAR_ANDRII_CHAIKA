@@ -13,9 +13,10 @@ const paintFor = (name?: string | null) => {
 
 /** Profile photo, or the first letter of the name on a paint disc. Decorative: the name sits next to it. */
 export default function Avatar({ username, url, size = 40 }: { username?: string | null; url?: string | null; size?: number }) {
-  const [failed, setFailed] = useState(false);
+  // Remembers which URL failed, so a new photo is tried again instead of staying on the letter
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const box = { width: size, height: size, borderRadius: size / 2 };
-  if (url && !failed) {
+  if (url && failedUrl !== url) {
     // Cloudinary: ask for a square face crop at twice the display size
     const thumb = url.includes('/image/upload/')
       ? url.replace('/image/upload/', `/image/upload/c_fill,g_face,w_${size * 2},h_${size * 2},q_auto/`)
@@ -24,7 +25,7 @@ export default function Avatar({ username, url, size = 40 }: { username?: string
       <Image
         source={{ uri: thumb }}
         style={[styles.base, box]}
-        onError={() => setFailed(true)}
+        onError={() => setFailedUrl(url)}
         accessibilityIgnoresInvertColors
         accessible={false}
       />

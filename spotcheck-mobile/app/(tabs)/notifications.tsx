@@ -14,7 +14,7 @@ import { timeAgo, type SpotSummary, type UserSummary } from '../../utils/social'
 
 interface NotificationItem {
   id: number;
-  type: 'FOLLOW' | 'COMMENT_ON_SPOT' | 'REPLY' | 'COMMENT_LIKE' | 'SESSION_JOINED' | 'SESSION_REMINDER' | 'FOLLOWEE_CHECKED_IN';
+  type: 'FOLLOW' | 'COMMENT_ON_SPOT' | 'REPLY' | 'COMMENT_LIKE' | 'SESSION_JOINED' | 'SESSION_REMINDER' | 'FOLLOWEE_CHECKED_IN' | 'SESSION_UPDATED' | 'SESSION_CANCELLED';
   actor: UserSummary;
   spot: SpotSummary | null;
   comment: string | null;

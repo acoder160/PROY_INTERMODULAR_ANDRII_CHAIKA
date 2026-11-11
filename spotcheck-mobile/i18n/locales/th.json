@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "เซสชันนี้จบแล้ว",
-    "sessionLimit": "คุณมีเซสชันที่กำลังจะมาถึงครบ 10 รายการแล้ว",
+    "sessionLimit": "คุณมีเซสชันที่ใช้งานอยู่ครบ 5 รายการแล้ว ซึ่งเป็นจำนวนสูงสุด",
     "blocked": "คุณไม่สามารถติดตามผู้ใช้นี้ได้",
     "cannotBlockSelf": "คุณไม่สามารถบล็อกตัวเองได้"
   },
@@ -219,6 +219,8 @@
     "newSpot": "สปอตใหม่ 📍",
     "close": "✕ ยกเลิก",
     "photoCaptured": "ถ่ายภาพแล้ว ✔️",
+    "photoRefused": "ใช้รูปนี้ไม่ได้",
+    "retakePhoto": "ถ่ายรูปใหม่",
     "name": "ชื่อ",
     "description": "คำอธิบาย...",
     "type": "ประเภท",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "ถูกใจความคิดเห็นของคุณ",
       "SESSION_JOINED": "จะไปเซสชันของคุณที่ {{spot}}",
       "SESSION_REMINDER": "เซสชันของคุณที่ {{spot}} ใกล้เริ่มแล้ว",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "เปลี่ยนเซสชันที่ {{spot}}",
+      "SESSION_CANCELLED": "ยกเลิกเซสชันที่ {{spot}}"
     },
     "reply": "ตอบกลับ",
     "replyingTo": "ตอบกลับ {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "ยังไม่มีเซสชันที่วางแผนไว้",
     "planSession": "วางแผนเซสชัน",
     "when": "เมื่อไร",
+    "customTime": "เวลาอื่น",
+    "day": "วัน",
+    "time": "เวลา",
+    "mySessions": "เซสชันของฉัน",
+    "hosting": "ฉันจัด",
     "note": "โน้ต (ไม่บังคับ)",
     "notePlaceholder": "Game of SKATE, ถ่ายคลิป, มือใหม่ยินดีต้อนรับ…",
     "create": "สร้าง",
@@ -357,7 +366,13 @@
     "going": "ไปด้วย: {{count}}",
     "hostedBy": "ผู้จัด: {{username}}",
     "keepSession": "เก็บไว้",
-    "cancelSessionAction": "ยกเลิกเซสชัน"
+    "cancelSessionAction": "ยกเลิกเซสชัน",
+    "activeSessions": "เซสชันที่ใช้งานอยู่",
+    "editSession": "แก้ไขเซสชัน",
+    "editNotice": "ทุกคนที่เข้าร่วมจะได้รับการแจ้งเตือน",
+    "cancelNotice": "ทุกคนที่เข้าร่วมจะได้รับการแจ้งเตือน",
+    "othersGoing": "เข้าร่วม: {{count}}",
+    "nobodyYet": "ยังไม่มีใครเข้าร่วม"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

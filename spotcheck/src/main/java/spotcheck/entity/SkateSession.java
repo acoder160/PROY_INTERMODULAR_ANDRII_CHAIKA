@@ -51,5 +51,7 @@ public class SkateSession {
     public String getNote() { return note; }
     public LocalDateTime getRemindedAt() { return remindedAt; }
     public void setRemindedAt(LocalDateTime remindedAt) { this.remindedAt = remindedAt; }
+    public void setStartsAt(LocalDateTime startsAt) { this.startsAt = startsAt; }
+    public void setNote(String note) { this.note = note; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 }

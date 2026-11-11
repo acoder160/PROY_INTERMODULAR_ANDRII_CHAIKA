@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import PageBar from '../components/PageBar';
 import Avatar from '../components/Avatar';
 import SpotCard from '../components/SpotCard';
+import ActiveSessions from '../components/ActiveSessions';
 import Sheet from '../components/Sheet';
 import ReportSheet from '../components/ReportSheet';
 import { LogoutIcon, EditIcon, BookmarkIcon, FlagIcon } from '../components/Icons';
@@ -45,6 +46,7 @@ export default function ProfilePage() {
       .catch(() => { if (!cancelled) setList([]); });
     return () => { cancelled = true; };
   }, [username, tab, reloadKey]);
+
 
   const [reporting, setReporting] = useState(false);
 
@@ -154,6 +156,8 @@ export default function ProfilePage() {
             <div><dt>{t('social.commentsCount')}</dt><dd>{profile.comments}</dd></div>
           </dl>
         </section>
+
+        {profile.me && <ActiveSessions reloadKey={reloadKey} />}
 
         <nav className="admin-tabs social-tabs" aria-label={t('social.profile')}>
           {TABS.map((key) => (

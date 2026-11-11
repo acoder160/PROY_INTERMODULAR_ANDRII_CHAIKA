@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "このセッションは終了しました。",
-    "sessionLimit": "予定中のセッションがすでに10件あります。",
+    "sessionLimit": "有効なセッションがすでに5件あります（上限）。",
     "blocked": "このユーザーはフォローできません。",
     "cannotBlockSelf": "自分自身はブロックできません。"
   },
@@ -219,6 +219,8 @@
     "newSpot": "新しいスポット 📍",
     "close": "✕ キャンセル",
     "photoCaptured": "撮影しました ✔️",
+    "photoRefused": "この写真は使えません",
+    "retakePhoto": "写真を撮り直す",
     "name": "名前",
     "description": "説明...",
     "type": "種類",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "があなたのコメントにいいねしました",
       "SESSION_JOINED": "があなたのセッション（{{spot}}）に参加します",
       "SESSION_REMINDER": "{{spot}}でのセッションがまもなく始まります",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "が{{spot}}のセッションを変更しました",
+      "SESSION_CANCELLED": "が{{spot}}のセッションを中止しました"
     },
     "reply": "返信",
     "replyingTo": "{{username}}さんへの返信",
@@ -347,6 +351,11 @@
     "noSessions": "予定されているセッションはまだありません。",
     "planSession": "セッションを企画",
     "when": "日時",
+    "customTime": "別の日時",
+    "day": "日付",
+    "time": "時刻",
+    "mySessions": "マイセッション",
+    "hosting": "主催",
     "note": "メモ（任意）",
     "notePlaceholder": "Game of SKATE、撮影、初心者歓迎…",
     "create": "作成",
@@ -357,7 +366,13 @@
     "going": "参加: {{count}}",
     "hostedBy": "主催: {{username}}",
     "keepSession": "残す",
-    "cancelSessionAction": "セッションを中止"
+    "cancelSessionAction": "セッションを中止",
+    "activeSessions": "アクティブなセッション",
+    "editSession": "セッションを編集",
+    "editNotice": "参加者全員に通知されます。",
+    "cancelNotice": "参加者全員に通知されます。",
+    "othersGoing": "参加: {{count}}人",
+    "nobodyYet": "まだ参加者はいません"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "Deze sessie is voorbij.",
-    "sessionLimit": "Je hebt al 10 komende sessies.",
+    "sessionLimit": "Je hebt al 5 actieve sessies, het maximum.",
     "blocked": "Je kunt deze gebruiker niet volgen.",
     "cannotBlockSelf": "Je kunt jezelf niet blokkeren."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Nieuwe spot 📍",
     "close": "✕ Annuleren",
     "photoCaptured": "Foto gemaakt ✔️",
+    "photoRefused": "Foto niet geaccepteerd",
+    "retakePhoto": "Nieuwe foto",
     "name": "Naam",
     "description": "Beschrijving...",
     "type": "Soort",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "vindt je reactie leuk",
       "SESSION_JOINED": "komt naar je sessie bij {{spot}}",
       "SESSION_REMINDER": "Je sessie bij {{spot}} begint zo",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "heeft de sessie bij {{spot}} gewijzigd",
+      "SESSION_CANCELLED": "heeft de sessie bij {{spot}} geannuleerd"
     },
     "reply": "Beantwoorden",
     "replyingTo": "Antwoord aan {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "Nog geen sessies gepland.",
     "planSession": "Sessie plannen",
     "when": "Wanneer",
+    "customTime": "Andere tijd",
+    "day": "Dag",
+    "time": "Tijd",
+    "mySessions": "Mijn sessies",
+    "hosting": "Ik organiseer",
     "note": "Notitie (optioneel)",
     "notePlaceholder": "Game of SKATE, filmen, beginners welkom…",
     "create": "Aanmaken",
@@ -357,7 +366,13 @@
     "going": "Gaan: {{count}}",
     "hostedBy": "Host: {{username}}",
     "keepSession": "Behouden",
-    "cancelSessionAction": "Sessie annuleren"
+    "cancelSessionAction": "Sessie annuleren",
+    "activeSessions": "Actieve sessies",
+    "editSession": "Sessie bewerken",
+    "editNotice": "Iedereen die komt krijgt een melding.",
+    "cancelNotice": "Iedereen die komt krijgt een melding.",
+    "othersGoing": "Komen: {{count}}",
+    "nobodyYet": "Nog niemand aangemeld"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

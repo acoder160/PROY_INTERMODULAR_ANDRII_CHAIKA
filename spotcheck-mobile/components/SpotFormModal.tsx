@@ -22,6 +22,10 @@ interface SpotFormModalProps {
   title?: string;
   /** The AI is reading the photo to fill in the form. */
   suggesting?: boolean;
+  /** The server refused the photo: it is marked and the form asks for another one. */
+  photoRejected?: boolean;
+  /** Opens the camera to replace the photo; without it the photo can't be changed. */
+  onRetakePhoto?: () => void;
 }
 
 const TYPES = ['STREET', 'PARK', 'RAMPS', 'RAIL', 'LEDGE'];
@@ -38,6 +42,8 @@ export default function SpotFormModal({
   errorMessage,
   title,
   suggesting = false,
+  photoRejected = false,
+  onRetakePhoto,
 }: SpotFormModalProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -92,10 +98,29 @@ export default function SpotFormModal({
             {capturedPhoto && (
               <View style={styles.photo}>
                 <Image source={{ uri: capturedPhoto }} style={styles.photoImage} accessibilityIgnoresInvertColors />
-                <View style={styles.photoTag}>
-                  <Ionicons name="checkmark-circle" size={16} color={Palette.positive} />
-                  <Text style={styles.photoTagText}>{cleanLabel(t('form.photoCaptured'))}</Text>
+                <View style={[styles.photoTag, photoRejected && styles.photoTagRejected]}>
+                  <Ionicons
+                    name={photoRejected ? 'close-circle' : 'checkmark-circle'}
+                    size={16}
+                    color={photoRejected ? Palette.danger : Palette.positive}
+                  />
+                  <Text style={styles.photoTagText}>
+                    {photoRejected ? t('form.photoRefused') : cleanLabel(t('form.photoCaptured'))}
+                  </Text>
                 </View>
+                {onRetakePhoto && (
+                  <TouchableOpacity
+                    style={[styles.retakeChip, isUploading && styles.closeBtnBusy]}
+                    onPress={onRetakePhoto}
+                    disabled={isUploading}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: isUploading }}
+                    accessibilityLabel={t('form.retakePhoto')}
+                  >
+                    <Ionicons name="camera" size={18} color={Palette.white} />
+                    <Text style={styles.retakeChipText} numberOfLines={1}>{t('form.retakePhoto')}</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
 
@@ -182,6 +207,19 @@ export default function SpotFormModal({
                 <Text style={styles.errorText}>{errorMessage}</Text>
               </View>
             )}
+            {photoRejected && onRetakePhoto && !isUploading && (
+              <TouchableOpacity
+                style={styles.retakeBtn}
+                onPress={onRetakePhoto}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+              >
+                <Ionicons name="camera" size={22} color={Palette.ink} />
+                <Text style={styles.retakeBtnText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+                  {t('form.retakePhoto')}
+                </Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={[styles.saveBtn, isUploading && styles.saveBtnBusy]}
               onPress={handleSave}
@@ -256,6 +294,37 @@ const styles = StyleSheet.create({
     borderColor: Palette.ink,
   },
   photoTagText: { fontSize: 14, fontWeight: '700', color: Palette.ink },
+  photoTagRejected: { borderColor: Palette.danger },
+  retakeChip: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    maxWidth: '70%',
+    minHeight: MIN_TARGET,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    borderRadius: MIN_TARGET / 2,
+    backgroundColor: Palette.asphalt,
+    borderWidth: 2,
+    borderColor: Palette.white,
+  },
+  retakeChipText: { flexShrink: 1, fontSize: 14, fontWeight: '800', color: Palette.white },
+  retakeBtn: {
+    minHeight: 52,
+    marginBottom: 12,
+    borderRadius: 26,
+    borderWidth: 2,
+    borderColor: Palette.ink,
+    backgroundColor: Palette.sheet,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingHorizontal: 20,
+  },
+  retakeBtnText: { flexShrink: 1, fontFamily: DisplayFont.black, fontSize: 20, letterSpacing: 0.8, textTransform: 'uppercase', color: Palette.ink },
 
   field: { gap: 8 },
   label: { fontFamily: DisplayFont.bold, fontSize: 18, letterSpacing: 0.6, textTransform: 'uppercase', color: Palette.ink },

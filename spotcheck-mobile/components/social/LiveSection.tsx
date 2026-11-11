@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -212,19 +213,83 @@ export default function LiveSection({ spotId, me, liveCount, onBeforeNavigate }:
   );
 }
 
-function PlanSession({ spotId, onCancel, onCreated }: { spotId: number; onCancel: () => void; onCreated: () => void }) {
+const DAYS_AHEAD = 30; // the server takes sessions up to 30 days ahead
+const HOURS = Array.from({ length: 24 }, (_, h) => h);
+const MINUTES = [0, 15, 30, 45];
+
+function startOfDay(offset: number): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + offset);
+  return d;
+}
+
+function at(dayOffset: number, hour: number, minute: number): Date {
+  const d = startOfDay(dayOffset);
+  d.setHours(hour, minute, 0, 0);
+  return d;
+}
+
+/** A session being edited: the form opens on its time and note. */
+export interface EditableSession { id: number; startsAt: string; note: string | null }
+
+function daysFromToday(date: Date): number {
+  // Rounded: a day with a daylight-saving change is 23 or 25 hours long
+  return Math.round((new Date(date).setHours(0, 0, 0, 0) - startOfDay(0).getTime()) / 86400000);
+}
+
+/**
+ * Plan a session at a spot, or (with {@code session}) change the time and note of one you host.
+ * Used by the spot sheet and by "Active sessions" on your profile.
+ */
+export function PlanSession({ spotId, session, onCancel, onCreated }: {
+  spotId: number;
+  session?: EditableSession;
+  onCancel: () => void;
+  onCreated: () => void;
+}) {
   const { t, i18n } = useTranslation();
   const [options] = useState(startOptions);
-  const [when, setWhen] = useState<Date>(options[1]);
-  const [note, setNote] = useState('');
+  const [preset, setPreset] = useState<Date>(options[1]);
+  const start = session ? new Date(session.startsAt) : null;
+  // "Other time": any day of the next month, any hour, in 15-minute steps. Editing opens on it.
+  const [custom, setCustom] = useState(!!start);
+  const [day, setDay] = useState(() => (start ? Math.max(0, daysFromToday(start)) : 0));
+  const [hour, setHour] = useState(() => (start ? start.getHours() : Math.min(23, new Date().getHours() + 2)));
+  const [minute, setMinute] = useState(() => (start ? start.getMinutes() : 0));
+  const minutes = MINUTES.includes(minute) ? MINUTES : [...MINUTES, minute].sort((a, b) => a - b);
+  const [note, setNote] = useState(session?.note ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // "Now" for greying out past times; ticks so an open form doesn't offer a time that just passed
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(timer);
+  }, []);
+  const when = custom ? at(day, hour, minute) : preset;
+  const inPast = when.getTime() < now;
+  const days = Array.from({ length: DAYS_AHEAD }, (_, i) => startOfDay(i));
+
+  const pickDay = (offset: number) => {
+    setDay(offset);
+    // Today: move the time forward if it already passed
+    if (offset === 0 && at(0, hour, minute).getTime() < now) {
+      const next = new Date(now + 3600000);
+      setHour(next.getHours());
+      setMinute(0);
+      if (next.getDate() !== new Date(now).getDate()) setDay(1);
+    }
+  };
+
   const submit = async () => {
+    if (inPast) return;
     setSaving(true);
     setError(null);
     try {
-      await api.post(`/spots/${spotId}/sessions`, { startsAt: when.toISOString(), note });
+      if (session) await api.patch(`/sessions/${session.id}`, { startsAt: when.toISOString(), note });
+      else await api.post(`/spots/${spotId}/sessions`, { startsAt: when.toISOString(), note });
       onCreated();
     } catch (e) {
       setError(apiErrorText(e, t, { text_rejected: 'social.commentRejected' }));
@@ -237,15 +302,75 @@ function PlanSession({ spotId, onCancel, onCreated }: { spotId: number; onCancel
       <Text style={styles.label}>{t('live.when')}</Text>
       <View style={styles.chips}>
         {options.map((d) => {
-          const on = d.getTime() === when.getTime();
+          const on = !custom && d.getTime() === preset.getTime();
           return (
-            <TouchableOpacity key={d.getTime()} style={[styles.chip, on && styles.chipOn]} onPress={() => setWhen(d)}
+            <TouchableOpacity key={d.getTime()} style={[styles.chip, on && styles.chipOn]} onPress={() => { setCustom(false); setPreset(d); }}
                               accessibilityRole="button" accessibilityState={{ selected: on }}>
               <Text style={[styles.chipText, on && { color: Palette.white }]}>{formatSessionTime(d.toISOString(), i18n.language)}</Text>
             </TouchableOpacity>
           );
         })}
+        <TouchableOpacity style={[styles.chip, styles.chipCustom, custom && styles.chipOn]} onPress={() => setCustom(true)}
+                          accessibilityRole="button" accessibilityState={{ selected: custom }}>
+          <Ionicons name="calendar-outline" size={16} color={custom ? Palette.white : Palette.ink} />
+          <Text style={[styles.chipText, custom && { color: Palette.white }]}>{t('live.customTime')}</Text>
+        </TouchableOpacity>
       </View>
+
+      {custom && (
+        <View style={styles.custom}>
+          <Text style={styles.subLabel}>{t('live.day')}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.strip}>
+            {days.map((d, i) => {
+              const on = i === day;
+              return (
+                <TouchableOpacity key={i} style={[styles.dayChip, on && styles.chipOn]} onPress={() => pickDay(i)}
+                                  accessibilityRole="button" accessibilityState={{ selected: on }}
+                                  accessibilityLabel={d.toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' })}>
+                  <Text style={[styles.dayWeek, on && { color: Palette.white }]}>
+                    {d.toLocaleDateString(i18n.language, { weekday: 'short' })}
+                  </Text>
+                  <Text style={[styles.dayNum, on && { color: Palette.white }]}>{d.getDate()}</Text>
+                  <Text style={[styles.dayWeek, on && { color: Palette.white }]}>
+                    {d.toLocaleDateString(i18n.language, { month: 'short' })}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          <Text style={styles.subLabel}>{t('live.time')}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.strip}>
+            {HOURS.map((h) => {
+              const on = h === hour;
+              const past = at(day, h, 45).getTime() < now;
+              return (
+                <TouchableOpacity key={h} style={[styles.timeChip, on && styles.chipOn, past && styles.chipPast]}
+                                  onPress={() => { setHour(h); if (at(day, h, minute).getTime() < now) setMinute(45); }}
+                                  disabled={past} accessibilityRole="button" accessibilityState={{ selected: on, disabled: past }}>
+                  <Text style={[styles.timeText, on && { color: Palette.white }]}>{String(h).padStart(2, '0')}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+          <View style={styles.chips}>
+            {minutes.map((m) => {
+              const on = m === minute;
+              const past = at(day, hour, m).getTime() < now;
+              return (
+                <TouchableOpacity key={m} style={[styles.timeChip, on && styles.chipOn, past && styles.chipPast]}
+                                  onPress={() => setMinute(m)} disabled={past}
+                                  accessibilityRole="button" accessibilityState={{ selected: on, disabled: past }}>
+                  <Text style={[styles.timeText, on && { color: Palette.white }]}>:{String(m).padStart(2, '0')}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          <Text style={[styles.picked, inPast && { color: Palette.danger }]} accessibilityLiveRegion="polite">
+            {inPast ? t('errors.sessionBadTime') : formatSessionTime(when.toISOString(), i18n.language)}
+          </Text>
+        </View>
+      )}
       <Text style={styles.label}>{t('live.note')}</Text>
       <TextInput
         style={styles.input}
@@ -262,9 +387,10 @@ function PlanSession({ spotId, onCancel, onCreated }: { spotId: number; onCancel
         <TouchableOpacity style={styles.outlineBtn} onPress={onCancel} accessibilityRole="button">
           <Text style={styles.btnText}>{t('common.cancel')}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.primaryBtn} onPress={submit} disabled={saving} accessibilityRole="button">
+        <TouchableOpacity style={[styles.primaryBtn, inPast && { opacity: 0.5 }]} onPress={submit} disabled={saving || inPast}
+                          accessibilityRole="button" accessibilityState={{ disabled: saving || inPast }}>
           <GradientFill name="pink" radius={Radius.control} />
-          {saving ? <ActivityIndicator color={Palette.ink} /> : <Text style={styles.btnText}>{t('live.create')}</Text>}
+          {saving ? <ActivityIndicator color={Palette.ink} /> : <Text style={styles.btnText}>{session ? t('social.save') : t('live.create')}</Text>}
         </TouchableOpacity>
       </View>
     </View>
@@ -295,6 +421,17 @@ const styles = StyleSheet.create({
   chip: { minHeight: 40, paddingHorizontal: 12, borderRadius: 20, borderWidth: 2, borderColor: Palette.ink, justifyContent: 'center', backgroundColor: Palette.white },
   chipOn: { backgroundColor: Palette.asphalt },
   chipText: { fontSize: 14, fontWeight: '700', color: Palette.ink },
+  chipCustom: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  chipPast: { opacity: 0.3 },
+  custom: { gap: 8, padding: 10, borderRadius: 12, backgroundColor: '#F2F2EF' },
+  subLabel: { fontSize: 13, fontWeight: '800', letterSpacing: 0.4, textTransform: 'uppercase', color: Palette.inkMuted },
+  strip: { gap: 6, paddingRight: 6 },
+  dayChip: { width: 58, paddingVertical: 6, borderRadius: 12, borderWidth: 2, borderColor: Palette.ink, alignItems: 'center', backgroundColor: Palette.white },
+  dayWeek: { fontSize: 12, fontWeight: '700', color: Palette.inkMuted, textTransform: 'uppercase' },
+  dayNum: { fontFamily: DisplayFont.black, fontSize: 22, lineHeight: 26, color: Palette.ink },
+  timeChip: { minWidth: MIN_TARGET, minHeight: MIN_TARGET, paddingHorizontal: 10, borderRadius: Radius.control, borderWidth: 2, borderColor: Palette.ink, alignItems: 'center', justifyContent: 'center', backgroundColor: Palette.white },
+  timeText: { fontFamily: DisplayFont.black, fontSize: 18, color: Palette.ink },
+  picked: { fontSize: 15, fontWeight: '800', color: Palette.ink },
   input: { backgroundColor: Palette.white, borderRadius: Radius.input, paddingHorizontal: 14, paddingVertical: 10, minHeight: MIN_TARGET, borderWidth: 2, borderColor: Palette.ink, fontSize: 16, color: Palette.ink },
   planActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8 },
   error: { color: Palette.danger, fontSize: 14, fontWeight: '700' },

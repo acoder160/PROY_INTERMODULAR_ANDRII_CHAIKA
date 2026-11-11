@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "Cette session est terminée.",
-    "sessionLimit": "Vous avez déjà 10 sessions à venir.",
+    "sessionLimit": "Vous avez déjà 5 sessions actives, c’est le maximum.",
     "blocked": "Tu ne peux pas suivre cet utilisateur.",
     "cannotBlockSelf": "Tu ne peux pas te bloquer toi-même."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Nouveau spot 📍",
     "close": "✕ Annuler",
     "photoCaptured": "Photo prise ✔️",
+    "photoRefused": "Photo refusée",
+    "retakePhoto": "Reprendre la photo",
     "name": "Nom",
     "description": "Description...",
     "type": "Type",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "a aimé votre commentaire",
       "SESSION_JOINED": "vient à votre session sur {{spot}}",
       "SESSION_REMINDER": "Votre session sur {{spot}} commence bientôt",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "a modifié la session à {{spot}}",
+      "SESSION_CANCELLED": "a annulé la session à {{spot}}"
     },
     "reply": "Répondre",
     "replyingTo": "Réponse à {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "Aucune session prévue pour l’instant.",
     "planSession": "Planifier une session",
     "when": "Quand",
+    "customTime": "Autre horaire",
+    "day": "Jour",
+    "time": "Heure",
+    "mySessions": "Mes sessions",
+    "hosting": "J’organise",
     "note": "Note (facultatif)",
     "notePlaceholder": "Game of SKATE, tournage, débutants bienvenus…",
     "create": "Créer",
@@ -357,7 +366,13 @@
     "going": "Participants : {{count}}",
     "hostedBy": "Organisateur : {{username}}",
     "keepSession": "La garder",
-    "cancelSessionAction": "Annuler la session"
+    "cancelSessionAction": "Annuler la session",
+    "activeSessions": "Sessions actives",
+    "editSession": "Modifier la session",
+    "editNotice": "Tous les participants seront prévenus.",
+    "cancelNotice": "Tous les participants seront prévenus.",
+    "othersGoing": "Participants : {{count}}",
+    "nobodyYet": "Personne n’est encore inscrit"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

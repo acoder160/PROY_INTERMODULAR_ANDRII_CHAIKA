@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "Diese Session ist vorbei.",
-    "sessionLimit": "Du hast schon 10 geplante Sessions.",
+    "sessionLimit": "Du hast schon 5 aktive Sessions, mehr geht nicht.",
     "blocked": "Du kannst diesem Nutzer nicht folgen.",
     "cannotBlockSelf": "Du kannst dich nicht selbst blockieren."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Neuer Spot 📍",
     "close": "✕ Abbrechen",
     "photoCaptured": "Foto aufgenommen ✔️",
+    "photoRefused": "Foto nicht geeignet",
+    "retakePhoto": "Neues Foto",
     "name": "Name",
     "description": "Beschreibung...",
     "type": "Typ",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "gefällt dein Kommentar",
       "SESSION_JOINED": "kommt zu deiner Session am Spot {{spot}}",
       "SESSION_REMINDER": "Deine Session am Spot {{spot}} beginnt bald",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "hat die Session bei {{spot}} geändert",
+      "SESSION_CANCELLED": "hat die Session bei {{spot}} abgesagt"
     },
     "reply": "Antworten",
     "replyingTo": "Antwort an {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "Noch keine Sessions geplant.",
     "planSession": "Session planen",
     "when": "Wann",
+    "customTime": "Andere Zeit",
+    "day": "Tag",
+    "time": "Uhrzeit",
+    "mySessions": "Meine Sessions",
+    "hosting": "Ich organisiere",
     "note": "Notiz (optional)",
     "notePlaceholder": "Game of SKATE, Filmen, Anfänger willkommen…",
     "create": "Erstellen",
@@ -357,7 +366,13 @@
     "going": "Dabei: {{count}}",
     "hostedBy": "Gastgeber: {{username}}",
     "keepSession": "Behalten",
-    "cancelSessionAction": "Session absagen"
+    "cancelSessionAction": "Session absagen",
+    "activeSessions": "Aktive Sessions",
+    "editSession": "Session bearbeiten",
+    "editNotice": "Alle, die kommen, werden benachrichtigt.",
+    "cancelNotice": "Alle, die kommen, werden benachrichtigt.",
+    "othersGoing": "Dabei: {{count}}",
+    "nobodyYet": "Noch niemand dabei"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

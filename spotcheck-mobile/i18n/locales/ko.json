@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "종료된 세션입니다.",
-    "sessionLimit": "이미 예정된 세션이 10개 있습니다.",
+    "sessionLimit": "이미 활성 세션이 5개 있습니다(최대).",
     "blocked": "이 사용자를 팔로우할 수 없습니다.",
     "cannotBlockSelf": "자기 자신은 차단할 수 없습니다."
   },
@@ -219,6 +219,8 @@
     "newSpot": "새 스팟 📍",
     "close": "✕ 취소",
     "photoCaptured": "사진 촬영 완료 ✔️",
+    "photoRefused": "사용할 수 없는 사진",
+    "retakePhoto": "사진 다시 찍기",
     "name": "이름",
     "description": "설명...",
     "type": "유형",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "님이 회원님의 댓글을 좋아합니다",
       "SESSION_JOINED": "님이 {{spot}} 세션에 참여합니다",
       "SESSION_REMINDER": "{{spot}} 세션이 곧 시작됩니다",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "님이 {{spot}} 세션을 변경했습니다",
+      "SESSION_CANCELLED": "님이 {{spot}} 세션을 취소했습니다"
     },
     "reply": "답글",
     "replyingTo": "{{username}}님에게 답글",
@@ -347,6 +351,11 @@
     "noSessions": "아직 계획된 세션이 없습니다.",
     "planSession": "세션 계획하기",
     "when": "언제",
+    "customTime": "다른 시간",
+    "day": "날짜",
+    "time": "시간",
+    "mySessions": "내 세션",
+    "hosting": "주최",
     "note": "메모 (선택)",
     "notePlaceholder": "Game of SKATE, 촬영, 초보 환영…",
     "create": "만들기",
@@ -357,7 +366,13 @@
     "going": "참여: {{count}}",
     "hostedBy": "주최: {{username}}",
     "keepSession": "유지",
-    "cancelSessionAction": "세션 취소"
+    "cancelSessionAction": "세션 취소",
+    "activeSessions": "활성 세션",
+    "editSession": "세션 수정",
+    "editNotice": "참가자 모두에게 알림이 갑니다.",
+    "cancelNotice": "참가자 모두에게 알림이 갑니다.",
+    "othersGoing": "참가: {{count}}명",
+    "nobodyYet": "아직 참가자가 없습니다"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

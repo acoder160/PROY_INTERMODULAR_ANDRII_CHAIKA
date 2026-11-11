@@ -46,10 +46,33 @@ export default function ProfileEditScreen() {
     if (result.canceled || !result.assets?.[0]) return;
     setUploading(true);
     setError(null);
+    let uploaded: string;
     try {
-      setAvatarUrl(await uploadImageToCloudinary(result.assets[0].uri));
+      uploaded = await uploadImageToCloudinary(result.assets[0].uri);
     } catch {
       setError(t('errors.uploadFailed'));
+      setUploading(false);
+      return;
+    }
+    // The photo is applied at once: before, it only counted after "Save", and going back lost it
+    try {
+      const res = await api.patch('/users/me', { avatarUrl: uploaded });
+      setAvatarUrl(res.data?.avatarUrl ?? uploaded);
+    } catch (e) {
+      setError(apiErrorText(e, t, { photo_rejected: 'errors.photoRejected' }));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removePhoto = async () => {
+    setUploading(true);
+    setError(null);
+    try {
+      await api.patch('/users/me', { avatarUrl: '' });
+      setAvatarUrl('');
+    } catch (e) {
+      setError(apiErrorText(e, t));
     } finally {
       setUploading(false);
     }
@@ -101,7 +124,7 @@ export default function ProfileEditScreen() {
                 {uploading ? <ActivityIndicator color={Palette.ink} /> : <Text style={styles.outlineText}>{t('social.changePhoto')}</Text>}
               </TouchableOpacity>
               {!!avatarUrl && (
-                <TouchableOpacity style={styles.outlineBtn} onPress={() => setAvatarUrl('')} disabled={demo} accessibilityRole="button">
+                <TouchableOpacity style={styles.outlineBtn} onPress={removePhoto} disabled={uploading || demo} accessibilityRole="button">
                   <Text style={styles.outlineText}>{t('social.removePhoto')}</Text>
                 </TouchableOpacity>
               )}

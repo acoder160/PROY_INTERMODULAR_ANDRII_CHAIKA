@@ -188,6 +188,16 @@ public class PushService {
                     case "ru" -> actor + " катается на «" + spot + "»";
                     default -> actor + " is skating at " + spot;
                 };
+                case SESSION_UPDATED -> switch (lang) {
+                    case "es" -> actor + " cambió la sesión en " + spot;
+                    case "ru" -> actor + " изменил(а) сессию на «" + spot + "»";
+                    default -> actor + " changed the session at " + spot;
+                };
+                case SESSION_CANCELLED -> switch (lang) {
+                    case "es" -> actor + " canceló la sesión en " + spot;
+                    case "ru" -> actor + " отменил(а) сессию на «" + spot + "»";
+                    default -> actor + " cancelled the session at " + spot;
+                };
                 case SESSION_REMINDER -> switch (lang) {
                     case "es" -> "Tu sesión en " + spot + " empieza pronto";
                     case "ru" -> "Сессия на «" + spot + "» скоро начнётся";

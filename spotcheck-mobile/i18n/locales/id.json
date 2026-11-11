@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "Sesi ini sudah selesai.",
-    "sessionLimit": "Anda sudah punya 10 sesi mendatang.",
+    "sessionLimit": "Anda sudah punya 5 sesi aktif, batas maksimum.",
     "blocked": "Kamu tidak bisa mengikuti pengguna ini.",
     "cannotBlockSelf": "Kamu tidak bisa memblokir dirimu sendiri."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Spot baru 📍",
     "close": "✕ Batal",
     "photoCaptured": "Foto diambil ✔️",
+    "photoRefused": "Foto tidak diterima",
+    "retakePhoto": "Ambil ulang foto",
     "name": "Nama",
     "description": "Deskripsi...",
     "type": "Jenis",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "menyukai komentar Anda",
       "SESSION_JOINED": "ikut sesi Anda di {{spot}}",
       "SESSION_REMINDER": "Sesi Anda di {{spot}} segera dimulai",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "mengubah sesi di {{spot}}",
+      "SESSION_CANCELLED": "membatalkan sesi di {{spot}}"
     },
     "reply": "Balas",
     "replyingTo": "Balas ke {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "Belum ada sesi terjadwal.",
     "planSession": "Rencanakan sesi",
     "when": "Kapan",
+    "customTime": "Waktu lain",
+    "day": "Hari",
+    "time": "Jam",
+    "mySessions": "Sesi saya",
+    "hosting": "Saya penyelenggara",
     "note": "Catatan (opsional)",
     "notePlaceholder": "Game of SKATE, syuting, pemula dipersilakan…",
     "create": "Buat",
@@ -357,7 +366,13 @@
     "going": "Ikut: {{count}}",
     "hostedBy": "Penyelenggara: {{username}}",
     "keepSession": "Pertahankan",
-    "cancelSessionAction": "Batalkan sesi"
+    "cancelSessionAction": "Batalkan sesi",
+    "activeSessions": "Sesi aktif",
+    "editSession": "Ubah sesi",
+    "editNotice": "Semua yang ikut akan diberi tahu.",
+    "cancelNotice": "Semua yang ikut akan diberi tahu.",
+    "othersGoing": "Ikut: {{count}}",
+    "nobodyYet": "Belum ada yang ikut"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

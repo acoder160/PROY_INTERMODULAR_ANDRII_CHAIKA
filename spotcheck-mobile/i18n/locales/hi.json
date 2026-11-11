@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "यह सेशन खत्म हो चुका है।",
-    "sessionLimit": "आपके पहले से 10 आने वाले सेशन हैं।",
+    "sessionLimit": "आपके पहले से 5 सक्रिय सेशन हैं, यही अधिकतम सीमा है।",
     "blocked": "आप इस उपयोगकर्ता को फ़ॉलो नहीं कर सकते।",
     "cannotBlockSelf": "आप खुद को ब्लॉक नहीं कर सकते।"
   },
@@ -219,6 +219,8 @@
     "newSpot": "नया स्पॉट 📍",
     "close": "✕ रद्द करें",
     "photoCaptured": "फ़ोटो ले ली गई ✔️",
+    "photoRefused": "फ़ोटो स्वीकार नहीं हुई",
+    "retakePhoto": "फिर से फ़ोटो लें",
     "name": "नाम",
     "description": "विवरण...",
     "type": "प्रकार",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "को आपकी टिप्पणी पसंद आई",
       "SESSION_JOINED": "आपके सेशन में आ रहे हैं: {{spot}}",
       "SESSION_REMINDER": "{{spot}} पर आपका सेशन जल्द शुरू होगा",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "ने {{spot}} का सेशन बदला",
+      "SESSION_CANCELLED": "ने {{spot}} का सेशन रद्द किया"
     },
     "reply": "जवाब दें",
     "replyingTo": "{{username}} को जवाब",
@@ -347,6 +351,11 @@
     "noSessions": "अभी कोई सेशन तय नहीं है।",
     "planSession": "सेशन तय करें",
     "when": "कब",
+    "customTime": "दूसरा समय",
+    "day": "दिन",
+    "time": "समय",
+    "mySessions": "मेरे सेशन",
+    "hosting": "मैं आयोजक",
     "note": "नोट (वैकल्पिक)",
     "notePlaceholder": "Game of SKATE, फ़िल्मिंग, नए लोग भी आएँ…",
     "create": "बनाएँ",
@@ -357,7 +366,13 @@
     "going": "आ रहे: {{count}}",
     "hostedBy": "होस्ट: {{username}}",
     "keepSession": "रहने दें",
-    "cancelSessionAction": "सेशन रद्द करें"
+    "cancelSessionAction": "सेशन रद्द करें",
+    "activeSessions": "सक्रिय सेशन",
+    "editSession": "सेशन बदलें",
+    "editNotice": "आने वाले सभी लोगों को सूचना मिलेगी।",
+    "cancelNotice": "आने वाले सभी लोगों को सूचना मिलेगी।",
+    "othersGoing": "आ रहे हैं: {{count}}",
+    "nobodyYet": "अभी तक कोई नहीं जुड़ा"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

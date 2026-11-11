@@ -184,15 +184,20 @@ export default function LiveSection({ spot, liveCount, onClose }) {
   );
 }
 
-function PlanSessionForm({ spotId, onCancel, onCreated }) {
+/**
+ * Plan a session at a spot, or (with `session`) change the time and note of one you host.
+ * Used by the spot sheet and by "Active sessions" on your profile.
+ */
+export function PlanSessionForm({ spotId, session = null, onCancel, onCreated }) {
   const { t } = useTranslation();
   const now = new Date();
   const [when, setWhen] = useState(() => {
+    if (session) return toLocalInput(new Date(session.startsAt));
     const d = new Date(now.getTime() + 2 * 60 * 60 * 1000);
     d.setMinutes(0, 0, 0);
     return toLocalInput(d);
   });
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState(session?.note ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
@@ -201,7 +206,9 @@ function PlanSessionForm({ spotId, onCancel, onCreated }) {
     setSaving(true);
     setError(null);
     try {
-      await api.post(`/spots/${spotId}/sessions`, { startsAt: new Date(when).toISOString(), note });
+      const body = { startsAt: new Date(when).toISOString(), note };
+      if (session) await api.patch(`/sessions/${session.id}`, body);
+      else await api.post(`/spots/${spotId}/sessions`, body);
       onCreated();
     } catch (err) {
       setError(apiErrorText(err, t, { text_rejected: 'social.commentRejected' }));
@@ -222,7 +229,7 @@ function PlanSessionForm({ spotId, onCancel, onCreated }) {
       <div className="live-plan-actions">
         <button type="button" className="btn-outline btn-small" onClick={onCancel}>{t('common.cancel')}</button>
         <button type="submit" className="btn-dark btn-small" disabled={saving || !when}>
-          {saving ? <span className="spinner spinner-ink" aria-label={t('popup.sending')} /> : t('live.create')}
+          {saving ? <span className="spinner spinner-ink" aria-label={t('popup.sending')} /> : session ? t('social.save') : t('live.create')}
         </button>
       </div>
     </form>

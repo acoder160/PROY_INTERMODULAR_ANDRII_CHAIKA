@@ -128,6 +128,9 @@ export default function HomeScreen() {
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
 
   const [formError, setFormError] = useState<string | null>(null);
+  // The server refused the photo: the form offers to take another one without losing what was typed
+  const [photoRejected, setPhotoRejected] = useState(false);
+  const retakingRef = useRef(false); // the camera is open to replace the form's photo
 
   // The photo is uploaded as soon as it is taken, so the AI can suggest the form's values while the
   // user types, and a "create anyway" retry doesn't upload it again
@@ -220,7 +223,27 @@ export default function HomeScreen() {
     setSuggesting(false);
     setModalVisible(false); setIsAddingMode(false); setNewSpotLocation(null); setCapturedPhoto(null); setStatusMessage(null);
     setFormError(null);
+    setPhotoRejected(false);
+    retakingRef.current = false;
     setFormData({ name: '', description: '', spotType: 'STREET', difficultyLevel: 'INTERMEDIATE' });
+  };
+
+  // New photo from inside the form: the form hides while the camera is open, and comes back with
+  // the same name, type and place (or with the old photo if the camera is cancelled)
+  const retakePhoto = () => {
+    if (isUploading) return;
+    retakingRef.current = true;
+    setModalVisible(false);
+    setShowCamera(true);
+  };
+
+  const cancelCamera = () => {
+    setShowCamera(false);
+    setStatusMessage(null);
+    if (retakingRef.current) {
+      retakingRef.current = false;
+      setModalVisible(true);
+    }
   };
 
   // Cerrar el formulario con una foto hecha la perdería: se pide confirmación
@@ -236,7 +259,6 @@ export default function HomeScreen() {
   /** Uploads the photo now and asks the AI for tags; the form stays editable the whole time. */
   const startUploadAndSuggest = (uri: string) => {
     const flow = ++flowRef.current;
-    editedRef.current = new Set();
     const upload = uploadImageToCloudinary(uri);
     uploadRef.current = upload;
     upload
@@ -288,6 +310,18 @@ export default function HomeScreen() {
       setStatusMessage(t('status.processingPhoto'));
       const photo = await cameraRef.current.takePictureAsync({ quality: 0.6 });
       setCapturedPhoto(photo.uri);
+      setPhotoRejected(false);
+      if (retakingRef.current) {
+        // Same spot, new photo: back to the form, keeping what the user typed and picked
+        retakingRef.current = false;
+        setFormError(null);
+        startUploadAndSuggest(photo.uri);
+        setShowCamera(false);
+        setStatusMessage(null);
+        setModalVisible(true);
+        return;
+      }
+      editedRef.current = new Set();
       startUploadAndSuggest(photo.uri);
       setShowCamera(false);
       setIsAddingMode(true);
@@ -330,7 +364,10 @@ export default function HomeScreen() {
         return;
       }
       // A refused photo is deleted by the server: the next save has to upload it again
-      if (typeof data?.code === 'string' && data.code.startsWith('photo_')) uploadRef.current = null;
+      if (typeof data?.code === 'string' && data.code.startsWith('photo_')) {
+        uploadRef.current = null;
+        setPhotoRejected(true);
+      }
       const serverError = error.response?.data?.error; // Captura errores de Bucket4j
       const serverMessage = error.response?.data?.message; // Captura errores de IA o Validación
       const moderationKey = MODERATION_ERRORS[error.response?.data?.code];
@@ -550,6 +587,8 @@ export default function HomeScreen() {
         isUploading={isUploading}
         errorMessage={formError}
         suggesting={suggesting}
+        photoRejected={photoRejected}
+        onRetakePhoto={retakePhoto}
       />
 
       <SpotDetailsModal
@@ -581,7 +620,7 @@ export default function HomeScreen() {
       <LanguageModal visible={languageModalVisible} onClose={() => setLanguageModalVisible(false)} />
 
       {showCamera && (
-        <CameraOverlay cameraRef={cameraRef} onCapture={takePicture} onCancel={() => { setShowCamera(false); setStatusMessage(null); }} />
+        <CameraOverlay cameraRef={cameraRef} onCapture={takePicture} onCancel={cancelCamera} />
       )}
     </View>
   );

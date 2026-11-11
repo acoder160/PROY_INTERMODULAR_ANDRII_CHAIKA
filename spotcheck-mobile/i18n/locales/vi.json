@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "Buổi trượt này đã kết thúc.",
-    "sessionLimit": "Bạn đã có 10 buổi trượt sắp tới.",
+    "sessionLimit": "Bạn đã có 5 buổi trượt đang hoạt động, mức tối đa.",
     "blocked": "Bạn không thể theo dõi người dùng này.",
     "cannotBlockSelf": "Bạn không thể tự chặn mình."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Spot mới 📍",
     "close": "✕ Hủy",
     "photoCaptured": "Đã chụp ảnh ✔️",
+    "photoRefused": "Ảnh không hợp lệ",
+    "retakePhoto": "Chụp lại ảnh",
     "name": "Tên",
     "description": "Mô tả...",
     "type": "Loại",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "đã thích bình luận của bạn",
       "SESSION_JOINED": "sẽ đến buổi trượt của bạn ở {{spot}}",
       "SESSION_REMINDER": "Buổi trượt của bạn ở {{spot}} sắp bắt đầu",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "đã đổi buổi trượt tại {{spot}}",
+      "SESSION_CANCELLED": "đã hủy buổi trượt tại {{spot}}"
     },
     "reply": "Trả lời",
     "replyingTo": "Trả lời {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "Chưa có buổi trượt nào.",
     "planSession": "Lên lịch buổi trượt",
     "when": "Khi nào",
+    "customTime": "Giờ khác",
+    "day": "Ngày",
+    "time": "Giờ",
+    "mySessions": "Buổi của tôi",
+    "hosting": "Tôi tổ chức",
     "note": "Ghi chú (không bắt buộc)",
     "notePlaceholder": "Game of SKATE, quay phim, chào đón người mới…",
     "create": "Tạo",
@@ -357,7 +366,13 @@
     "going": "Sẽ đến: {{count}}",
     "hostedBy": "Chủ trì: {{username}}",
     "keepSession": "Giữ lại",
-    "cancelSessionAction": "Hủy buổi trượt"
+    "cancelSessionAction": "Hủy buổi trượt",
+    "activeSessions": "Buổi đang hoạt động",
+    "editSession": "Sửa buổi trượt",
+    "editNotice": "Mọi người tham gia sẽ được thông báo.",
+    "cancelNotice": "Mọi người tham gia sẽ được thông báo.",
+    "othersGoing": "Tham gia: {{count}}",
+    "nobodyYet": "Chưa ai tham gia"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

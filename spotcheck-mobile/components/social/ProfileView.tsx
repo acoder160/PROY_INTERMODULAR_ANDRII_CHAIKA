@@ -9,6 +9,7 @@ import { DisplayFont, MIN_TARGET, Palette, Radius } from '../../constants/theme'
 import GradientFill from '../ui/GradientFill';
 import Avatar from './Avatar';
 import SpotCard from './SpotCard';
+import ActiveSessions from './ActiveSessions';
 import ReportModal from '../ReportModal';
 import { formatMonthYear } from '../../utils/social';
 
@@ -195,6 +196,8 @@ export default function ProfileView({ username }: { username: string }) {
         </View>
       </View>
 
+      {profile.me && <ActiveSessions reloadKey={reloadKey} />}
+
       <View style={styles.tabs} accessibilityRole="tablist">
         {TABS.map((key) => (
           <TouchableOpacity key={key} style={[styles.tab, tab === key && styles.tabOn]} onPress={() => { if (key !== tab) { setList(null); setTab(key); } }}
@@ -242,6 +245,16 @@ const styles = StyleSheet.create({
   stats: { flexDirection: 'row', gap: 20 },
   statLabel: { color: Palette.inkMuted, fontSize: 14 },
   statValue: { color: Palette.ink, fontFamily: DisplayFont.black, fontSize: 20 },
+  sessions: { gap: 8 },
+  sessionsTitle: { fontFamily: DisplayFont.bold, fontSize: 20, letterSpacing: 0.6, textTransform: 'uppercase', color: Palette.ink },
+  sessionRow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingHorizontal: 14, paddingVertical: 10, borderRadius: Radius.card, borderWidth: 2, borderColor: Palette.ink, backgroundColor: Palette.sheet },
+  sessionText: { flex: 1, minWidth: 0 },
+  sessionTime: { fontFamily: DisplayFont.black, fontSize: 18, textTransform: 'uppercase', color: Palette.ink },
+  sessionSpot: { fontSize: 15, fontWeight: '700', color: Palette.ink },
+  sessionMeta: { fontSize: 13, color: Palette.inkMuted },
+  sessionTag: { maxWidth: '35%', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, borderWidth: 2, borderColor: Palette.ink, backgroundColor: Palette.white },
+  sessionTagHost: { backgroundColor: Palette.asphalt },
+  sessionTagText: { fontSize: 13, fontWeight: '800', color: Palette.ink, textTransform: 'uppercase' },
   tabs: { flexDirection: 'row', gap: 8 },
   tab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: MIN_TARGET, paddingHorizontal: 8, borderRadius: Radius.control, borderWidth: 2, borderColor: Palette.ink, backgroundColor: Palette.white },
   tabOn: { backgroundColor: Palette.asphalt },

@@ -333,6 +333,72 @@ class LiveIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void aSkaterHostsAtMostFiveActiveSessions() throws Exception {
+        for (int i = 1; i <= 5; i++) {
+            createSession(bob, macba, Instant.now().plus(i, ChronoUnit.DAYS), null).andExpect(status().isOk());
+        }
+        createSession(bob, forum, Instant.now().plus(6, ChronoUnit.DAYS), null)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("session_limit"));
+        // The limit is per host: someone else can still plan one
+        createSession(ana, forum, Instant.now().plus(1, ChronoUnit.DAYS), null).andExpect(status().isOk());
+    }
+
+    @Test
+    void myProfileListsTheSessionsIHostAndJoined() throws Exception {
+        long hosted = createSession(bob, macba, Instant.now().plus(2, ChronoUnit.DAYS), null)
+                .andReturn().getResponse().getContentAsString().transform(this::idOf);
+        long joined = createSession(ana, forum, Instant.now().plus(1, ChronoUnit.DAYS), null)
+                .andReturn().getResponse().getContentAsString().transform(this::idOf);
+        createSession(ana, macba, Instant.now().plus(3, ChronoUnit.DAYS), null); // bob is not in this one
+        as(bob, post("/api/sessions/" + joined + "/join")).andExpect(status().isOk());
+
+        as(bob, get("/api/users/me/sessions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(joined))
+                .andExpect(jsonPath("$[0].spotName").value(forum.getName()))
+                .andExpect(jsonPath("$[0].joinedByMe").value(true))
+                .andExpect(jsonPath("$[0].hostedByMe").value(false))
+                .andExpect(jsonPath("$[1].id").value(hosted))
+                .andExpect(jsonPath("$[1].hostedByMe").value(true));
+        mvc.perform(get("/api/users/me/sessions")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void theHostEditsASessionAndEveryoneWhoJoinedIsTold() throws Exception {
+        long id = createSession(bob, macba, Instant.now().plus(2, ChronoUnit.DAYS), "Old note")
+                .andReturn().getResponse().getContentAsString().transform(this::idOf);
+        as(ana, post("/api/sessions/" + id + "/join")).andExpect(status().isOk());
+
+        Instant later = Instant.now().plus(3, ChronoUnit.DAYS).truncatedTo(ChronoUnit.MINUTES);
+        String body = json.writeValueAsString(Map.of("startsAt", later.toString(), "note", "New note"));
+        as(ana, patch("/api/sessions/" + id).contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isForbidden());
+        as(bob, patch("/api/sessions/" + id).contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.note").value("New note"))
+                .andExpect(jsonPath("$.startsAt").value(later.toString()))
+                .andExpect(jsonPath("$.participants").value(2));
+
+        as(ana, get("/api/notifications")).andExpect(jsonPath("$.items[0].type").value("SESSION_UPDATED"))
+                .andExpect(jsonPath("$.items[0].session.id").value(id));
+        // The host doesn't notify themselves
+        as(bob, get("/api/notifications")).andExpect(jsonPath("$.items[0].type").value("SESSION_JOINED"));
+    }
+
+    @Test
+    void cancellingASessionTellsWhoeverJoined() throws Exception {
+        long id = createSession(bob, macba, Instant.now().plus(2, ChronoUnit.DAYS), null)
+                .andReturn().getResponse().getContentAsString().transform(this::idOf);
+        as(ana, post("/api/sessions/" + id + "/join")).andExpect(status().isOk());
+        as(bob, delete("/api/sessions/" + id)).andExpect(status().isNoContent());
+
+        as(ana, get("/api/notifications")).andExpect(jsonPath("$.items[0].type").value("SESSION_CANCELLED"))
+                .andExpect(jsonPath("$.items[0].spot.id").value(macba.getId()));
+    }
+
+    @Test
     void sessionTimesMustBeAheadAndWithinAMonth() throws Exception {
         createSession(bob, macba, Instant.now().minus(1, ChronoUnit.DAYS), null)
                 .andExpect(jsonPath("$.code").value("session_bad_time"));

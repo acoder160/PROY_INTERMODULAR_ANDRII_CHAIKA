@@ -198,7 +198,7 @@
     "alreadyJoined": "Ya te has apuntado a esta sesión.",
     "duplicateCandidate": "Ya hay un spot aquí.",
     "sessionOver": "Esta sesión ya ha terminado.",
-    "sessionLimit": "Ya tienes 10 sesiones próximas.",
+    "sessionLimit": "Ya tienes 5 sesiones activas, el máximo permitido.",
     "blocked": "No puedes seguir a este usuario.",
     "cannotBlockSelf": "No puedes bloquearte a ti mismo."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Nuevo spot 📍",
     "close": "✕ Cancelar",
     "photoCaptured": "Foto capturada ✔️",
+    "photoRefused": "Foto no válida",
+    "retakePhoto": "Repetir foto",
     "name": "Nombre",
     "description": "Descripción...",
     "type": "Tipo",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "dio me gusta a tu comentario",
       "SESSION_JOINED": "se apunta a tu sesión en {{spot}}",
       "SESSION_REMINDER": "Tu sesión en {{spot}} empieza pronto",
-      "FOLLOWEE_CHECKED_IN": "está patinando en {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "está patinando en {{spot}}",
+      "SESSION_UPDATED": "cambió la sesión en {{spot}}",
+      "SESSION_CANCELLED": "canceló la sesión en {{spot}}"
     },
     "reply": "Responder",
     "replyingTo": "Responder a {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "Aún no hay sesiones.",
     "planSession": "Planear una sesión",
     "when": "Cuándo",
+    "customTime": "Otra hora",
+    "day": "Día",
+    "time": "Hora",
+    "mySessions": "Mis sesiones",
+    "hosting": "Organizo",
     "note": "Nota (opcional)",
     "notePlaceholder": "Game of SKATE, grabar, principiantes bienvenidos…",
     "create": "Crear",
@@ -357,7 +366,13 @@
     "going": "Van: {{count}}",
     "hostedBy": "Organiza: {{username}}",
     "keepSession": "Mantenerla",
-    "cancelSessionAction": "Cancelar sesión"
+    "cancelSessionAction": "Cancelar sesión",
+    "activeSessions": "Sesiones activas",
+    "editSession": "Editar sesión",
+    "editNotice": "Avisaremos a todos los que se han apuntado.",
+    "cancelNotice": "Avisaremos a todos los que se han apuntado.",
+    "othersGoing": "Se apuntan: {{count}}",
+    "nobodyYet": "Aún no se ha apuntado nadie"
   },
   "ai": {
     "suggesting": "La IA está rellenando los datos a partir de tu foto…"

@@ -11,14 +11,14 @@ const paintFor = (name) => {
 
 /** Profile photo, or the first letter of the name on a paint disc. Decorative: the name sits next to it. */
 export default function Avatar({ username, url, size = 40 }) {
-  const [failed, setFailed] = useState(false);
+  const [failedUrl, setFailedUrl] = useState(null); // a new photo is tried again after a failed one
   const style = { width: size, height: size, fontSize: Math.round(size * 0.48) };
-  if (url && !failed) {
+  if (url && failedUrl !== url) {
     // Cloudinary: ask for a square thumbnail at twice the display size
     const thumb = url.includes('/image/upload/')
       ? url.replace('/image/upload/', `/image/upload/c_fill,g_face,w_${size * 2},h_${size * 2},q_auto/`)
       : url;
-    return <img className="avatar" src={thumb} alt="" style={style} onError={() => setFailed(true)} />;
+    return <img className="avatar" src={thumb} alt="" style={style} onError={() => setFailedUrl(url)} />;
   }
   return (
     <span className="avatar avatar-letter" style={{ ...style, background: paintFor(username) }} aria-hidden="true">

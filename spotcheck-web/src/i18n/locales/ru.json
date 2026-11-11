@@ -198,7 +198,7 @@
     "alreadyJoined": "Вы уже присоединились к этой сессии.",
     "duplicateCandidate": "Здесь уже есть спот.",
     "sessionOver": "Эта сессия уже закончилась.",
-    "sessionLimit": "У вас уже 10 предстоящих сессий.",
+    "sessionLimit": "У вас уже 5 активных сессий — это максимум.",
     "blocked": "Вы не можете подписаться на этого пользователя.",
     "cannotBlockSelf": "Нельзя заблокировать самого себя."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Новый спот 📍",
     "close": "✕ Отмена",
     "photoCaptured": "Фото сделано ✔️",
+    "photoRefused": "Фото не подходит",
+    "retakePhoto": "Переснять фото",
     "name": "Название",
     "description": "Описание...",
     "type": "Тип",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "лайкнул(а) ваш комментарий",
       "SESSION_JOINED": "идёт на вашу сессию: {{spot}}",
       "SESSION_REMINDER": "Сессия на «{{spot}}» скоро начнётся",
-      "FOLLOWEE_CHECKED_IN": "катается на {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "катается на {{spot}}",
+      "SESSION_UPDATED": "изменил(а) сессию на {{spot}}",
+      "SESSION_CANCELLED": "отменил(а) сессию на {{spot}}"
     },
     "reply": "Ответить",
     "replyingTo": "Ответ для {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "Пока нет запланированных сессий.",
     "planSession": "Запланировать сессию",
     "when": "Когда",
+    "customTime": "Своё время",
+    "day": "День",
+    "time": "Время",
+    "mySessions": "Мои сессии",
+    "hosting": "Организую",
     "note": "Заметка (необязательно)",
     "notePlaceholder": "Game of SKATE, съёмка, новички welcome…",
     "create": "Создать",
@@ -357,7 +366,13 @@
     "going": "Идут: {{count}}",
     "hostedBy": "Организатор: {{username}}",
     "keepSession": "Оставить",
-    "cancelSessionAction": "Отменить сессию"
+    "cancelSessionAction": "Отменить сессию",
+    "activeSessions": "Активные сессии",
+    "editSession": "Изменить сессию",
+    "editNotice": "Все, кто записался, получат уведомление.",
+    "cancelNotice": "Все, кто записался, получат уведомление.",
+    "othersGoing": "Идут: {{count}}",
+    "nobodyYet": "Пока никто не записался"
   },
   "ai": {
     "suggesting": "ИИ заполняет данные по вашему фото…"

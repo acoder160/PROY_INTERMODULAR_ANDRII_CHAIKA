@@ -198,7 +198,7 @@
     "alreadyJoined": "You already joined this session.",
     "duplicateCandidate": "There is already a spot here.",
     "sessionOver": "Ta sesja już się skończyła.",
-    "sessionLimit": "Masz już 10 nadchodzących sesji.",
+    "sessionLimit": "Masz już 5 aktywnych sesji – to maksimum.",
     "blocked": "Nie możesz obserwować tego użytkownika.",
     "cannotBlockSelf": "Nie możesz zablokować samego siebie."
   },
@@ -219,6 +219,8 @@
     "newSpot": "Nowy spot 📍",
     "close": "✕ Anuluj",
     "photoCaptured": "Zdjęcie zrobione ✔️",
+    "photoRefused": "Zdjęcie odrzucone",
+    "retakePhoto": "Zrób nowe zdjęcie",
     "name": "Nazwa",
     "description": "Opis...",
     "type": "Typ",
@@ -313,7 +315,9 @@
       "COMMENT_LIKE": "polubił(a) twój komentarz",
       "SESSION_JOINED": "dołącza do twojej sesji: {{spot}}",
       "SESSION_REMINDER": "Twoja sesja na {{spot}} zaczyna się wkrótce",
-      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}"
+      "FOLLOWEE_CHECKED_IN": "is skating at {{spot}}",
+      "SESSION_UPDATED": "zmienił(a) sesję w {{spot}}",
+      "SESSION_CANCELLED": "odwołał(a) sesję w {{spot}}"
     },
     "reply": "Odpowiedz",
     "replyingTo": "Odpowiedź dla {{username}}",
@@ -347,6 +351,11 @@
     "noSessions": "Brak zaplanowanych sesji.",
     "planSession": "Zaplanuj sesję",
     "when": "Kiedy",
+    "customTime": "Inny termin",
+    "day": "Dzień",
+    "time": "Godzina",
+    "mySessions": "Moje sesje",
+    "hosting": "Organizuję",
     "note": "Notatka (opcjonalnie)",
     "notePlaceholder": "Game of SKATE, nagrywanie, początkujący mile widziani…",
     "create": "Utwórz",
@@ -357,7 +366,13 @@
     "going": "Idzie: {{count}}",
     "hostedBy": "Organizator: {{username}}",
     "keepSession": "Zostaw",
-    "cancelSessionAction": "Odwołaj sesję"
+    "cancelSessionAction": "Odwołaj sesję",
+    "activeSessions": "Aktywne sesje",
+    "editSession": "Edytuj sesję",
+    "editNotice": "Wszyscy zapisani dostaną powiadomienie.",
+    "cancelNotice": "Wszyscy zapisani dostaną powiadomienie.",
+    "othersGoing": "Idą: {{count}}",
+    "nobodyYet": "Nikt się jeszcze nie zapisał"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

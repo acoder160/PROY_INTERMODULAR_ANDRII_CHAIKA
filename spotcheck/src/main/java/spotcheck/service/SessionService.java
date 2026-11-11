@@ -43,10 +43,11 @@ public class SessionService {
     /** A session stays listed this long after it started (people are still there). */
     static final Duration SHOWN_AFTER_START = Duration.ofHours(2);
     static final Duration REMIND_BEFORE = Duration.ofMinutes(30);
-    static final int MAX_UPCOMING_PER_HOST = 10;
+    /** Sessions a skater can host at once (not finished yet, so still listed on the spot). */
+    static final int MAX_ACTIVE_PER_HOST = 5;
     static final int PEOPLE_SHOWN = 6;
 
-    public record SessionItem(Long id, Long spotId, Instant startsAt, String note, UserSummary host,
+    public record SessionItem(Long id, Long spotId, String spotName, Instant startsAt, String note, UserSummary host,
                               long participants, List<UserSummary> people, boolean joinedByMe, boolean hostedByMe) {}
 
     private final SkateSessionRepository sessionRepository;
@@ -73,21 +74,16 @@ public class SessionService {
     }
 
     public SessionItem create(String username, Long spotId, Instant startsAt, String rawNote) {
-        Instant now = Instant.now();
-        if (startsAt == null || startsAt.isBefore(now.minus(Duration.ofMinutes(5))) || startsAt.isAfter(now.plus(MAX_AHEAD))) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "session_bad_time", "Pick a time between now and 30 days ahead");
-        }
-        String note = rawNote == null || rawNote.isBlank() ? null : rawNote.trim();
-        if (note != null && !aiModerationService.isContentAllowed(note)) {
-            throw ApiException.contentRejected("text_rejected",
-                    "This note breaks the community rules (spam, inappropriate content or nonsense text).");
-        }
+        checkTime(startsAt);
+        String note = moderatedNote(rawNote);
         return tx.execute(status -> {
             User host = userLookup.require(username);
             Spot spot = spotRepository.findById(spotId).filter(Spot::isPublic)
                     .orElseThrow(() -> ApiException.notFound("Spot"));
-            if (sessionRepository.countByHostIdAndStartsAtAfter(host.getId(), LocalDateTime.now()) >= MAX_UPCOMING_PER_HOST) {
-                throw new ApiException(HttpStatus.CONFLICT, "session_limit", "You already have 10 upcoming sessions");
+            LocalDateTime activeSince = LocalDateTime.now().minus(SHOWN_AFTER_START);
+            if (sessionRepository.countByHostIdAndStartsAtAfter(host.getId(), activeSince) >= MAX_ACTIVE_PER_HOST) {
+                throw new ApiException(HttpStatus.CONFLICT, "session_limit",
+                        "You already have " + MAX_ACTIVE_PER_HOST + " active sessions");
             }
             SkateSession session = sessionRepository.save(new SkateSession(spot, host, toLocal(startsAt), note));
             participantRepository.save(new SessionParticipant(session, host));
@@ -101,6 +97,17 @@ public class SessionService {
         LocalDateTime since = LocalDateTime.now().minus(SHOWN_AFTER_START);
         return items(sessionRepository.findBySpotIdAndStartsAtAfterOrderByStartsAtAsc(spotId, since),
                 userLookup.current().orElse(null));
+    }
+
+    /** The sessions a skater hosts or joined that aren't over yet, soonest first (their profile). */
+    @Transactional(readOnly = true)
+    public List<SessionItem> mine(String username) {
+        User user = userLookup.require(username);
+        LocalDateTime since = LocalDateTime.now().minus(SHOWN_AFTER_START);
+        List<SkateSession> sessions = sessionRepository.findJoinedBy(user.getId(), since).stream()
+                .filter(s -> s.getSpot().isPublic())
+                .toList();
+        return items(sessions, user);
     }
 
     @Transactional
@@ -130,15 +137,52 @@ public class SessionService {
         return items(List.of(session), user).get(0);
     }
 
-    /** Only the host cancels; participants and feed lines go with it (ON DELETE CASCADE). */
+    /**
+     * The host changes the time and/or the note. Everyone who joined is told; a new time also means
+     * a new reminder. The AI check of the note runs before the transaction, like on create.
+     */
+    public SessionItem update(String username, Long sessionId, Instant startsAt, String rawNote) {
+        checkTime(startsAt);
+        String note = moderatedNote(rawNote);
+        return tx.execute(status -> {
+            User host = userLookup.require(username);
+            SkateSession session = openSession(sessionId);
+            requireHost(session, host);
+            LocalDateTime newStart = toLocal(startsAt);
+            boolean timeChanged = !newStart.equals(session.getStartsAt());
+            boolean noteChanged = !java.util.Objects.equals(note, session.getNote());
+            if (!timeChanged && !noteChanged) return items(List.of(session), host).get(0);
+            session.setStartsAt(newStart);
+            session.setNote(note);
+            if (timeChanged) session.setRemindedAt(null);
+            sessionRepository.save(session);
+            for (SessionParticipant p : participantRepository.findBySessionId(session.getId())) {
+                notificationService.notify(p.getUser(), host, NotificationType.SESSION_UPDATED, session.getSpot(), null, session);
+            }
+            return items(List.of(session), host).get(0);
+        });
+    }
+
+    /**
+     * Only the host cancels; participants and feed lines go with it (ON DELETE CASCADE). Those who
+     * joined get a notice that points at the spot, since the session itself no longer exists.
+     */
     @Transactional
     public void cancel(String username, Long sessionId) {
         User user = userLookup.require(username);
         SkateSession session = sessionRepository.findById(sessionId).orElseThrow(() -> ApiException.notFound("Session"));
-        if (!session.getHost().getId().equals(user.getId())) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "not_owner", "Only the host can cancel a session");
-        }
+        requireHost(session, user);
+        boolean upcoming = session.getStartsAt().isAfter(LocalDateTime.now());
+        Spot spot = session.getSpot();
+        spot.getName(); // loaded now: the notices below are written after the session row is gone
+        List<User> joined = participantRepository.findBySessionId(session.getId()).stream()
+                .map(SessionParticipant::getUser).toList();
         sessionRepository.delete(session);
+        if (upcoming) {
+            for (User u : joined) {
+                notificationService.notify(u, user, NotificationType.SESSION_CANCELLED, spot, null, null);
+            }
+        }
     }
 
     /**
@@ -162,6 +206,28 @@ public class SessionService {
 
     // --- helpers ---
 
+    private static void checkTime(Instant startsAt) {
+        Instant now = Instant.now();
+        if (startsAt == null || startsAt.isBefore(now.minus(Duration.ofMinutes(5))) || startsAt.isAfter(now.plus(MAX_AHEAD))) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "session_bad_time", "Pick a time between now and 30 days ahead");
+        }
+    }
+
+    private String moderatedNote(String rawNote) {
+        String note = rawNote == null || rawNote.isBlank() ? null : rawNote.trim();
+        if (note != null && !aiModerationService.isContentAllowed(note)) {
+            throw ApiException.contentRejected("text_rejected",
+                    "This note breaks the community rules (spam, inappropriate content or nonsense text).");
+        }
+        return note;
+    }
+
+    private static void requireHost(SkateSession session, User user) {
+        if (!session.getHost().getId().equals(user.getId())) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "not_owner", "Only the host can change or cancel a session");
+        }
+    }
+
     private SkateSession openSession(Long sessionId) {
         SkateSession session = sessionRepository.findById(sessionId).orElseThrow(() -> ApiException.notFound("Session"));
         if (session.getStartsAt().isBefore(LocalDateTime.now().minus(SHOWN_AFTER_START)) || !session.getSpot().isPublic()) {
@@ -179,7 +245,7 @@ public class SessionService {
             List<User> in = people.getOrDefault(s.getId(), List.of());
             boolean joined = viewer != null && in.stream().anyMatch(u -> u.getId().equals(viewer.getId()));
             boolean hosted = viewer != null && s.getHost().getId().equals(viewer.getId());
-            return new SessionItem(s.getId(), s.getSpot().getId(), toInstant(s.getStartsAt()), s.getNote(),
+            return new SessionItem(s.getId(), s.getSpot().getId(), s.getSpot().getName(), toInstant(s.getStartsAt()), s.getNote(),
                     UserSummary.of(s.getHost()), in.size(),
                     in.stream().filter(u -> !u.isDeleted()).limit(PEOPLE_SHOWN).map(UserSummary::of).toList(),
                     joined, hosted);
