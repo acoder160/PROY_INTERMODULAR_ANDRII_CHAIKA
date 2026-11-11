@@ -1,27 +1,31 @@
-name: Render Keep-Alive Service
+name: Render Keep-Alive
 
+# Render (plan gratuito) duerme el servicio tras 15 min sin peticiones, y el cron de GitHub
+# se retrasa a menudo mas de eso. Por eso cada ejecucion es un bucle largo (~5 h 40 min) que
+# hace peticiones cada 4-11 min, y el cron solo lo relanza cada 3 horas.
 on:
   schedule:
-    # Ejecucion programada cada 12 minutos
-    - cron: '*/12 * * * *'
-  # Permite ejecucion manual desde la pestaña 'Actions' de GitHub
+    - cron: '7 */3 * * *'
   workflow_dispatch:
+
+# La ejecucion nueva cancela la anterior: siempre hay un solo bucle activo
+concurrency:
+  group: render-keep-alive
+  cancel-in-progress: true
 
 jobs:
   ping:
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 355
     steps:
-      - name: Checkout del codigo fuente
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configuracion de entorno Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
-      - name: Instalacion de dependencias
-        run: pip install requests
-
-      - name: Ejecucion del script de ping
+      - name: Bucle de keep-alive
+        env:
+          # Se puede cambiar en Settings -> Secrets and variables -> Actions -> Variables
+          RENDER_URL: ${{ vars.RENDER_URL || 'https://skatemap.onrender.com' }}
         run: python keep_alive.py
