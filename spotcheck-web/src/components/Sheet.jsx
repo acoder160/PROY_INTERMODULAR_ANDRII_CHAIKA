@@ -26,18 +26,40 @@ export default function Sheet({ open, onClose, title, children, footer, classNam
     if (!open) return undefined;
     const previous = document.activeElement;
     panelRef.current?.focus();
+    // Hoja modal (no "peek"): el fondo no se desplaza y Tab no se escapa a la página de debajo
+    const modal = !peekable;
+    const previousOverflow = document.body.style.overflow;
+    if (modal) document.body.style.overflow = 'hidden';
     const onKeyDown = (event) => {
-      if (event.key !== 'Escape') return;
       const overlays = document.querySelectorAll('.sheet-overlay');
-      if (overlays[overlays.length - 1] !== overlayRef.current) return;
-      onClose();
+      const isTop = overlays[overlays.length - 1] === overlayRef.current;
+      if (event.key === 'Escape') {
+        if (isTop) onClose();
+        return;
+      }
+      if (event.key !== 'Tab' || !modal || !isTop || !panelRef.current) return;
+      const focusable = Array.from(panelRef.current.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )).filter((el) => el.offsetParent !== null);
+      if (focusable.length === 0) { event.preventDefault(); return; }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || active === panelRef.current)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.removeEventListener('keydown', onKeyDown);
+      if (modal) document.body.style.overflow = previousOverflow;
       if (previous instanceof HTMLElement && document.contains(previous)) previous.focus();
     };
-  }, [open, onClose]);
+  }, [open, onClose, peekable]);
 
   if (!open) return null;
 

@@ -451,7 +451,7 @@
 
 .comment-actions {
   display: flex;
-  gap: 4px;
+  gap: 8px;
   margin-top: 4px;
 }
 
@@ -459,11 +459,11 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  min-width: 40px;
-  min-height: 40px;
-  padding: 0 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
   border: none;
-  border-radius: 20px;
+  border-radius: 22px;
   background: transparent;
   color: var(--ink-muted);
   font: 600 14px/1 var(--body);

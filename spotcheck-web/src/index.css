@@ -23,12 +23,14 @@ body {
   padding: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Visible solo para lectores de pantalla (p. ej. el h1 del mapa, que no tiene título a la vista) */
