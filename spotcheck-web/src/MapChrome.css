@@ -396,7 +396,8 @@
 
 .leaflet-popup-content {
   margin: 0;
-  width: 240px !important;
+  width: 270px !important;
+  max-width: calc(100vw - 32px) !important;
   font-size: inherit;
   line-height: inherit;
 }
@@ -412,7 +413,8 @@
 }
 
 .popup-card {
-  width: 240px;
+  width: 270px;
+  max-width: calc(100vw - 32px);
   color: var(--ink);
   font-family: var(--body);
 }
@@ -525,6 +527,7 @@
 .details-btn,
 .directions-btn {
   flex: 1;
+  min-width: 0;
   min-height: var(--min-target);
   padding: 6px 8px;
   display: inline-flex;
@@ -532,11 +535,14 @@
   justify-content: center;
   border: 2px solid var(--asphalt);
   border-radius: var(--radius-control);
-  font: 900 18px/1 var(--display);
-  letter-spacing: 0.8px;
+  font: 900 15px/1.1 var(--display);
+  letter-spacing: 0.4px;
   text-transform: uppercase;
   text-align: center;
   text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--ink) !important;
   transition: transform 0.12s ease;
 }
@@ -947,6 +953,12 @@
   gap: 10px;
   margin-top: 12px;
   flex-shrink: 0;
+}
+
+.sheet-footer .btn-primary {
+  font: 900 clamp(16px, 3.8vw, 20px)/1 var(--display);
+  letter-spacing: 0.6px;
+  padding: 0 14px;
 }
 
 /* ---------- Detalle del spot ---------- */
