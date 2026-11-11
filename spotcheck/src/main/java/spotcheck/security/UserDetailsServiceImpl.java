@@ -24,17 +24,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+        return buildUserDetails(user);
+    }
 
-        //  Creamos la autoridad basada en el rol del usuario guardado en la base de datos
+    /** Builds UserDetails directly from an already-loaded User entity, avoiding duplicate DB queries in filters. */
+    public UserDetails buildUserDetails(User user) {
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(
                 new SimpleGrantedAuthority(user.getRole())
         );
 
-        // Convertimos nuestro User (Entidad) al UserDetails (Spring Security)
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                authorities //  Pasamos las autoridades aquí
+                authorities
         );
     }
 }

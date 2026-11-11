@@ -32,5 +32,22 @@ export default defineConfig(({ mode }) => {
       },
     },
   ],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/leaflet') || id.includes('node_modules/react-leaflet')) {
+              return 'leaflet-vendor';
+            }
+            if (id.includes('node_modules/@stomp') || id.includes('node_modules/@react-oauth')) {
+              return 'services-vendor';
+            }
+            if (id.includes('node_modules/i18next') || id.includes('node_modules/react-i18next')) {
+              return 'i18n-vendor';
+            }
+          },
+        },
+      },
+    },
   };
 });
