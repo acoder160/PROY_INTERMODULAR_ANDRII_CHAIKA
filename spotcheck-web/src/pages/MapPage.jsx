@@ -979,7 +979,16 @@ export default function MapPage() {
     // Opening a spot is the lesson the hint teaches
     useEffect(() => { if (selectedSpotId !== null) dismissHint(); }, [selectedSpotId, dismissHint]);
     const reportSpot = reportSpotId === null ? null : spots.find((s) => s.id === reportSpotId) ?? null;
-    const closeDetails = useCallback(() => setSelectedSpotId(null), []);
+    const closeDetails = useCallback(() => {
+        setSelectedSpotId(null);
+        if (searchParams.has('spot')) {
+            setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete('spot');
+                return next;
+            }, { replace: true });
+        }
+    }, [searchParams, setSearchParams]);
     const closeFilters = useCallback(() => setShowFilters(false), []);
     const closeReport = useCallback(() => setReportSpotId(null), []);
 
@@ -1130,7 +1139,7 @@ export default function MapPage() {
 
             {selectedSpot && (
                 <SpotDetailsSheet
-                    key={selectedSpot.id}
+                    key={`spot-details-${selectedSpot.id}`}
                     spot={selectedSpot}
                     userLocation={myPosition}
                     onClose={closeDetails}
@@ -1144,7 +1153,7 @@ export default function MapPage() {
             )}
 
             {reportSpot && (
-                <ReportSheet key={reportSpot.id} spot={reportSpot} onClose={closeReport} />
+                <ReportSheet key={`spot-report-${reportSpot.id}`} spot={reportSpot} onClose={closeReport} />
             )}
 
             {panel && <ActivityWindow tab={panel} onTab={switchPanel} onClose={closePanel} onRead={clearUnread} unread={unread} />}

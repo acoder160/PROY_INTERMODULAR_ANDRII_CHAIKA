@@ -42,7 +42,15 @@ export default function Sheet({ open, onClose, title, children, footer, classNam
   if (!open) return null;
 
   const closeButton = (
-    <button type="button" className="sheet-close" onClick={onClose} aria-label={cleanLabel(t('form.close'))}>
+    <button
+      type="button"
+      className="sheet-close"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClose?.();
+      }}
+      aria-label={cleanLabel(t('form.close'))}
+    >
       <CloseIcon size={22} />
     </button>
   );
