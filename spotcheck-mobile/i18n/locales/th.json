@@ -372,7 +372,9 @@
     "editNotice": "ทุกคนที่เข้าร่วมจะได้รับการแจ้งเตือน",
     "cancelNotice": "ทุกคนที่เข้าร่วมจะได้รับการแจ้งเตือน",
     "othersGoing": "เข้าร่วม: {{count}}",
-    "nobodyYet": "ยังไม่มีใครเข้าร่วม"
+    "nobodyYet": "ยังไม่มีใครเข้าร่วม",
+    "notGoing": "ไม่ไปแล้ว",
+    "leftNotice": "คุณไม่ไปแล้ว เปลี่ยนใจไหม?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

@@ -118,7 +118,8 @@ public class ProfileService {
 
         if (update.bio() != null) {
             String bio = update.bio().trim();
-            if (!bio.isEmpty() && !aiModerationService.isContentAllowed(bio)) {
+            // Admins write their own bio freely: no AI check (the length limit still applies)
+            if (!bio.isEmpty() && !user.isAdmin() && !aiModerationService.isContentAllowed(bio)) {
                 throw ApiException.contentRejected("text_rejected",
                         "This bio breaks the community rules (spam, inappropriate content or nonsense text).");
             }

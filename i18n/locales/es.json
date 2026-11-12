@@ -372,7 +372,9 @@
     "editNotice": "Avisaremos a todos los que se han apuntado.",
     "cancelNotice": "Avisaremos a todos los que se han apuntado.",
     "othersGoing": "Se apuntan: {{count}}",
-    "nobodyYet": "Aún no se ha apuntado nadie"
+    "nobodyYet": "Aún no se ha apuntado nadie",
+    "notGoing": "Ya no voy",
+    "leftNotice": "No vas. ¿Cambiaste de idea?"
   },
   "ai": {
     "suggesting": "La IA está rellenando los datos a partir de tu foto…"

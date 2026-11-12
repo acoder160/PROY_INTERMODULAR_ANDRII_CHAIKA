@@ -372,7 +372,9 @@
     "editNotice": "Wszyscy zapisani dostaną powiadomienie.",
     "cancelNotice": "Wszyscy zapisani dostaną powiadomienie.",
     "othersGoing": "Idą: {{count}}",
-    "nobodyYet": "Nikt się jeszcze nie zapisał"
+    "nobodyYet": "Nikt się jeszcze nie zapisał",
+    "notGoing": "Jednak nie idę",
+    "leftNotice": "Nie idziesz. Zmieniłeś zdanie?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
 import GoogleAuthButton from '../components/GoogleAuthButton';
 import { useAuth } from '../context/AuthContext';
+import { leaveAuthScreens } from '../utils/googleBrowserSignIn';
 
 // Shared demo account (POST /api/auth/demo); the button only shows when the backend has it on
 const DEMO_ENABLED = process.env.EXPO_PUBLIC_DEMO_ENABLED === 'true';
@@ -55,7 +56,7 @@ export default function LoginScreen() {
         response.data.refreshToken,
         response.data.role
       );
-      router.replace('/(tabs)');
+      leaveAuthScreens(router);
     } catch (error: any) {
       // Un login fallido es un estado esperado: log, no pantalla roja de LogBox
       console.log('Login fallido:', error?.response?.status ?? error?.message, error?.response?.data ?? '');
@@ -73,7 +74,7 @@ export default function LoginScreen() {
     try {
       const response = await api.post('/auth/demo');
       await login(response.data.username, response.data.token, response.data.refreshToken, response.data.role);
-      router.replace('/(tabs)');
+      leaveAuthScreens(router);
     } catch (error: any) {
       console.log('Demo login fallido:', error?.response?.status ?? error?.message);
       setErrorMessage(error?.response ? t('auth.demoFailed') : t('popup.sendErrorConnection'));
@@ -163,7 +164,7 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.guestButton} onPress={() => router.replace('/(tabs)')}>
+          <TouchableOpacity style={styles.guestButton} onPress={() => leaveAuthScreens(router)}>
             <Text style={styles.guestButtonText}>{t('auth.backToMap')}</Text>
           </TouchableOpacity>
           {hasLegalPage && (

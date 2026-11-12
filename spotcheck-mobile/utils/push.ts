@@ -1,29 +1,45 @@
 import { Platform } from 'react-native';
-import Constants, { ExecutionEnvironment } from 'expo-constants';
+import Constants from 'expo-constants';
+import { requireOptionalNativeModule } from 'expo';
 import type * as NotificationsModule from 'expo-notifications';
 import api from './api';
+import { isRunningInExpoGo } from './googleBrowserSignIn';
 
 /**
- * Expo Go can't receive remote pushes (Android, SDK 53+) and expo-notifications warns as soon as it
- * is imported there. So the module is only loaded in a development or store build; in Expo Go and
- * on the web every function here quietly does nothing.
+ * Expo Go can't receive remote pushes (Android, SDK 53+) and expo-notifications throws on channel
+ * setup there. So the module is only loaded in a development or store build; in Expo Go and on the
+ * web every function here quietly does nothing.
  */
-const pushSupported = Platform.OS !== 'web' && Constants.executionEnvironment !== ExecutionEnvironment.StoreClient;
+const pushSupported = Platform.OS !== 'web' && !isRunningInExpoGo();
 
 let notificationsModule: typeof NotificationsModule | null = null;
+let notificationsUnavailable = false;
 function notifications(): typeof NotificationsModule | null {
-  if (!pushSupported) return null;
+  if (!pushSupported || notificationsUnavailable) return null;
   if (!notificationsModule) {
-    notificationsModule = require('expo-notifications') as typeof NotificationsModule;
-    // Pushes that arrive while the app is open still show as a banner
-    notificationsModule.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowBanner: true,
-        shouldShowList: true,
-        shouldPlaySound: false,
-        shouldSetBadge: false,
-      }),
-    });
+    // Expo Go doesn't ship the native side of expo-notifications (ExpoApplication among it), and the
+    // Expo Go check above can be fooled when Expo Go reopens the app from a deep link. So look for the
+    // native module itself, and never let loading push break the app.
+    if (!requireOptionalNativeModule('ExpoApplication') || !requireOptionalNativeModule('ExpoPushTokenManager')) {
+      notificationsUnavailable = true;
+      return null;
+    }
+    try {
+      notificationsModule = require('expo-notifications') as typeof NotificationsModule;
+      // Pushes that arrive while the app is open still show as a banner
+      notificationsModule.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowBanner: true,
+          shouldShowList: true,
+          shouldPlaySound: false,
+          shouldSetBadge: false,
+        }),
+      });
+    } catch (error) {
+      console.log('Push not available:', (error as Error)?.message ?? error);
+      notificationsModule = null;
+      notificationsUnavailable = true;
+    }
   }
   return notificationsModule;
 }

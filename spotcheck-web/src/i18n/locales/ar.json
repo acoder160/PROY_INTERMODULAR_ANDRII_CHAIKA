@@ -372,7 +372,9 @@
     "editNotice": "سيتم إشعار كل من سيحضر.",
     "cancelNotice": "سيتم إشعار كل من سيحضر.",
     "othersGoing": "سيحضر: {{count}}",
-    "nobodyYet": "لم ينضم أحد بعد"
+    "nobodyYet": "لم ينضم أحد بعد",
+    "notGoing": "لن أذهب",
+    "leftNotice": "لن تذهب. غيّرت رأيك؟"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

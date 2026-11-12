@@ -1,5 +1,5 @@
 import { DarkTheme, ThemeProvider } from 'expo-router/react-navigation';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, usePathname, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { View } from 'react-native';
@@ -15,6 +15,7 @@ import {
 import '../i18n';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { UnreadProvider } from '../context/UnreadContext';
+import { leaveAuthScreens } from '../utils/googleBrowserSignIn';
 import { onPushTapped, registerForPush } from '../utils/push';
 
 /** Registers this device for push after sign-in, and opens the right screen when a push is tapped. */
@@ -22,10 +23,17 @@ function PushBridge() {
   const { user } = useAuth();
   const { i18n } = useTranslation();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (user) registerForPush(i18n.language);
   }, [user, i18n.language]);
+
+  useEffect(() => {
+    if (user && (pathname === '/login' || pathname === '/register' || pathname === '/auth/google')) {
+      leaveAuthScreens(router);
+    }
+  }, [user, pathname, router]);
 
   useEffect(() => onPushTapped((target) => router.push(target as any)), [router]);
 

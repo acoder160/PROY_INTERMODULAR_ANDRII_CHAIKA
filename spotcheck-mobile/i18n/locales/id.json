@@ -372,7 +372,9 @@
     "editNotice": "Semua yang ikut akan diberi tahu.",
     "cancelNotice": "Semua yang ikut akan diberi tahu.",
     "othersGoing": "Ikut: {{count}}",
-    "nobodyYet": "Belum ada yang ikut"
+    "nobodyYet": "Belum ada yang ikut",
+    "notGoing": "Tidak jadi ikut",
+    "leftNotice": "Kamu tidak ikut. Berubah pikiran?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

@@ -372,7 +372,9 @@
     "editNotice": "Everyone who's coming will be notified.",
     "cancelNotice": "Everyone who's coming will be notified.",
     "othersGoing": "Coming: {{count}}",
-    "nobodyYet": "Nobody has joined yet"
+    "nobodyYet": "Nobody has joined yet",
+    "notGoing": "Not going anymore",
+    "leftNotice": "You're not going. Changed your mind?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

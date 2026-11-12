@@ -33,6 +33,9 @@ export default function ActiveSessions({ reloadKey }: { reloadKey: number }) {
   const [editing, setEditing] = useState<MySession | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [localKey, setLocalKey] = useState(0);
+  // Sessions you just left: they stay on the list so you can change your mind
+  const [left, setLeft] = useState<Set<number>>(() => new Set());
+  const [busyId, setBusyId] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -61,6 +64,27 @@ export default function ActiveSessions({ reloadKey }: { reloadKey: number }) {
     ]);
   };
 
+  const toggleGoing = async (s: MySession) => {
+    const leaving = !left.has(s.id);
+    setBusyId(s.id);
+    setError(null);
+    try {
+      const res = leaving ? await api.delete(`/sessions/${s.id}/join`) : await api.post(`/sessions/${s.id}/join`);
+      setSessions((list) => list.map((x) => (x.id === s.id
+        ? { ...x, participants: res.data?.participants ?? x.participants, people: res.data?.people ?? x.people }
+        : x)));
+      setLeft((prev) => {
+        const next = new Set(prev);
+        if (leaving) next.add(s.id); else next.delete(s.id);
+        return next;
+      });
+    } catch (e) {
+      setError(apiErrorText(e, t));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   if (sessions.length === 0) return null;
 
   const others = (s: MySession) => s.people.filter((p) => p.username !== s.host.username);
@@ -80,7 +104,7 @@ export default function ActiveSessions({ reloadKey }: { reloadKey: number }) {
             </View>
             <View style={[styles.tag, s.hostedByMe && styles.tagHost]}>
               <Text style={[styles.tagText, s.hostedByMe && { color: Palette.white }]} numberOfLines={1}>
-                {s.hostedByMe ? t('live.hosting') : t('live.joined')}
+                {s.hostedByMe ? t('live.hosting') : left.has(s.id) ? t('live.notGoing') : t('live.joined')}
               </Text>
             </View>
           </TouchableOpacity>
@@ -96,6 +120,22 @@ export default function ActiveSessions({ reloadKey }: { reloadKey: number }) {
                 : t('live.going', { count: s.participants })}
             </Text>
           </View>
+
+          {!s.hostedByMe && (
+            <View style={styles.actions}>
+              {left.has(s.id) && <Text style={styles.meta}>{t('live.leftNotice')}</Text>}
+              <TouchableOpacity
+                style={[styles.btn, !left.has(s.id) && styles.btnDanger, busyId === s.id && { opacity: 0.5 }]}
+                onPress={() => toggleGoing(s)} disabled={busyId === s.id}
+                accessibilityRole="button" accessibilityState={{ selected: !left.has(s.id), busy: busyId === s.id }}>
+                <Ionicons name={left.has(s.id) ? 'checkmark-circle-outline' : 'close-circle-outline'} size={18}
+                          color={left.has(s.id) ? Palette.ink : Palette.danger} />
+                <Text style={[styles.btnText, !left.has(s.id) && { color: Palette.danger }]}>
+                  {left.has(s.id) ? t('live.join') : t('live.notGoing')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {s.hostedByMe && (
             <View style={styles.actions}>

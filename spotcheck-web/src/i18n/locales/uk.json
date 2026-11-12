@@ -372,7 +372,9 @@
     "editNotice": "Усі, хто записався, отримають сповіщення.",
     "cancelNotice": "Усі, хто записався, отримають сповіщення.",
     "othersGoing": "Ідуть: {{count}}",
-    "nobodyYet": "Поки ніхто не записався"
+    "nobodyYet": "Поки ніхто не записався",
+    "notGoing": "Більше не піду",
+    "leftNotice": "Ти не підеш. Передумав?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

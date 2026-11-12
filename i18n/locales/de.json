@@ -372,7 +372,9 @@
     "editNotice": "Alle, die kommen, werden benachrichtigt.",
     "cancelNotice": "Alle, die kommen, werden benachrichtigt.",
     "othersGoing": "Dabei: {{count}}",
-    "nobodyYet": "Noch niemand dabei"
+    "nobodyYet": "Noch niemand dabei",
+    "notGoing": "Ich komme doch nicht",
+    "leftNotice": "Du kommst nicht. Doch umentschieden?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

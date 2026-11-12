@@ -372,7 +372,9 @@
     "editNotice": "Mọi người tham gia sẽ được thông báo.",
     "cancelNotice": "Mọi người tham gia sẽ được thông báo.",
     "othersGoing": "Tham gia: {{count}}",
-    "nobodyYet": "Chưa ai tham gia"
+    "nobodyYet": "Chưa ai tham gia",
+    "notGoing": "Không đi nữa",
+    "leftNotice": "Bạn không đi. Đổi ý à?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

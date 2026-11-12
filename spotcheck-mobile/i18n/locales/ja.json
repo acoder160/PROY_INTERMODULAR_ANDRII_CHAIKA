@@ -372,7 +372,9 @@
     "editNotice": "参加者全員に通知されます。",
     "cancelNotice": "参加者全員に通知されます。",
     "othersGoing": "参加: {{count}}人",
-    "nobodyYet": "まだ参加者はいません"
+    "nobodyYet": "まだ参加者はいません",
+    "notGoing": "やっぱり行かない",
+    "leftNotice": "参加しません。気が変わりましたか？"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

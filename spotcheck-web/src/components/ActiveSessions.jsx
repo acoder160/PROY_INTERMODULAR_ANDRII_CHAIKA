@@ -21,6 +21,9 @@ export default function ActiveSessions({ reloadKey }) {
   const [cancelling, setCancelling] = useState(null);
   const [error, setError] = useState(null);
   const [localKey, setLocalKey] = useState(0);
+  // Sessions you just left: they stay on the list so you can change your mind
+  const [left, setLeft] = useState(() => new Set());
+  const [busyId, setBusyId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -41,6 +44,27 @@ export default function ActiveSessions({ reloadKey }) {
     }
   };
 
+  const toggleGoing = async (s) => {
+    const leaving = !left.has(s.id);
+    setBusyId(s.id);
+    setError(null);
+    try {
+      const res = leaving ? await api.delete(`/sessions/${s.id}/join`) : await api.post(`/sessions/${s.id}/join`);
+      setSessions((list) => list.map((x) => (x.id === s.id
+        ? { ...x, participants: res.data?.participants ?? x.participants, people: res.data?.people ?? x.people }
+        : x)));
+      setLeft((prev) => {
+        const next = new Set(prev);
+        if (leaving) next.add(s.id); else next.delete(s.id);
+        return next;
+      });
+    } catch (err) {
+      setError(apiErrorText(err, t));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   if (sessions.length === 0) return null;
 
   // For your own sessions the list of who is coming leaves you out
@@ -58,7 +82,7 @@ export default function ActiveSessions({ reloadKey }) {
               {s.note && <span className="active-session-note">{s.note}</span>}
             </span>
             <span className={`my-session-tag${s.hostedByMe ? ' is-host' : ''}`}>
-              {s.hostedByMe ? t('live.hosting') : t('live.joined')}
+              {s.hostedByMe ? t('live.hosting') : left.has(s.id) ? t('live.notGoing') : t('live.joined')}
             </span>
           </Link>
 
@@ -72,6 +96,17 @@ export default function ActiveSessions({ reloadKey }) {
                 : t('live.going', { count: s.participants })}
             </span>
           </div>
+
+          {!s.hostedByMe && (
+            <div className="active-session-actions">
+              {left.has(s.id) && <span className="my-session-meta" role="status">{t('live.leftNotice')}</span>}
+              <button type="button"
+                      className={`btn-outline btn-small${left.has(s.id) ? '' : ' btn-danger-outline'}`}
+                      onClick={() => toggleGoing(s)} disabled={busyId === s.id} aria-pressed={!left.has(s.id)}>
+                {left.has(s.id) ? t('live.join') : t('live.notGoing')}
+              </button>
+            </div>
+          )}
 
           {s.hostedByMe && (
             <div className="active-session-actions">

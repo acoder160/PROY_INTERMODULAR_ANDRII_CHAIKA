@@ -372,7 +372,9 @@
     "editNotice": "Katılan herkes bilgilendirilecek.",
     "cancelNotice": "Katılan herkes bilgilendirilecek.",
     "othersGoing": "Gelenler: {{count}}",
-    "nobodyYet": "Henüz kimse katılmadı"
+    "nobodyYet": "Henüz kimse katılmadı",
+    "notGoing": "Artık gelmiyorum",
+    "leftNotice": "Gelmiyorsun. Fikrini mi değiştirdin?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

@@ -372,7 +372,9 @@
     "editNotice": "所有参加者都会收到通知。",
     "cancelNotice": "所有参加者都会收到通知。",
     "othersGoing": "参加：{{count}} 人",
-    "nobodyYet": "还没有人参加"
+    "nobodyYet": "还没有人参加",
+    "notGoing": "不去了",
+    "leftNotice": "你不去了。改变主意了？"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

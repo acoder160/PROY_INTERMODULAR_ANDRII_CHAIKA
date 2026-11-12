@@ -372,7 +372,9 @@
     "editNotice": "Iedereen die komt krijgt een melding.",
     "cancelNotice": "Iedereen die komt krijgt een melding.",
     "othersGoing": "Komen: {{count}}",
-    "nobodyYet": "Nog niemand aangemeld"
+    "nobodyYet": "Nog niemand aangemeld",
+    "notGoing": "Ik ga toch niet",
+    "leftNotice": "Je gaat niet. Toch van gedachten veranderd?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

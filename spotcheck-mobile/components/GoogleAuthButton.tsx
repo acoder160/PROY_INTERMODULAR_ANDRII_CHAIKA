@@ -3,9 +3,12 @@ import { ActivityIndicator, Platform, StyleSheet, Text, TouchableOpacity, View }
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
-import { startGoogleBrowserSignIn } from '../utils/googleBrowserSignIn';
+import {
+  exchangeGoogleBrowserCode,
+  leaveAuthScreens,
+  startGoogleBrowserSignIn,
+} from '../utils/googleBrowserSignIn';
 import { DisplayFont, Palette } from '../constants/theme';
 
 /**
@@ -34,17 +37,18 @@ export default function GoogleAuthButton() {
     const result = await startGoogleBrowserSignIn();
     if (result.type === 'cancel') return null;
     if (result.type === 'error') throw new Error(`Google browser sign-in: ${result.error}`);
-    return api.post('/auth/google/exchange', { code: result.code, verifier: result.verifier });
+    return exchangeGoogleBrowserCode(result.code, result.attempt, result.verifier);
   };
 
   const handlePress = async () => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await signIn();
-      if (!response) return;
-      await login(response.data.username, response.data.token, response.data.refreshToken, response.data.role);
-      router.replace('/(tabs)');
+      const session = await signIn();
+      if (!session) return;
+      await login(session.username, session.token, session.refreshToken, session.role);
+      console.log('Google sign-in: signed in as', session.username);
+      leaveAuthScreens(router);
     } catch (e: any) {
       console.log('Google sign-in failed:', e?.response?.status ?? e?.code ?? e?.message, e?.response?.data ?? '');
       // A request with no response means no connection; anything else is a Google or server error

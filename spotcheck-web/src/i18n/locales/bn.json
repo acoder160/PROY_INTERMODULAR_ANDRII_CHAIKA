@@ -372,7 +372,9 @@
     "editNotice": "যারা আসছে সবাই বিজ্ঞপ্তি পাবে।",
     "cancelNotice": "যারা আসছে সবাই বিজ্ঞপ্তি পাবে।",
     "othersGoing": "আসছে: {{count}}",
-    "nobodyYet": "এখনও কেউ যোগ দেয়নি"
+    "nobodyYet": "এখনও কেউ যোগ দেয়নি",
+    "notGoing": "আর যাব না",
+    "leftNotice": "আপনি যাচ্ছেন না। মত বদলেছেন?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

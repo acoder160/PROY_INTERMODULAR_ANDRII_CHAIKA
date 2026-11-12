@@ -372,7 +372,9 @@
     "editNotice": "Tous les participants seront prévenus.",
     "cancelNotice": "Tous les participants seront prévenus.",
     "othersGoing": "Participants : {{count}}",
-    "nobodyYet": "Personne n’est encore inscrit"
+    "nobodyYet": "Personne n’est encore inscrit",
+    "notGoing": "Je n'y vais plus",
+    "leftNotice": "Tu n'y vas pas. Tu as changé d'avis ?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

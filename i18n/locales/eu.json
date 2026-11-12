@@ -372,7 +372,9 @@
     "editNotice": "Izena eman duten guztiei jakinaraziko zaie.",
     "cancelNotice": "Izena eman duten guztiei jakinaraziko zaie.",
     "othersGoing": "Doaz: {{count}}",
-    "nobodyYet": "Oraindik inork ez du izena eman"
+    "nobodyYet": "Oraindik inork ez du izena eman",
+    "notGoing": "Ez noa jada",
+    "leftNotice": "Ez zoaz. Iritziz aldatu duzu?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"

@@ -372,7 +372,9 @@
     "editNotice": "참가자 모두에게 알림이 갑니다.",
     "cancelNotice": "참가자 모두에게 알림이 갑니다.",
     "othersGoing": "참가: {{count}}명",
-    "nobodyYet": "아직 참가자가 없습니다"
+    "nobodyYet": "아직 참가자가 없습니다",
+    "notGoing": "안 갈래요",
+    "leftNotice": "참여하지 않아요. 마음이 바뀌었나요?"
   },
   "ai": {
     "suggesting": "AI is filling in the details from your photo…"
